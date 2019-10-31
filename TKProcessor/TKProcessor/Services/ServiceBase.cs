@@ -86,7 +86,7 @@ namespace TKProcessor.Services
             else
             {
                 entity.Id = existing.Id;
-
+                entity.IsActive = true;
                 entity.LastModifiedBy = CurrentUser;
                 entity.LastModifiedOn = DateTime.Now;
 

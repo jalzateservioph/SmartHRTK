@@ -124,7 +124,7 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
-        public bool CanSave { get => CurrentItem.IsValid; }
+        //public bool CanSave { get => CurrentItem?.IsValid ?? false; }
 
         public void Save()
         {
@@ -133,7 +133,7 @@ namespace TKProcessor.WPF.ViewModels
             try
             {
 
-                if(string.IsNullOrEmpty(CurrentItem.ShiftCode))
+                if (string.IsNullOrEmpty(CurrentItem.ShiftCode))
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without shift code", MessageType.Success));
 
                 if (CurrentItem.ScheduleIn == null)
@@ -170,18 +170,17 @@ namespace TKProcessor.WPF.ViewModels
         {
             StartProcessing();
 
+            CurrentItem = new Shift();
+
             using (var globalSettingsService = new GlobalSettingsService())
             {
                 var a = globalSettingsService.List().Select(i => new { i.DefaultNDStart, i.DefaultNDEnd }).FirstOrDefault();
 
                 if (a != null)
                 {
-                    CurrentItem = new Shift()
-                    {
-                        IsDirty = false,
-                        NightDiffStart = a.DefaultNDStart,
-                        NightDiffEnd = a.DefaultNDEnd
-                    };
+                    CurrentItem.IsDirty = false;
+                    CurrentItem.NightDiffStart = a.DefaultNDStart;
+                    CurrentItem.NightDiffEnd = a.DefaultNDEnd;
                 }
             }
 

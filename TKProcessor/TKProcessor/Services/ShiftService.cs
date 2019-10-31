@@ -29,7 +29,7 @@ namespace TKProcessor.Services
         {
             try
             {
-                var existing = Context.Shift.FirstOrDefault(i => i.ShiftCode == entity.ShiftCode);
+                var existing = Context.Shift.FirstOrDefault(i => i.Id == entity.Id || i.ShiftCode == entity.ShiftCode);
 
                 if (existing != default(Shift))
                     entity.Id = existing.Id;

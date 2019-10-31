@@ -56,12 +56,8 @@ namespace TKProcessor.WPF.Models
         private DateTime? _latestTimeOut;
         private int _increment;
 
-        public Shift()
+        public Shift() : base()
         {
-            IsDirty = false;
-
-            IsValid = true;
-
             PropertyChanged += Shift_PropertyChanged;
         }
 

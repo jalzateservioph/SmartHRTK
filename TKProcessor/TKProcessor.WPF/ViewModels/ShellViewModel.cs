@@ -84,17 +84,11 @@ namespace TKProcessor.WPF.ViewModels
 
                     HasStartupMessage = false;
                 }
-                catch (SqlException ex) when (ex.ErrorCode == 26)
-                {
-                    verifying = false;
-
-                    StartupMessage = $"Cannot connect to Timekeeping SQL server. Please check connection settings.";
-                }
                 catch (Exception ex)
                 {
                     verifying = false;
 
-                    StartupMessage = $"{ex.Message} Please check connection settings.";
+                    StartupMessage = ex.Message;
                 }
             });
 
