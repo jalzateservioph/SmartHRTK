@@ -23,9 +23,11 @@ namespace TKProcessor.Services
         protected IEnumerable<Leave> Leaves;
 
         #region Initialization
+        protected decimal requiredWorkHours = 0;
         protected decimal leaveDuration = 0;
         protected DateTime actualTimeIn;
         protected DateTime actualTimeOut;
+        protected decimal regularWorkHours = 0;
         protected decimal totalBreak = 0;
         protected decimal workHours = 0;
         protected decimal totalOvertime = 0;
@@ -147,6 +149,7 @@ namespace TKProcessor.Services
 
         protected void MapFieldsToDTR()
         {
+            DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2);
             DTR.WorkHours = Math.Round(workHours / 60, 2);
             DTR.ApprovedLate = DTR.ActualLate = Math.Round(late / 60, 2);
             DTR.ApprovedOvertime = DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2);
@@ -200,6 +203,17 @@ namespace TKProcessor.Services
             if (Leaves.Count() > 0)
             {
                 leaveDuration = Leaves.OrderByDescending(e => e.LeaveHours).FirstOrDefault().LeaveHours;
+            }
+        }
+        protected void GetRequiredWorkHours()
+        {
+            if (DTR.Shift.RequiredWorkHours.HasValue)
+            {
+                requiredWorkHours = DTR.Shift.RequiredWorkHours.Value;
+            }
+            else
+            {
+                requiredWorkHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value - DTR.Shift.ScheduleIn.Value).TotalMinutes - totalBreak) / 60, 2);
             }
         }
     }

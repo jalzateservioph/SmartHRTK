@@ -15,6 +15,7 @@ namespace TKProcessor.Services
             Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
             GetLeaveDuration();
+            GetRequiredWorkHours();
             expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
         }
@@ -26,6 +27,7 @@ namespace TKProcessor.Services
             this.Holidays = holidays;
             totalBreak = GetTotalBreakDuration();
             GetLeaveDuration();
+            GetRequiredWorkHours();
             expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
         }
@@ -41,6 +43,15 @@ namespace TKProcessor.Services
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 AdjustWorkHours();
+
+                if (workHours > requiredWorkHours)
+                {
+                    regularWorkHours = requiredWorkHours;
+                }
+                else
+                {
+                    regularWorkHours = workHours;
+                }
 
                 if (expectedTimeOut < expectedTimeIn)
                 {
@@ -285,6 +296,15 @@ namespace TKProcessor.Services
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 AdjustWorkHours();
+
+                if (workHours > requiredWorkHours)
+                {
+                    regularWorkHours = requiredWorkHours;
+                }
+                else
+                {
+                    regularWorkHours = workHours;
+                }
 
                 if (expectedTimeOut < expectedTimeIn)
                 {

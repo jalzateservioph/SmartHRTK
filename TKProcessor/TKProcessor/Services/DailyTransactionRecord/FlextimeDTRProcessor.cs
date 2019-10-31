@@ -13,6 +13,7 @@ namespace TKProcessor.Services
             Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
             GetLeaveDuration();
+            GetRequiredWorkHours();
         }
 
         public FlextimeDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves, IEnumerable<Holiday> holidays) : base()
@@ -22,6 +23,7 @@ namespace TKProcessor.Services
             Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
             GetLeaveDuration();
+            GetRequiredWorkHours();
         }
 
 
@@ -30,13 +32,22 @@ namespace TKProcessor.Services
         {
             if (leaveDuration == 1M || leaveDuration == 0.5M)
             {
-                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+                workHours = requiredWorkHours * leaveDuration;
             }
             else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
                 AdjustWorkHours();
+
+                if (workHours > requiredWorkHours)
+                {
+                    regularWorkHours = requiredWorkHours;
+                }
+                else
+                {
+                    regularWorkHours = workHours;
+                }
 
                 #region Full Flex
                 if (DTR.Shift.FlextimeType.Value == (int)FlextimeType.Full)
@@ -61,7 +72,7 @@ namespace TKProcessor.Services
             }
             else
             {
-                absentHours = (decimal)(DTR.Shift.RequiredWorkHours * 60);
+                absentHours = (decimal)(requiredWorkHours * 60);
             }
 
     
@@ -72,12 +83,21 @@ namespace TKProcessor.Services
         {
             if (leaveDuration == 1M || leaveDuration == 0.5M)
             {
-                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+                workHours = requiredWorkHours * leaveDuration;
             }
             else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
                 AdjustWorkHours();
+
+                if (workHours > requiredWorkHours)
+                {
+                    regularWorkHours = requiredWorkHours;
+                }
+                else
+                {
+                    regularWorkHours = workHours;
+                }
 
                 bool isLegalHoliday = false;
                 bool isSpecialHoliday = false;
@@ -189,7 +209,7 @@ namespace TKProcessor.Services
             {
                 if (!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false)
                 {
-                    absentHours = DTR.Shift.RequiredWorkHours.Value * 60;
+                    absentHours = requiredWorkHours * 60;
                 }
             }
 
@@ -198,17 +218,17 @@ namespace TKProcessor.Services
 
         private void FullFlex()
         {
-            DateTime expectedTimeOut = actualTimeIn.AddMinutes((double)(DTR.Shift.RequiredWorkHours.Value + totalBreak));
+            DateTime expectedTimeOut = actualTimeIn.AddMinutes((double)(requiredWorkHours + totalBreak));
 
             #region Undertime
             if (DTR.Shift.IsEarlyOut == true)
             {
                 int gracePeriodMinutes = 0;
                 if (DTR.Shift.GracePeriodEarlyOut.HasValue) gracePeriodMinutes = DTR.Shift.GracePeriodEarlyOut.Value;
-                if (workHours < DTR.Shift.RequiredWorkHours.Value * 60)
+                if (workHours < requiredWorkHours * 60)
                 {
-                    undertime = (DTR.Shift.RequiredWorkHours.Value * 60) - workHours;
-                    if (workHours < (DTR.Shift.RequiredWorkHours * 60) - gracePeriodMinutes)
+                    undertime = (requiredWorkHours * 60) - workHours;
+                    if (workHours < (requiredWorkHours * 60) - gracePeriodMinutes)
                     {
                         approvedUndertime = undertime;
                     }
@@ -218,7 +238,7 @@ namespace TKProcessor.Services
                 {
                     if (undertime > DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.Value)
                     {
-                        absentHours = Math.Round((DTR.Shift.RequiredWorkHours.Value * 60) / 2, 2);
+                        absentHours = Math.Round((requiredWorkHours * 60) / 2, 2);
                         approvedUndertime = 0;
                     }
                 }
@@ -230,9 +250,9 @@ namespace TKProcessor.Services
             #region Post-Overtime
             if (DTR.Shift.IsPostShiftOt == true)
             {
-                if (workHours > DTR.Shift.RequiredWorkHours.Value * 60)
+                if (workHours > requiredWorkHours * 60)
                 {
-                    postShiftOvertime = workHours - (DTR.Shift.RequiredWorkHours.Value * 60);
+                    postShiftOvertime = workHours - (requiredWorkHours * 60);
                     approvedPostShiftOvertime = postShiftOvertime;
 
                     if (DTR.Shift.MinimumPostShiftOt.HasValue && postShiftOvertime < DTR.Shift.MinimumPostShiftOt.Value)
@@ -331,7 +351,7 @@ namespace TKProcessor.Services
 
             //DateTime earliestOut = new DateTime(DTR.TimeIn.Value.Year, DTR.TimeIn.Value.Month, DTR.TimeIn.Value.Day).AddHours((double) DTR.Shift.RequiredWorkHours.Value + (double) totalBreak);
             DateTime expectedTimeOut = actualTimeIn //Time in
-                .AddMinutes((double)((DTR.Shift.RequiredWorkHours.Value * 60) + totalBreak)); //Required work hours + total break
+                .AddMinutes((double)((requiredWorkHours * 60) + totalBreak)); //Required work hours + total break
             var shiftEarliestTimeOut = DTR.Shift.EarliestTimeOut.Value;
             var shiftEarliestTimeIn = DTR.Shift.EarliestTimeIn.Value;
             DateTime earliestOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(shiftEarliestTimeOut.TimeOfDay);
@@ -419,7 +439,7 @@ namespace TKProcessor.Services
                 {
                     if (undertime > DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.Value)
                     {
-                        absentHours = Math.Round((DTR.Shift.RequiredWorkHours.Value * 60) / 2, 2);
+                        absentHours = Math.Round((requiredWorkHours * 60) / 2, 2);
                         approvedUndertime = 0;
                     }
                 }
@@ -428,7 +448,7 @@ namespace TKProcessor.Services
             #endregion
 
             #region Overtime
-            if (workHours > DTR.Shift.RequiredWorkHours.Value * 60)
+            if (workHours > requiredWorkHours * 60)
             {
                 #region Pre-Overtime
                 if (DTR.Shift.IsPreShiftOt == true)
@@ -628,7 +648,7 @@ namespace TKProcessor.Services
                         {
                             if (late > DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value)
                             {
-                                absentHours = Math.Round((DTR.Shift.RequiredWorkHours.Value * 60) / 2, 2);
+                                absentHours = Math.Round((requiredWorkHours * 60) / 2, 2);
                             }
                         }
                         #endregion
@@ -638,7 +658,7 @@ namespace TKProcessor.Services
             }
             #endregion
 
-            windowOut = windowIn.AddMinutes((double)((DTR.Shift.RequiredWorkHours.Value * 60) + totalBreak));
+            windowOut = windowIn.AddMinutes((double)((requiredWorkHours * 60) + totalBreak));
 
             #region Undertime
             if (DTR.Shift.IsEarlyOut == true)
@@ -665,7 +685,7 @@ namespace TKProcessor.Services
                 {
                     if (undertime > DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.Value)
                     {
-                        absentHours = Math.Round((DTR.Shift.RequiredWorkHours.Value * 60) / 2, 2);
+                        absentHours = Math.Round((requiredWorkHours * 60) / 2, 2);
                         approvedUndertime = 0;
                     }
                 }
@@ -674,7 +694,7 @@ namespace TKProcessor.Services
             #endregion
 
             #region Overtime
-            if (workHours > DTR.Shift.RequiredWorkHours.Value * 60)
+            if (workHours > requiredWorkHours * 60)
             {
                 #region Pre-Overtime
                 if (DTR.Shift.IsPreShiftOt == true)
