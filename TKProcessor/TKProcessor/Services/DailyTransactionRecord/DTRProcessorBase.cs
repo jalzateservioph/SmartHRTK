@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TKProcessor.Models.TK;
 using TKProcessor.Common;
+using System.Linq;
+
 namespace TKProcessor.Services
 {
     public interface IDTRProcessor
@@ -18,8 +20,10 @@ namespace TKProcessor.Services
 
         public DailyTransactionRecord DTR { get; set; }
         protected IEnumerable<Holiday> Holidays;
+        protected IEnumerable<Leave> Leaves;
 
         #region Initialization
+        protected decimal leaveDuration = 0;
         protected DateTime actualTimeIn;
         protected DateTime actualTimeOut;
         protected decimal totalBreak = 0;
@@ -189,6 +193,14 @@ namespace TKProcessor.Services
             DTR.ApprovedLegSpeHolRDot = DTR.ActualLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayOvertime / 60, 2);
             DTR.ApprovedNDLegSpeHolRD = DTR.ActualNDLegSpeHolRD = Math.Round(legalSpecialHolidayRestDayNightDifferential / 60, 2);
             DTR.ApprovedNDLegSpeHolRDot = DTR.ActualNDLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayNightDifferentialOvertime / 60, 2);
+        }
+
+        protected void GetLeaveDuration()
+        {
+            if (Leaves.Count() > 0)
+            {
+                leaveDuration = Leaves.OrderByDescending(e => e.LeaveHours).FirstOrDefault().LeaveHours;
+            }
         }
     }
 }

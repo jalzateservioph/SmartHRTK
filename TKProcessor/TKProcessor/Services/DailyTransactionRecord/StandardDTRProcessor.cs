@@ -9,26 +9,34 @@ namespace TKProcessor.Services
         DateTime expectedTimeIn;
         DateTime expectedTimeOut;
 
-        public StandardDTRProcessor(DailyTransactionRecord DTR) : base()
+        public StandardDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves) : base()
         {
             this.DTR = DTR;
+            Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
+            GetLeaveDuration();
             expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
         }
 
-        public StandardDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Holiday> holidays) : base()
+        public StandardDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves, IEnumerable<Holiday> holidays) : base()
         {
             this.DTR = DTR;
+            Leaves = leaves;
             this.Holidays = holidays;
             totalBreak = GetTotalBreakDuration();
+            GetLeaveDuration();
             expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
         }
 
         public void ComputeRegular()
         {
-            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (leaveDuration == 1M || leaveDuration == 0.5M)
+            {
+                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+            }
+            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
@@ -268,7 +276,11 @@ namespace TKProcessor.Services
 
         public void ComputeHolidayAndRestDay()
         {
-            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (leaveDuration == 1M || leaveDuration == 0.5M)
+            {
+                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+            }
+            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;

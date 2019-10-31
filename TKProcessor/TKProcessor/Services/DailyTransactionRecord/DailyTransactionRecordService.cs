@@ -16,11 +16,13 @@ namespace TKProcessor.Services
 
         IDTRProcessor processor;
         HolidayService holidayService;
+        LeaveService leaveService;
 
         public DailyTransactionRecordService(Guid userId) : base(userId)
         {
             dPContext = new DPContext();
             holidayService = new HolidayService();
+            leaveService = new LeaveService();
         }
 
         public IEnumerable<DailyTransactionRecord> List(DateTime start, DateTime end, string payrollCode)
@@ -157,28 +159,29 @@ namespace TKProcessor.Services
                             };
 
                             IEnumerable<Holiday> holidays = null;
-
+                            IEnumerable<Leave> leaves = null;
                             if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
                             {
                                 holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
-
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
                             }
                             else if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleOut)
                             {
                                 holidays = holidayService.GetHolidays(DTR.TimeOut ?? DTR.Shift.ScheduleOut.Value);
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
                             }
 
                             if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                             {
                                 if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
                                 {
-                                    processor = new StandardDTRProcessor(DTR, holidays);
+                                    processor = new StandardDTRProcessor(DTR, leaves, holidays);
                                     processor.ComputeHolidayAndRestDay();
                                     DTR = processor.DTR;
                                 }
                                 else
                                 {
-                                    processor = new StandardDTRProcessor(DTR);
+                                    processor = new StandardDTRProcessor(DTR, leaves);
                                     processor.ComputeRegular();
                                     DTR = processor.DTR;
                                 }
@@ -187,13 +190,13 @@ namespace TKProcessor.Services
                             {
                                 if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
                                 {
-                                    processor = new FlextimeDTRProcessor(DTR, holidays);
+                                    processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
                                     processor.ComputeHolidayAndRestDay();
                                     DTR = processor.DTR;
                                 }
                                 else
                                 {
-                                    processor = new FlextimeDTRProcessor(DTR);
+                                    processor = new FlextimeDTRProcessor(DTR, leaves);
                                     processor.ComputeRegular();
                                     DTR = processor.DTR;
                                 }

@@ -7,23 +7,32 @@ namespace TKProcessor.Services
 {
     public class FlextimeDTRProcessor : DTRProcessorBase, IDTRProcessor
     {
-     
-        public FlextimeDTRProcessor(DailyTransactionRecord DTR) : base()
+        public FlextimeDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves) : base()
         {
             this.DTR = DTR;
+            Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
+            GetLeaveDuration();
         }
 
-        public FlextimeDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Holiday> holidays) : base()
+        public FlextimeDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves, IEnumerable<Holiday> holidays) : base()
         {
             this.DTR = DTR;
             this.Holidays = holidays;
+            Leaves = leaves;
             totalBreak = GetTotalBreakDuration();
+            GetLeaveDuration();
         }
+
+
 
         public void ComputeRegular()
         {
-            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (leaveDuration == 1M || leaveDuration == 0.5M)
+            {
+                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+            }
+            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
@@ -54,13 +63,18 @@ namespace TKProcessor.Services
             {
                 absentHours = (decimal)(DTR.Shift.RequiredWorkHours * 60);
             }
+
     
             MapFieldsToDTR();
         }
 
         public void ComputeHolidayAndRestDay()
         {
-            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (leaveDuration == 1M || leaveDuration == 0.5M)
+            {
+                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+            }
+            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
                 AdjustWorkHours();
