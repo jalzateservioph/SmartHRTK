@@ -1,0 +1,326 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.EntityFrameworkCore.Design.2.2.6\build\net461\Microsoft.EntityFrameworkCore.Design.props" Condition="Exists('..\packages\Microsoft.EntityFrameworkCore.Design.2.2.6\build\net461\Microsoft.EntityFrameworkCore.Design.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{46CF0544-F0AF-448B-8F7A-01EE04ABCF09}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TKProcessor</RootNamespace>
+    <AssemblyName>TKProcessor</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AutoMapper, Version=9.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.9.0.0\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="ClosedXML, Version=0.94.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.0.94.2\lib\net46\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.7.2.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.7.2\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelNumberFormat, Version=1.0.3.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelNumberFormat.1.0.3\lib\net20\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="FastMember, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.3.0\lib\net45\FastMember.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.2.2.6\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Abstractions, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.Abstractions.2.2.6\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Design, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.Design.2.2.6\lib\net461\Microsoft.EntityFrameworkCore.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Relational, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.Relational.2.2.6\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.SqlServer.2.2.6\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.2.2.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion.Linq, Version=2.2.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Remotion.Linq.2.2.0\lib\net45\Remotion.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.2.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.6.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Data.SqlClient, Version=4.5.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.6.1\lib\net461\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Interactive.Async, Version=3.2.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.Async.3.2.0\lib\net46\System.Interactive.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Packaging, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Packaging.4.0.0\lib\net46\System.IO.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.1\lib\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.4.6.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Permissions.4.6.0\lib\net461\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.4.6.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contexts\DPContext.cs" />
+    <Compile Include="Contexts\SHRContext.cs" />
+    <Compile Include="Contexts\TKContext.cs" />
+    <Compile Include="Migrations\20191004152753_InitialCreate.cs" />
+    <Compile Include="Migrations\20191004152753_InitialCreate.designer.cs">
+      <DependentUpon>20191004152753_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191005095309_UpdateRawDataRemovedScheduleDate.cs" />
+    <Compile Include="Migrations\20191005095309_UpdateRawDataRemovedScheduleDate.designer.cs">
+      <DependentUpon>20191005095309_UpdateRawDataRemovedScheduleDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191007063543_UpdateShiftAddNDFields.cs" />
+    <Compile Include="Migrations\20191007063543_UpdateShiftAddNDFields.designer.cs">
+      <DependentUpon>20191007063543_UpdateShiftAddNDFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191008000617_UpdateModelsWorkScheduleShiftField.cs" />
+    <Compile Include="Migrations\20191008000617_UpdateModelsWorkScheduleShiftField.designer.cs">
+      <DependentUpon>20191008000617_UpdateModelsWorkScheduleShiftField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191009082538_UpdateDTRModelFieldNames.cs" />
+    <Compile Include="Migrations\20191009082538_UpdateDTRModelFieldNames.designer.cs">
+      <DependentUpon>20191009082538_UpdateDTRModelFieldNames.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191009082854_UpdateDTRModelFieldNames2.cs" />
+    <Compile Include="Migrations\20191009082854_UpdateDTRModelFieldNames2.designer.cs">
+      <DependentUpon>20191009082854_UpdateDTRModelFieldNames2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191009084846_UpdateDTRShiftReference.cs" />
+    <Compile Include="Migrations\20191009084846_UpdateDTRShiftReference.designer.cs">
+      <DependentUpon>20191009084846_UpdateDTRShiftReference.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191010111216_UpdateEmployeeAddJobGradeBandField.cs" />
+    <Compile Include="Migrations\20191010111216_UpdateEmployeeAddJobGradeBandField.designer.cs">
+      <DependentUpon>20191010111216_UpdateEmployeeAddJobGradeBandField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191011005806_UpdateGlobalSettingsFields.cs" />
+    <Compile Include="Migrations\20191011005806_UpdateGlobalSettingsFields.designer.cs">
+      <DependentUpon>20191011005806_UpdateGlobalSettingsFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191011022832_UpdateDTRFields.cs" />
+    <Compile Include="Migrations\20191011022832_UpdateDTRFields.designer.cs">
+      <DependentUpon>20191011022832_UpdateDTRFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191011030232_AddedMappingTable.cs" />
+    <Compile Include="Migrations\20191011030232_AddedMappingTable.designer.cs">
+      <DependentUpon>20191011030232_AddedMappingTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191011031248_UpdateGlobalSettingsPayrollCodeMappingsField.cs" />
+    <Compile Include="Migrations\20191011031248_UpdateGlobalSettingsPayrollCodeMappingsField.designer.cs">
+      <DependentUpon>20191011031248_UpdateGlobalSettingsPayrollCodeMappingsField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191016081610_UpdateShiftEntity.cs" />
+    <Compile Include="Migrations\20191016081610_UpdateShiftEntity.designer.cs">
+      <DependentUpon>20191016081610_UpdateShiftEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191017024302_UpdateHolidayEntity.cs" />
+    <Compile Include="Migrations\20191017024302_UpdateHolidayEntity.designer.cs">
+      <DependentUpon>20191017024302_UpdateHolidayEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191017064427_GlobalSettingsAddNewField.cs" />
+    <Compile Include="Migrations\20191017064427_GlobalSettingsAddNewField.designer.cs">
+      <DependentUpon>20191017064427_GlobalSettingsAddNewField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191017075213_GlobalSettingsAddNewFieldPayPackageMappings.cs" />
+    <Compile Include="Migrations\20191017075213_GlobalSettingsAddNewFieldPayPackageMappings.designer.cs">
+      <DependentUpon>20191017075213_GlobalSettingsAddNewFieldPayPackageMappings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191017093547_UpdateMappingTableAddOrderCol.cs" />
+    <Compile Include="Migrations\20191017093547_UpdateMappingTableAddOrderCol.designer.cs">
+      <DependentUpon>20191017093547_UpdateMappingTableAddOrderCol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191025203408_UpdateModelsAddFiedIsActive.cs" />
+    <Compile Include="Migrations\20191025203408_UpdateModelsAddFiedIsActive.designer.cs">
+      <DependentUpon>20191025203408_UpdateModelsAddFiedIsActive.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191029091313_UpdateRawDataAddScheduleDate.cs" />
+    <Compile Include="Migrations\20191029091313_UpdateRawDataAddScheduleDate.designer.cs">
+      <DependentUpon>20191029091313_UpdateRawDataAddScheduleDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191030104935_UpdateDTRRenameNDLEGHOLOT.cs" />
+    <Compile Include="Migrations\20191030104935_UpdateDTRRenameNDLEGHOLOT.designer.cs">
+      <DependentUpon>20191030104935_UpdateDTRRenameNDLEGHOLOT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191031031120_UpdateDTRFieldsActualNDLegHolRDot.cs" />
+    <Compile Include="Migrations\20191031031120_UpdateDTRFieldsActualNDLegHolRDot.designer.cs">
+      <DependentUpon>20191031031120_UpdateDTRFieldsActualNDLegHolRDot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\TKContextModelSnapshot.cs" />
+    <Compile Include="Models\DP\Company.cs" />
+    <Compile Include="Models\DP\Country.cs" />
+    <Compile Include="Models\DP\GscuserSecurity.cs" />
+    <Compile Include="Models\DP\PayFreqCalendar.cs" />
+    <Compile Include="Models\DP\PayPackage.cs" />
+    <Compile Include="Models\DP\PayPackagePayFreqCalendars.cs" />
+    <Compile Include="Models\DP\PayrollCode.cs" />
+    <Compile Include="Models\DP\PayrollTrx.cs" />
+    <Compile Include="Models\DP\PayrollTrxHist.cs" />
+    <Compile Include="Models\DP\PayrollTrxLines.cs" />
+    <Compile Include="Models\DP\PayrollTrxVoid.cs" />
+    <Compile Include="Models\IModel.cs" />
+    <Compile Include="Models\SHR\JobGradeBandLu.cs" />
+    <Compile Include="Models\SHR\Leave.cs" />
+    <Compile Include="Models\SHR\Personnel.cs" />
+    <Compile Include="Models\SHR\Personnel1.cs" />
+    <Compile Include="Models\TK\AuditLog.cs" />
+    <Compile Include="Models\TK\DailyTransactionRecord.cs" />
+    <Compile Include="Models\TK\Employee.cs" />
+    <Compile Include="Models\TK\ErrorLog.cs" />
+    <Compile Include="Models\TK\GlobalSetting.cs" />
+    <Compile Include="Models\TK\Holiday.cs" />
+    <Compile Include="Models\TK\ImportLog.cs" />
+    <Compile Include="Models\TK\Leave.cs" />
+    <Compile Include="Models\TK\Mapping.cs" />
+    <Compile Include="Models\TK\RawData.cs" />
+    <Compile Include="Models\TK\Shift.cs" />
+    <Compile Include="Models\TK\User.cs" />
+    <Compile Include="Models\TK\WorkSchedule.cs" />
+    <Compile Include="Models\TK\WorkScheduleAdjustment.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AbsenceReportService.cs" />
+    <Compile Include="Services\DailyTransactionRecord\DailyTransactionRecordService.cs" />
+    <Compile Include="Services\DailyTransactionRecord\DTRProcessorBase.cs" />
+    <Compile Include="Services\DailyTransactionRecord\FlextimeDTRProcessor.cs" />
+    <Compile Include="Services\DailyTransactionRecord\StandardDTRProcessor.cs" />
+    <Compile Include="Services\DatabaseService.cs" />
+    <Compile Include="Services\ErrorLogService.cs" />
+    <Compile Include="Services\GlobalSettingsService.cs" />
+    <Compile Include="Services\HolidayService.cs" />
+    <Compile Include="Services\LeaveService.cs" />
+    <Compile Include="Services\PayrollCodeService.cs" />
+    <Compile Include="Services\UserService.cs" />
+    <Compile Include="Services\EmployeeService.cs" />
+    <Compile Include="Services\RawDataService.cs" />
+    <Compile Include="Services\ServiceBase.cs" />
+    <Compile Include="Services\ShiftService.cs" />
+    <Compile Include="Services\WorkScheduleService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TKProcessor.Common\TKProcessor.Common.csproj">
+      <Project>{FC281C27-5DC5-431D-9176-86E3EC953077}</Project>
+      <Name>TKProcessor.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.EntityFrameworkCore.Design.2.2.6\build\net461\Microsoft.EntityFrameworkCore.Design.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.EntityFrameworkCore.Design.2.2.6\build\net461\Microsoft.EntityFrameworkCore.Design.props'))" />
+  </Target>
+</Project>

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="TKProcessor.WPF.Views.ReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:rv="clr-namespace:Microsoft.Reporting.WinForms;assembly=Microsoft.ReportViewer.WinForms"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Report" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top"/>
+        <ComboBox Margin="50,0,0,0" VerticalAlignment="Top" Height="26" ItemsSource="{Binding Items}" 
+                  SelectedItem="{Binding ActiveItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"
+                  cal:Message.Attach="[Event SelectionChanged] = [Action SelectionChanged]"/>
+
+        <WindowsFormsHost Grid.Row="1" Margin="0,10,0,0">
+            <rv:ReportViewer x:Name="reportViewer" />
+        </WindowsFormsHost>
+        
+    </Grid>
+</UserControl>
