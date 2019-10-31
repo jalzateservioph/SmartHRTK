@@ -174,6 +174,11 @@ namespace TKProcessor.WPF.ViewModels
             ChangeActiveItem(new ErrorLogsViewModel(eventAggregator, windowManager), true);
         }
 
+        public void ExitApplication()
+        {
+            App.Current.Shutdown();
+        }
+
         public void ShowReports()
         {
             ChangeActiveItem(new ReportViewModel(), true);
@@ -234,7 +239,6 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
-
         public bool IsLoggedIn
         {
             get => _isLoggedIn;
@@ -244,7 +248,6 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
-
         public string StartupMessage
         {
             get => _startupMessage;

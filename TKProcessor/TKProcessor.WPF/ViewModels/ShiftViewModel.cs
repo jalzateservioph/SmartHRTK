@@ -133,6 +133,18 @@ namespace TKProcessor.WPF.ViewModels
             try
             {
 
+                if(string.IsNullOrEmpty(CurrentItem.ShiftCode))
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without shift code", MessageType.Success));
+
+                if (CurrentItem.ScheduleIn == null)
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without schedule in", MessageType.Success));
+
+                if (CurrentItem.ScheduleOut == null)
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without schedule out", MessageType.Success));
+
+                if (CurrentItem.RequiredWorkHours == 0)
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without required work hours", MessageType.Success));
+
                 service.Save(mapper.Map<TKModels.Shift>(CurrentItem));
 
                 if (Items.Any(i => i.Id == CurrentItem.Id))
