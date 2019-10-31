@@ -81,20 +81,6 @@ namespace TKProcessor.Services
 
         public void ComputeHolidayAndRestDay()
         {
-            bool isLegalHoliday = false;
-            bool isSpecialHoliday = false;
-            bool isRestDay = false;
-
-            if (Holidays != null)
-            {
-                foreach (var holiday in Holidays)
-                {
-                    if (holiday.Type == (int)HolidayType.Legal) isLegalHoliday = true;
-                    if (holiday.Type == (int)HolidayType.Special) isSpecialHoliday = true;
-                }
-            }
-
-            if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
 
             if (leaveDuration == 1M || leaveDuration == 0.5M)
             {
@@ -129,34 +115,16 @@ namespace TKProcessor.Services
 
                 if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
 
-                #region Full Flex
-                if (DTR.Shift.FlextimeType.Value == (int)FlextimeType.Full)
-                {
-                    FullFlex();
-                }
-                #endregion
-
-                #region Semi - On the dot
-                else if (DTR.Shift.FlextimeType.Value == (int)FlextimeType.SemiOnTheDot)
-                {
-                    SemiOnTheDot();
-                }
-                #endregion
-
-                #region Semi - Fixed Increments
-                else if (DTR.Shift.FlextimeType.Value == (int)FlextimeType.SemiFixedIncrements)
-                {
-                    SemiFixedIncrements();
-                }
-                #endregion
 
                 #region Legal and Special Holiday plus Rest Day
                 if (isLegalHoliday && isSpecialHoliday && isRestDay)
                 {
                     legalSpecialHolidayRestDay = workHours;
                     legalSpecialHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
                     legalSpecialHolidayRestDayNightDifferential = nightDifferential;
                     legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -165,8 +133,10 @@ namespace TKProcessor.Services
                 {
                     legalSpecialHoliday = workHours;
                     legalSpecialHolidayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayOvertime = approvedOvertime;
                     legalSpecialHolidayNightDifferential = nightDifferential;
                     legalSpecialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -175,8 +145,10 @@ namespace TKProcessor.Services
                 {
                     specialHolidayRestDay = workHours;
                     specialHolidayRestDayOvertime = totalOvertime;
+                    approvedSpecialHolidayRestDayOvertime = approvedOvertime;
                     specialHolidayRestDayNightDifferential = nightDifferential;
                     specialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -185,8 +157,10 @@ namespace TKProcessor.Services
                 {
                     legalHolidayRestDay = workHours;
                     legalHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalHolidayRestDayOvertime = approvedOvertime;
                     legalHolidayRestDayNightDifferential = nightDifferential;
                     legalHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -195,8 +169,10 @@ namespace TKProcessor.Services
                 {
                     legalHoliday = workHours;
                     legalHolidayOvertime = totalOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
                     legalHolidayNightDifferential = nightDifferential;
                     legalHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -205,8 +181,10 @@ namespace TKProcessor.Services
                 {
                     specialHoliday = workHours;
                     specialHolidayOvertime = totalOvertime;
+                    approvedSpecialHolidayOvertime = approvedOvertime;
                     specialHolidayNightDifferential = nightDifferential;
                     specialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -215,8 +193,10 @@ namespace TKProcessor.Services
                 {
                     restDay = workHours;
                     restDayOvertime = totalOvertime;
+                    approvedRestDayOvertime = approvedOvertime;
                     restDayNightDifferential = nightDifferential;
                     restDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
             }
@@ -227,89 +207,8 @@ namespace TKProcessor.Services
                     absentHours = requiredWorkHours * 60;
                 }
             }
-            #region Legal and Special Holiday plus Rest Day
-            if (isLegalHoliday && isSpecialHoliday && isRestDay)
-            {
-                legalSpecialHolidayRestDay = workHours;
-                legalSpecialHolidayRestDayOvertime = totalOvertime;
-                approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
-                legalSpecialHolidayRestDayNightDifferential = nightDifferential;
-                legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
 
-            #region Legal and Special Holiday
-            else if (isLegalHoliday && isSpecialHoliday)
-            {
-                legalSpecialHoliday = workHours;
-                legalSpecialHolidayOvertime = totalOvertime;
-                approvedLegalSpecialHolidayOvertime = approvedOvertime;
-                legalSpecialHolidayNightDifferential = nightDifferential;
-                legalSpecialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
 
-            #region Special Holiday and Rest Day
-            else if (isSpecialHoliday && isRestDay)
-            {
-                specialHolidayRestDay = workHours;
-                specialHolidayRestDayOvertime = totalOvertime;
-                approvedSpecialHolidayRestDayOvertime = approvedOvertime;
-                specialHolidayRestDayNightDifferential = nightDifferential;
-                specialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
-
-            #region Legal Holiday and Rest Day
-            else if (isLegalHoliday && isRestDay)
-            {
-                legalHolidayRestDay = workHours;
-                legalHolidayRestDayOvertime = totalOvertime;
-                approvedLegalHolidayRestDayOvertime = approvedOvertime;
-                legalHolidayRestDayNightDifferential = nightDifferential;
-                legalHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedLegalHolidayRestDayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
-
-            #region Legal Holiday
-            else if (isLegalHoliday)
-            {
-                legalHoliday = workHours;
-                legalHolidayOvertime = totalOvertime;
-                approvedLegalHolidayOvertime = approvedOvertime;
-                legalHolidayNightDifferential = nightDifferential;
-                legalHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedLegalHolidayOvertime = approvedOvertime;
-            }
-            #endregion
-
-            #region Special Holiday
-            else if (isSpecialHoliday)
-            {
-                specialHoliday = workHours;
-                specialHolidayOvertime = totalOvertime;
-                approvedSpecialHolidayOvertime = approvedOvertime;
-                specialHolidayNightDifferential = nightDifferential;
-                specialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
-
-            #region Rest Day
-            else if (isRestDay)
-            {
-                restDay = workHours;
-                restDayOvertime = totalOvertime;
-                approvedRestDayOvertime = approvedOvertime;
-                restDayNightDifferential = nightDifferential;
-                restDayNightDifferentialOvertime = nightDifferentialOvertime;
-                approvedRestDayNightDifferentialOvertime = approvedOvertime;
-            }
-            #endregion
             MapFieldsToDTR();
         }
 
