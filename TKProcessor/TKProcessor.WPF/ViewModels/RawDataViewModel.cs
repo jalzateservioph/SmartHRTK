@@ -172,6 +172,12 @@ namespace TKProcessor.WPF.ViewModels
             return false;
         }
 
+        public override void Sort()
+        {
+            View.SortDescriptions.Add(new System.ComponentModel.SortDescription(nameof(RawData.ScheduleDate), System.ComponentModel.ListSortDirection.Descending));
+            View.SortDescriptions.Add(new System.ComponentModel.SortDescription(nameof(RawData.TransactionDateTime), System.ComponentModel.ListSortDirection.Ascending));
+        }
+
         public void Dispose()
         {
             service.Dispose();

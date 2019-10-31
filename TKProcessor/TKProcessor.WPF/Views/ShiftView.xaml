@@ -136,47 +136,47 @@
 
                 <!--Row 4-->
 
-                <Label Content="AM Break In:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="AM Break Start:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="4" Grid.Column="0" />
                 <xctk:TimePicker Grid.Row="4" Grid.Column="1" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.AmBreakIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <Label Content="AM Break Out:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
-                       Grid.Row="4" Grid.Column="2" />
-                <xctk:TimePicker Grid.Row="4" Grid.Column="3" Margin="0" VerticalAlignment="Center" 
                                  Value="{Binding CurrentItem.AmBreakOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Label Content="PM Break In:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="AM Break End:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                       Grid.Row="4" Grid.Column="2" />
+                <xctk:TimePicker Grid.Row="4" Grid.Column="3" Margin="0" VerticalAlignment="Center" 
+                                 Value="{Binding CurrentItem.AmBreakIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Label Content="PM Break Start:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="4" Grid.Column="4" />
                 <xctk:TimePicker Grid.Row="4" Grid.Column="5" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.PmBreakIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Value="{Binding CurrentItem.PmBreakOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Label Content="PM Break Out:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="PM Break End:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="4" Grid.Column="6" />
                 <xctk:TimePicker Grid.Row="4" Grid.Column="7" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.PmBreakOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Value="{Binding CurrentItem.PmBreakIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <!--Row 5-->
 
-                <Label Content="Lunch In:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="Lunch Start:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="5" Grid.Column="0" />
                 <xctk:TimePicker Grid.Row="5" Grid.Column="1" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.LunchIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <Label Content="Lunch Out:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
-                       Grid.Row="5" Grid.Column="2" />
-                <xctk:TimePicker Grid.Row="5" Grid.Column="3" Margin="0" VerticalAlignment="Center" 
                                  Value="{Binding CurrentItem.LunchOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Label Content="Dinner In:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="Lunch End:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                       Grid.Row="5" Grid.Column="2" />
+                <xctk:TimePicker Grid.Row="5" Grid.Column="3" Margin="0" VerticalAlignment="Center" 
+                                 Value="{Binding CurrentItem.LunchIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Label Content="Dinner Start:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="5" Grid.Column="4" />
                 <xctk:TimePicker Grid.Row="5" Grid.Column="5" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.DinnerIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Value="{Binding CurrentItem.DinnerOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Label Content="Dinner Out:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <Label Content="Dinner End:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
                        Grid.Row="5" Grid.Column="6" />
                 <xctk:TimePicker Grid.Row="5" Grid.Column="7" Margin="0" VerticalAlignment="Center" 
-                                 Value="{Binding CurrentItem.DinnerOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Value="{Binding CurrentItem.DinnerIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <!--Row 6-->
 
@@ -218,13 +218,13 @@
 
                 <!--Row 8-->
 
-                <Label HorizontalAlignment="Left" VerticalAlignment="Center"
+                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"
                     Grid.Row="8" Grid.Column="0" Margin="0" MaxWidth="100">
                     <TextBlock TextWrapping="WrapWithOverflow">
                         Is Plus Late In Minutes
                     </TextBlock>
                 </Label>
-                <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
+                <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Collapsed"
                     Grid.Row="8" Grid.Column="1" IsChecked="{Binding CurrentItem.IsPlusLateInMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Label HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -279,15 +279,15 @@
                                      Value="{Binding CurrentItem.DeductionOfEarlyOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <!--Row 11-->
-                
-                <Label HorizontalAlignment="Left" VerticalAlignment="Center"
+
+                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"
                     Grid.Row="11" Grid.Column="0" Margin="0" MaxWidth="100">
                     <TextBlock TextWrapping="WrapWithOverflow">
-                        Is Plus Late In Minutes
+                        Is Plus Early Out Minutes
                     </TextBlock>
                 </Label>
-                <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"
-                    Grid.Row="11" Grid.Column="1" IsChecked="{Binding CurrentItem.IsPlusLateInMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Collapsed"
+                    Grid.Row="11" Grid.Column="1" IsChecked="{Binding CurrentItem.IsPlusEarlyOutMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Label HorizontalAlignment="Left" VerticalAlignment="Center"
                     Grid.Row="11" Grid.Column="2" Margin="0" MaxWidth="100">

@@ -83,7 +83,7 @@ namespace TKProcessor.Services
                                                      row[columns[1]].ToString().ToLower() == "out" ? 2 :
                                                         int.Parse(row[columns[1]].ToString()),
                                 TransactionDateTime = DateTime.Parse(row[columns[2]].ToString()),
-                                ScheduleDate = DateTime.Parse(row[columns[3]].ToString())
+                                ScheduleDate = DateTime.Parse(row[columns[3]].ToString()).GetStartOfDay()
                             };
 
                             Save(importedRawData);

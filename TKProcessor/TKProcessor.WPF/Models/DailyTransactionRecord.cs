@@ -104,6 +104,7 @@ namespace TKProcessor.WPF.Models
         public DateTime? TransactionDate { get; set; }
         public DateTime? TimeIn { get; set; }
         public DateTime? TimeOut { get; set; }
+        public decimal RegularWorkHours { get;set; }
         public decimal WorkHours { get; set; }
         public decimal AbsentHours { get; set; }
         public decimal ActualLate
