@@ -60,15 +60,17 @@ namespace TKProcessor.Models.TK
     {
         Standard, Flex
     }
-    public enum FlextimeType 
+
+    public enum FlextimeType
     {
         Full, SemiOnTheDot, SemiFixedIncrements
     }
 
     public enum Increment
     {
-        HalfHour,WholeHour
+        HalfHour, WholeHour
     }
+
     public enum FocusDate
     {
         ScheduleIn, ScheduleOut

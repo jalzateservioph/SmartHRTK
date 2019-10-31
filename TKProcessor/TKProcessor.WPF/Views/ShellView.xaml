@@ -21,14 +21,14 @@
 
         <Menu Grid.Row="0" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
             <MenuItem Header="TK Processor">
-                <MenuItem Header="Users"/>
-                <MenuItem x:Name="GlobalSettings" Header="Settings"/>
+                <!--<MenuItem Header="Users"/>-->
+                <MenuItem x:Name="GlobalSettings" Header="Global Settings"/>
                 <Separator/>
                 <MenuItem x:Name="ShowErrorLogs" Header="Error Logs"/>
                 <MenuItem x:Name="ShowAuditLogs" Header="Audit Logs"/>
                 <Separator/>
                 <MenuItem Header="Data Backup" Visibility="Collapsed"/>
-                <MenuItem Header="Exit"/>
+                <MenuItem x:Name="ExitApplication" Header="Exit"/>
             </MenuItem>
             <MenuItem Header="Maintenance">
                 <MenuItem x:Name="ShowEmployees" Header="Employees"/>
