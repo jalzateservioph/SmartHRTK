@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TKProcessor.Models.TK;
-
+using TKProcessor.Common;
 namespace TKProcessor.Services
 {
     public interface IDTRProcessor
@@ -20,6 +20,8 @@ namespace TKProcessor.Services
         protected IEnumerable<Holiday> Holidays;
 
         #region Initialization
+        protected DateTime actualTimeIn;
+        protected DateTime actualTimeOut;
         protected decimal totalBreak = 0;
         protected decimal workHours = 0;
         protected decimal totalOvertime = 0;
@@ -77,7 +79,13 @@ namespace TKProcessor.Services
 
         }
 
-        public decimal GetTotalBreakDuration()
+        protected void GetActualTimeInAndOut()
+        {
+            actualTimeIn = DateTimeHelpers.RemoveSeconds(DTR.TimeIn.Value);
+            actualTimeOut = DateTimeHelpers.RemoveSeconds(DTR.TimeOut.Value);
+        }
+
+        protected decimal GetTotalBreakDuration()
         {
             decimal sum = 0;
 
@@ -100,7 +108,7 @@ namespace TKProcessor.Services
             return sum;
         }
 
-        public void AdjustWorkHours()
+        protected void AdjustWorkHours()
         {
             if (DTR.Shift.AmbreakIn.HasValue && DTR.Shift.AmbreakOut.HasValue)
             {

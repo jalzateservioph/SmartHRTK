@@ -17,13 +17,14 @@ namespace TKProcessor.Test
         public void StandardRegularWorkHoursTest()
         {
             DTR = new DailyTransactionRecord();
-            DTR.TimeIn = new DateTime(2019, 10, 14, 7, 0, 0); 
-            DTR.TimeOut = new DateTime(2019, 10, 14, 16, 0, 0);
-
+            DTR.TimeIn = new DateTime(2019, 9, 3, 8, 0, 0); 
+            DTR.TimeOut = new DateTime(2019, 9, 3, 18, 0, 0);
+            DTR.TransactionDate = new DateTime(2019, 9, 3, 0, 0, 0);
             Shift shift = new Shift();
 
-            shift.ScheduleIn = new DateTime(2019, 10, 14, 7, 0, 0);
-            shift.ScheduleOut = new DateTime(2019, 10, 14, 16, 0, 0);
+            shift.ScheduleIn = new DateTime(2019, 9, 3, 8, 0, 0);
+            shift.ScheduleOut = new DateTime(2019, 9, 3, 17, 0, 0);
+            shift.IsPostShiftOt = true;
 
             //shift.AmbreakIn = new DateTime(2019, 10, 14, 9, 0, 0);
             //shift.AmbreakOut = new DateTime(2019, 10, 14, 9, 15, 0);

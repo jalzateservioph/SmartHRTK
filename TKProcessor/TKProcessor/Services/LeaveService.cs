@@ -12,10 +12,11 @@ namespace TKProcessor.Services
     public class LeaveService : TKService<TK.Leave>
     {
         readonly SHRContext sHRContext;
-
+        readonly TKContext tKContext;
         public LeaveService() : base()
         {
             sHRContext = new SHRContext();
+            tKContext = new TKContext();
         }
 
         public void Sync()
@@ -37,6 +38,11 @@ namespace TKProcessor.Services
 
                 Save(tkLeave);
             }
+        }
+
+        public IEnumerable<TK.Leave> GetLeaves(string employeeCode, DateTime date)
+        {
+            return tKContext.Leave.Where(l => l.EmployeeCode == employeeCode && l.LeaveDate == date);
         }
     }
 }

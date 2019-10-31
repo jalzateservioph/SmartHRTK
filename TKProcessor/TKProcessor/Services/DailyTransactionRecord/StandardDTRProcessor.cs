@@ -30,7 +30,8 @@ namespace TKProcessor.Services
         {
             if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
-                workHours = (decimal)(DTR.TimeOut.Value - DTR.TimeIn.Value).TotalMinutes;
+                GetActualTimeInAndOut();
+                workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 AdjustWorkHours();
 
                 if (expectedTimeOut < expectedTimeIn)
@@ -53,38 +54,37 @@ namespace TKProcessor.Services
 
         private void ComputeLate()
         {
+
             if (DTR.Shift.IsLateIn == true)
             {
-                if (DTR.Shift.IsLateIn == true)
+                int gracePeriodMinutes = 0;
+                //DateTime latestIn = DTR.Shift.LatestTimeIn.Value.TimeOfDay;
+                if (DTR.Shift.GracePeriodLateIn.HasValue)
                 {
-                    int gracePeriodMinutes = 0;
-                    //DateTime latestIn = DTR.Shift.LatestTimeIn.Value.TimeOfDay;
-                    if (DTR.Shift.GracePeriodLateIn.HasValue)
-                    {
-                        gracePeriodMinutes = DTR.Shift.GracePeriodLateIn.Value;
-                    }
-                    if (DTR.TimeIn.Value > expectedTimeIn)
-                    {
-                        late = (decimal)(DTR.TimeIn.Value - expectedTimeIn).TotalMinutes;
-
-                        if (DTR.TimeIn.Value > expectedTimeIn.AddMinutes(gracePeriodMinutes))
-                        {
-                            approvedLate = late;
-                        }
-                    }
-
-                    #region Half day
-                    if (DTR.Shift.MaximumMinutesConsideredAsHalfDay.HasValue)
-                    {
-                        if (late > DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value)
-                        {
-                            absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value - DTR.Shift.ScheduleIn.Value).TotalMinutes - totalBreak) / 2, 2);
-                            approvedLate = 0;
-                        }
-                    }
-                    #endregion
+                    gracePeriodMinutes = DTR.Shift.GracePeriodLateIn.Value;
                 }
+                if (actualTimeIn > expectedTimeIn)
+                {
+                    late = (decimal)(actualTimeIn - expectedTimeIn).TotalMinutes;
+
+                    if (actualTimeIn > expectedTimeIn.AddMinutes(gracePeriodMinutes))
+                    {
+                        approvedLate = late;
+                    }
+                }
+
+                #region Half day
+                if (DTR.Shift.MaximumMinutesConsideredAsHalfDay.HasValue)
+                {
+                    if (late > DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value)
+                    {
+                        absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value - DTR.Shift.ScheduleIn.Value).TotalMinutes - totalBreak) / 2, 2);
+                        approvedLate = 0;
+                    }
+                }
+                #endregion
             }
+            
         }
 
         private void ComputeUndertime()
@@ -97,11 +97,11 @@ namespace TKProcessor.Services
                     //expectedTimeOut.AddMinutes(-DTR.Shift.GracePeriodEarlyOut.Value);
                     gracePeriodMinutes = DTR.Shift.GracePeriodEarlyOut.Value;
                 }
-                if (DTR.TimeOut.Value < expectedTimeOut)
+                if (actualTimeOut < expectedTimeOut)
                 {
-                    undertime = (decimal)((expectedTimeOut - DTR.TimeOut.Value).TotalMinutes);
+                    undertime = (decimal)((expectedTimeOut - actualTimeOut).TotalMinutes);
 
-                    if (DTR.TimeOut.Value < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
+                    if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
                     }
@@ -125,9 +125,9 @@ namespace TKProcessor.Services
             #region Pre-Overtime
             if (DTR.Shift.IsPreShiftOt == true)
             {
-                if (DTR.TimeIn < expectedTimeIn)
+                if (actualTimeIn < expectedTimeIn)
                 {
-                    preShiftOvertime = (decimal)(expectedTimeIn - DTR.TimeIn.Value).TotalMinutes;
+                    preShiftOvertime = (decimal)(expectedTimeIn - actualTimeIn).TotalMinutes;
                     approvedPreShiftOvertime = preShiftOvertime;
                 }
 
@@ -148,9 +148,9 @@ namespace TKProcessor.Services
             #region Post-Overtime
             if (DTR.Shift.IsPostShiftOt == true)
             {
-                if (DTR.TimeOut > expectedTimeOut)
+                if (actualTimeOut > expectedTimeOut)
                 {
-                    postShiftOvertime = (decimal)(DTR.TimeOut.Value - expectedTimeOut).TotalMinutes;
+                    postShiftOvertime = (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
                     approvedPostShiftOvertime = postShiftOvertime;
                 }
 
@@ -182,21 +182,21 @@ namespace TKProcessor.Services
                     expectedNightDifferentialEnd = expectedNightDifferentialEnd.AddDays(1);
                 }
 
-                if (DTR.TimeIn >= expectedNightDifferentialStart && DTR.TimeIn < expectedNightDifferentialEnd)
+                if (actualTimeIn >= expectedNightDifferentialStart && actualTimeIn < expectedNightDifferentialEnd)
                 {
-                    nightDifferential = (decimal)(expectedNightDifferentialEnd - DTR.TimeIn.Value).TotalMinutes;
+                    nightDifferential = (decimal)(expectedNightDifferentialEnd - actualTimeIn).TotalMinutes;
                 }
-                else if (expectedNightDifferentialStart >= DTR.TimeIn && expectedNightDifferentialEnd <= DTR.TimeOut)
+                else if (expectedNightDifferentialStart >= actualTimeIn && expectedNightDifferentialEnd <= actualTimeOut)
                 {
                     nightDifferential = (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
                 }
-                else if (expectedNightDifferentialStart < DTR.TimeOut && DTR.TimeOut < expectedNightDifferentialEnd)
+                else if (expectedNightDifferentialStart < actualTimeOut && actualTimeOut < expectedNightDifferentialEnd)
                 {
-                    nightDifferential = (decimal)(DTR.TimeOut.Value - expectedNightDifferentialStart).TotalMinutes;
+                    nightDifferential = (decimal)(actualTimeOut - expectedNightDifferentialStart).TotalMinutes;
                 }
-                else if (DTR.TimeIn >= expectedNightDifferentialStart && DTR.TimeOut <= expectedNightDifferentialEnd)
+                else if (actualTimeIn >= expectedNightDifferentialStart && actualTimeOut <= expectedNightDifferentialEnd)
                 {
-                    nightDifferential = (decimal)(DTR.TimeOut.Value - DTR.TimeIn.Value).TotalMinutes;
+                    nightDifferential = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 }
 
                 #region Night Differential Overtime
@@ -204,11 +204,11 @@ namespace TKProcessor.Services
                 #region Pre-shift Overtime
                 if (DTR.Shift.IsPreShiftOt == true)
                 {
-                    if (expectedTimeIn > DTR.TimeIn)
+                    if (expectedTimeIn > actualTimeIn)
                     {
                         if (expectedNightDifferentialEnd >= expectedTimeIn)
                         {
-                            if (expectedNightDifferentialStart < DTR.TimeIn)
+                            if (expectedNightDifferentialStart < actualTimeIn)
                             {
                                 nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeIn).TotalMinutes;
                             }
@@ -217,11 +217,11 @@ namespace TKProcessor.Services
                                 nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
                             }
                         }
-                        else if (expectedNightDifferentialEnd > DTR.TimeIn)
+                        else if (expectedNightDifferentialEnd > actualTimeIn)
                         {
-                            if (expectedNightDifferentialStart <= DTR.TimeIn)
+                            if (expectedNightDifferentialStart <= actualTimeIn)
                             {
-                                nightDifferentialOvertime += (decimal)(DTR.TimeIn.Value - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(actualTimeIn.Value - expectedNightDifferentialStart).TotalMinutes;
                             }
                             else
                             {
@@ -235,24 +235,24 @@ namespace TKProcessor.Services
                 #region Post-shift Overtime
                 if (DTR.Shift.IsPostShiftOt == true)
                 {
-                    if (DTR.TimeOut > expectedTimeOut)
+                    if (actualTimeOut > expectedTimeOut)
                     {
                         if (expectedNightDifferentialStart <= expectedTimeOut)
                         {
-                            if (expectedNightDifferentialEnd > DTR.TimeOut)
+                            if (expectedNightDifferentialEnd > actualTimeOut)
                             {
-                                nightDifferentialOvertime += (decimal)(DTR.TimeOut.Value - expectedTimeOut).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
                             }
                             else
                             {
                                 nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeOut).TotalMinutes;
                             }
                         }
-                        else if (expectedNightDifferentialStart < DTR.TimeOut)
+                        else if (expectedNightDifferentialStart < actualTimeOut)
                         {
-                            if (expectedNightDifferentialEnd > DTR.TimeOut)
+                            if (expectedNightDifferentialEnd > actualTimeOut)
                             {
-                                nightDifferentialOvertime += (decimal)(DTR.TimeOut.Value - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(actualTimeOut - expectedNightDifferentialStart).TotalMinutes;
                             }
                             else
                             {
@@ -270,7 +270,8 @@ namespace TKProcessor.Services
         {
             if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
-                workHours = (decimal)(DTR.TimeOut.Value - DTR.TimeIn.Value).TotalMinutes;
+                GetActualTimeInAndOut();
+                workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 AdjustWorkHours();
 
                 if (expectedTimeOut < expectedTimeIn)
