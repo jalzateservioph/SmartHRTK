@@ -33,7 +33,7 @@ namespace TKProcessor.Services
                     EmployeeCode = leave.EmployeeNum,
                     LeaveDate = leave.StartDate,
                     LeaveType = leave.LeaveType,
-                    LeaveHours = Convert.ToDecimal(8 * leave.Duration)
+                    LeaveHours = (decimal) leave.Duration
                 };
 
                 Save(tkLeave);

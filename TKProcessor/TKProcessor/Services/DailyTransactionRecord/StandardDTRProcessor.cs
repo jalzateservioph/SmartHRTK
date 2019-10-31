@@ -221,7 +221,7 @@ namespace TKProcessor.Services
                         {
                             if (expectedNightDifferentialStart <= actualTimeIn)
                             {
-                                nightDifferentialOvertime += (decimal)(actualTimeIn.Value - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(actualTimeIn- expectedNightDifferentialStart).TotalMinutes;
                             }
                             else
                             {
