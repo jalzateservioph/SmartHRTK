@@ -338,8 +338,10 @@ namespace TKProcessor.Services
                 {
                     legalSpecialHolidayRestDay = workHours;
                     legalSpecialHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
                     legalSpecialHolidayRestDayNightDifferential = nightDifferential;
                     legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -348,8 +350,10 @@ namespace TKProcessor.Services
                 {
                     legalSpecialHoliday = workHours;
                     legalSpecialHolidayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayOvertime = approvedOvertime;
                     legalSpecialHolidayNightDifferential = nightDifferential;
                     legalSpecialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -358,8 +362,10 @@ namespace TKProcessor.Services
                 {
                     specialHolidayRestDay = workHours;
                     specialHolidayRestDayOvertime = totalOvertime;
+                    approvedSpecialHolidayRestDayOvertime = approvedOvertime;
                     specialHolidayRestDayNightDifferential = nightDifferential;
                     specialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -368,8 +374,10 @@ namespace TKProcessor.Services
                 {
                     legalHolidayRestDay = workHours;
                     legalHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalHolidayRestDayOvertime = approvedOvertime;
                     legalHolidayRestDayNightDifferential = nightDifferential;
                     legalHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -378,8 +386,10 @@ namespace TKProcessor.Services
                 {
                     legalHoliday = workHours;
                     legalHolidayOvertime = totalOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
                     legalHolidayNightDifferential = nightDifferential;
                     legalHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -388,8 +398,10 @@ namespace TKProcessor.Services
                 {
                     specialHoliday = workHours;
                     specialHolidayOvertime = totalOvertime;
+                    approvedSpecialHolidayOvertime = approvedOvertime;
                     specialHolidayNightDifferential = nightDifferential;
                     specialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -398,8 +410,10 @@ namespace TKProcessor.Services
                 {
                     restDay = workHours;
                     restDayOvertime = totalOvertime;
+                    approvedRestDayOvertime = approvedOvertime;
                     restDayNightDifferential = nightDifferential;
                     restDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 

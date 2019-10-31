@@ -46,38 +46,52 @@ namespace TKProcessor.Services
 
         protected decimal legalHoliday = 0;
         protected decimal legalHolidayOvertime = 0;
+        protected decimal approvedLegalHolidayOvertime = 0;
         protected decimal legalHolidayNightDifferential = 0;
         protected decimal legalHolidayNightDifferentialOvertime = 0;
+        protected decimal approvedLegalHolidayNightDifferentialOvertime = 0;
 
         protected decimal specialHoliday = 0;
         protected decimal specialHolidayOvertime = 0;
+        protected decimal approvedSpecialHolidayOvertime = 0;
         protected decimal specialHolidayNightDifferential = 0;
         protected decimal specialHolidayNightDifferentialOvertime = 0;
+        protected decimal approvedSpecialHolidayNightDifferentialOvertime = 0;
 
         protected decimal restDay = 0;
         protected decimal restDayOvertime = 0;
+        protected decimal approvedRestDayOvertime = 0;
         protected decimal restDayNightDifferential = 0;
         protected decimal restDayNightDifferentialOvertime = 0;
+        protected decimal approvedRestDayNightDifferentialOvertime = 0;
 
         protected decimal legalSpecialHoliday = 0;
         protected decimal legalSpecialHolidayOvertime = 0;
+        protected decimal approvedLegalSpecialHolidayOvertime = 0;
         protected decimal legalSpecialHolidayNightDifferential = 0;
         protected decimal legalSpecialHolidayNightDifferentialOvertime = 0;
+        protected decimal approvedLegalSpecialHolidayNightDifferentialOvertime = 0;
 
         protected decimal specialHolidayRestDay = 0;
         protected decimal specialHolidayRestDayOvertime = 0;
+        protected decimal approvedSpecialHolidayRestDayOvertime = 0;
         protected decimal specialHolidayRestDayNightDifferential = 0;
         protected decimal specialHolidayRestDayNightDifferentialOvertime = 0;
+        protected decimal approvedSpecialHolidayRestDayNightDifferentialOvertime = 0;
 
         protected decimal legalHolidayRestDay = 0;
         protected decimal legalHolidayRestDayOvertime = 0;
+        protected decimal approvedLegalHolidayRestDayOvertime = 0;
         protected decimal legalHolidayRestDayNightDifferential = 0;
         protected decimal legalHolidayRestDayNightDifferentialOvertime = 0;
+        protected decimal approvedLegalHolidayRestDayNightDifferentialOvertime = 0;
 
         protected decimal legalSpecialHolidayRestDay = 0;
         protected decimal legalSpecialHolidayRestDayOvertime = 0;
+        protected decimal approvedLegalSpecialHolidayRestDayOvertime = 0;
         protected decimal legalSpecialHolidayRestDayNightDifferential = 0;
         protected decimal legalSpecialHolidayRestDayNightDifferentialOvertime = 0;
+        protected decimal approvedLegalSpecialHolidayRestDayNightDifferential = 0;
         #endregion
 
         public DTRProcessorBase()
@@ -163,7 +177,7 @@ namespace TKProcessor.Services
             DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2);
 
             DTR.ApprovedLegHol = DTR.ActualLegHol = Math.Round(legalHoliday / 60, 2);
-            DTR.ApprovedLegHolOt = DTR.ActualLegHolOt = Math.Round(legalHolidayOvertime / 60, 2);
+            DTR.ActualLegHolOt = Math.Round(legalHolidayOvertime / 60, 2);
             DTR.ApprovedNDLegHol = DTR.ActualNDLegHol = Math.Round(legalHolidayNightDifferential / 60, 2);
             DTR.ApprovedNDLegHolOt = DTR.ActualNDLegHolOt = Math.Round(legalHolidayNightDifferentialOvertime / 60, 2);
 
@@ -196,6 +210,7 @@ namespace TKProcessor.Services
             DTR.ApprovedLegSpeHolRDot = DTR.ActualLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayOvertime / 60, 2);
             DTR.ApprovedNDLegSpeHolRD = DTR.ActualNDLegSpeHolRD = Math.Round(legalSpecialHolidayRestDayNightDifferential / 60, 2);
             DTR.ApprovedNDLegSpeHolRDot = DTR.ActualNDLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayNightDifferentialOvertime / 60, 2);
+
         }
 
         protected void GetLeaveDuration()
