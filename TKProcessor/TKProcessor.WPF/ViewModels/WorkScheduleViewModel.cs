@@ -183,32 +183,56 @@ namespace TKProcessor.WPF.ViewModels
 
                     try
                     {
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving work schedules for {wsObject.Employee} ", MessageType.Information));
+                        if (wsObject.Employee == null)
+                            throw new Exception("Please select an employee");
 
                         Shift[] shifts = new Shift[] {
-                        wsObject.Sunday,
-                        wsObject.Monday,
-                        wsObject.Tuesday,
-                        wsObject.Wednesday,
-                        wsObject.Thursday,
-                        wsObject.Friday,
-                        wsObject.Saturday
-                    };
+                            wsObject.Sunday,
+                            wsObject.Monday,
+                            wsObject.Tuesday,
+                            wsObject.Wednesday,
+                            wsObject.Thursday,
+                            wsObject.Friday,
+                            wsObject.Saturday
+                        };
+
+                        var errMsg = "";
+
+                        if ((wsObject.EndDate - wsObject.StartDate).Days > 7)
+                        {
+                            var nullShift = shifts.ToList().FindAll(i => i == null);
+
+                            foreach (var item in nullShift)
+                            {
+                                if (string.IsNullOrEmpty(errMsg))
+                                    errMsg = "Please fill selet shift for ";
+
+                                errMsg += item.ToString() + " ";
+                            }
+                        }
+
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving work schedules for {wsObject.Employee} ", MessageType.Information));
 
                         var start = wsObject.StartDate;
                         var end = wsObject.EndDate;
 
                         while (start <= end)
                         {
-                            var forSave = new WorkSchedule()
-                            {
-                                Employee = wsObject.Employee,
-                                ScheduleDate = start,
-                                Shift = shifts[(int)start.DayOfWeek]
-                            };
+                            WorkSchedule forSave = null;
 
                             try
                             {
+                                if (shifts[(int)start.DayOfWeek] == null)
+                                    throw new Exception($"No shift setup for {start.DayOfWeek.ToString()}");
+
+                                forSave = new WorkSchedule()
+                                {
+                                    Employee = wsObject.Employee,
+                                    ScheduleDate = start,
+                                    Shift = shifts[(int)start.DayOfWeek]
+                                };
+
+
                                 eventAggregator.PublishOnUIThread(
                                    new NewMessageEvent(
                                        $"Saving {forSave.ScheduleDate.ToShortDateString()} - {forSave.Shift}",
@@ -222,13 +246,7 @@ namespace TKProcessor.WPF.ViewModels
                             }
                             catch (Exception ex)
                             {
-                                eventAggregator.PublishOnUIThread(
-                                    new NewMessageEvent(
-                                        $"Error saving {forSave.ScheduleDate.ToShortDateString()} - {forSave.Shift}" +
-                                        $"{(Debugger.IsAttached ? ex.Message : "")}",
-                                        MessageType.Error
-                                    )
-                                );
+                                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
                             }
 
                             start = start.AddDays(1);
@@ -278,10 +296,7 @@ namespace TKProcessor.WPF.ViewModels
                 }
             }
 
-
             EndEditing();
-
-            Populate();
         }
 
         public override void Sort()

@@ -42,8 +42,9 @@
             <Label Grid.Column="2" Content="End Date:" Margin="10,0,0,0"/>
             <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <Label Grid.Column="4" Content="Payroll Code:" Margin="10,0,0,0"/>
-            <ComboBox Grid.Column="5" Width="102" ItemsSource="{Binding PayrollCodeList}" SelectedItem="{Binding PayrollCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Grid.Column="4" Content="Pay Frequency:" Margin="10,0,0,0"/>
+            <ComboBox Grid.Column="5" Width="102" ItemsSource="{Binding PayrollCodeList}" 
+                      SelectedItem="{Binding PayrollCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Label Grid.Column="6" Content="Pay Out Date:" Margin="10,0,0,0"/>
             <DatePicker Grid.Column="7" SelectedDate="{Binding PayOutDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

@@ -12,6 +12,11 @@ namespace TKProcessor.WPF.Models
         private bool _isDirty;
         private bool _isValid;
         private bool _isSelected;
+
+        public BaseModel()
+        {
+            Id = Guid.NewGuid();
+        }
         
         public Guid Id { get; set; }
         public User CreatedBy { get; set; }
