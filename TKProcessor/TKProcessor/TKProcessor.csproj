@@ -254,6 +254,10 @@
     <Compile Include="Migrations\20191031031120_UpdateDTRFieldsActualNDLegHolRDot.designer.cs">
       <DependentUpon>20191031031120_UpdateDTRFieldsActualNDLegHolRDot.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191101091230_UpdateDTRAddRegularWorkHours.cs" />
+    <Compile Include="Migrations\20191101091230_UpdateDTRAddRegularWorkHours.designer.cs">
+      <DependentUpon>20191101091230_UpdateDTRAddRegularWorkHours.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
