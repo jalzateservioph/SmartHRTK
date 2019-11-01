@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Events;
@@ -232,7 +233,6 @@ namespace TKProcessor.WPF.ViewModels
                                     Shift = shifts[(int)start.DayOfWeek]
                                 };
 
-
                                 eventAggregator.PublishOnUIThread(
                                    new NewMessageEvent(
                                        $"Saving {forSave.ScheduleDate.ToShortDateString()} - {forSave.Shift}",
@@ -242,7 +242,17 @@ namespace TKProcessor.WPF.ViewModels
 
                                 service.Save(mapper.Map<TK.WorkSchedule>(forSave));
 
-                                App.Current.Dispatcher.Invoke(() => { Items.Add(forSave); });
+                                var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id &&
+                                                                         i.ScheduleDate.GetStartOfDay() == forSave.ScheduleDate.GetStartOfDay());
+
+                                App.Current.Dispatcher.Invoke(() =>
+                                {
+                                    if (existing != default(WorkSchedule))
+                                        Items.Remove(existing);
+
+                                    Items.Add(forSave);
+
+                                });
                             }
                             catch (Exception ex)
                             {
@@ -259,6 +269,8 @@ namespace TKProcessor.WPF.ViewModels
                                 MessageType.Success
                             )
                         );
+
+                        EndEditing();
                     }
                     catch (Exception ex)
                     {
@@ -272,15 +284,23 @@ namespace TKProcessor.WPF.ViewModels
             {
                 try
                 {
-                    service.Save(mapper.Map<TK.WorkSchedule>(new WorkSchedule()
+                    var forSave = new WorkSchedule()
                     {
                         Id = Guid.NewGuid(),
                         ScheduleDate = CurrentItem.ScheduleDate,
                         Employee = CurrentItem.Employee,
                         Shift = CurrentItem.Shift
-                    }));
+                    };
 
-                    Items.Add(mapper.Map<WorkSchedule>(CurrentItem));
+                    var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id && 
+                                                             i.ScheduleDate.GetStartOfDay() == forSave.ScheduleDate.GetStartOfDay());
+
+                    service.Save(mapper.Map<TK.WorkSchedule>(forSave));
+
+                    if (existing != default(WorkSchedule))
+                        Items.Remove(existing);
+
+                    Items.Add(forSave);
 
                     eventAggregator.PublishOnUIThread(
                         new NewMessageEvent(
@@ -289,14 +309,14 @@ namespace TKProcessor.WPF.ViewModels
                             MessageType.Success
                         )
                     );
+
+                    EndEditing();
                 }
                 catch (Exception ex)
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
                 }
             }
-
-            EndEditing();
         }
 
         public override void Sort()

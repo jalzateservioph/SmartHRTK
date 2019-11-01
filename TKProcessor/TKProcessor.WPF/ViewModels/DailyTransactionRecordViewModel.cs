@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Events;
@@ -22,6 +24,7 @@ namespace TKProcessor.WPF.ViewModels
         readonly IMapper mapper;
         readonly DailyTransactionRecordService service;
         readonly JobGradeBandService payCodeService;
+        readonly SaveFileDialog saveDiag;
 
         private ObservableCollection<string> _payrollCodeList;
         private DateTime _startDate;
@@ -31,6 +34,7 @@ namespace TKProcessor.WPF.ViewModels
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
             service = new DailyTransactionRecordService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
+
             payCodeService = new JobGradeBandService();
 
             mapper = new MapperConfiguration(cfg =>
@@ -47,6 +51,11 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<User, TK.User>();
                 cfg.CreateMap<TK.User, User>();
             }).CreateMapper();
+
+            saveDiag = new SaveFileDialog()
+            {
+                Filter = "Excel File (*.xlsx)|*.xlsx"
+            };
 
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
@@ -177,6 +186,23 @@ namespace TKProcessor.WPF.ViewModels
 
                 EndProcessing();
             });
+        }
+
+        public void ExportToExcel()
+        {
+            if (saveDiag.ShowDialog() == true)
+            {
+                Task.Run(() =>
+                {
+                    StartProcessing();
+
+                    var DTRs = service.List(StartDate, EndDate, PayrollCode);
+
+                    DataTableHelpers.ToDataTable(DTRs);
+
+                    EndProcessing();
+                });
+            }
         }
 
         public override bool Filter(object o)

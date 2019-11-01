@@ -18,7 +18,6 @@ namespace TKProcessor.Services
     {
         readonly List<List<string>> headerDef;
 
-
         Action<string> iterationCallback;
 
         public WorkScheduleService(Guid userId) : base(userId)
@@ -48,34 +47,22 @@ namespace TKProcessor.Services
 
         public override void Save(WorkSchedule entity)
         {
-            var existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee == entity.Employee && i.ScheduleDate == entity.ScheduleDate);
+            var existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id && i.ScheduleDate.GetStartOfDay() == entity.ScheduleDate.GetStartOfDay());
 
-            if (existing == default(WorkSchedule))
-            {
-                entity.IsActive = true;
-                entity.CreatedBy = CurrentUser;
-                entity.CreatedOn = DateTime.Now;
-                entity.LastModifiedBy = CurrentUser;
-                entity.LastModifiedOn = DateTime.Now;
+            Context.WorkSchedule.Remove(existing);
 
-                CreateAuditLog(entity);
+            entity.IsActive = true;
+            entity.CreatedBy = CurrentUser;
+            entity.CreatedOn = existing.CreatedOn ?? DateTime.Now;
+            entity.LastModifiedBy = CurrentUser;
+            entity.LastModifiedOn = DateTime.Now;
 
-                Context.WorkSchedule.Add(entity);
+            CreateAuditLog(entity);
 
-                Context.Entry(entity.Employee).State = EntityState.Unchanged;
-                Context.Entry(entity.Shift).State = EntityState.Unchanged;
-            }
-            else
-            {
-                entity.Id = existing.Id;
+            Context.WorkSchedule.Add(entity);
 
-                entity.LastModifiedBy = CurrentUser;
-                entity.LastModifiedOn = DateTime.Now;
-
-                CreateAuditLog(entity, existing);
-
-                Context.Entry(existing).CurrentValues.SetValues(entity);
-            }
+            Context.Entry(entity.Employee).State = EntityState.Unchanged;
+            Context.Entry(entity.Shift).State = EntityState.Unchanged;
 
             if (AutoSaveChanges)
                 SaveChanges();
