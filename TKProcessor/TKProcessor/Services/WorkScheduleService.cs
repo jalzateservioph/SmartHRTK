@@ -45,19 +45,23 @@ namespace TKProcessor.Services
             };
         }
 
-        public override void Save(WorkSchedule entity)
+        public new void Save(WorkSchedule entity)
         {
-            var existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id && i.ScheduleDate.GetStartOfDay() == entity.ScheduleDate.GetStartOfDay());
+            var existingList = Context.WorkSchedule.ToList().FindAll(i => i.Employee.Id == entity.Employee.Id &&
+                                                                          i.ScheduleDate.GetStartOfDay() == entity.ScheduleDate.GetStartOfDay());
 
-            Context.WorkSchedule.Remove(existing);
+            var existing = existingList == null || existingList.Count == 0 ? null : existingList.FirstOrDefault(i => i.LastModifiedOn == existingList.Max(ws => ws.LastModifiedOn));
 
             entity.IsActive = true;
-            entity.CreatedBy = CurrentUser;
-            entity.CreatedOn = existing.CreatedOn ?? DateTime.Now;
+            entity.CreatedBy = existing?.CreatedBy ?? CurrentUser;
+            entity.CreatedOn = existing?.CreatedOn ?? DateTime.Now;
             entity.LastModifiedBy = CurrentUser;
             entity.LastModifiedOn = DateTime.Now;
 
-            CreateAuditLog(entity);
+            foreach (var item in existingList)
+                Context.WorkSchedule.Remove(item);
+
+            CreateAuditLog(entity, existing);
 
             Context.WorkSchedule.Add(entity);
 

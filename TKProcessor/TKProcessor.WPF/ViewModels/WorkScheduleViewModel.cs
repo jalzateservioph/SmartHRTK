@@ -319,6 +319,18 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
+        public void Delete()
+        {
+            Task.Run(() => {
+                StartProcessing();
+
+                foreach (var item in Items.Where(i => i.IsSelected))
+                    service.Delete(mapper.Map<TK.WorkSchedule>(item));
+
+                EndProcessing();
+            });
+        }
+
         public override void Sort()
         {
             View.SortDescriptions.Add(new SortDescription("Employee.EmployeeCode", ListSortDirection.Ascending));
