@@ -16,6 +16,7 @@ namespace TKProcessor.WPF.Models
         {
             Id = Guid.NewGuid();
         }
+
         public Employee Employee
         {
             get => _employee;

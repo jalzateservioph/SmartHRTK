@@ -45,28 +45,55 @@ namespace TKProcessor.Services
             };
         }
 
-        public new void Save(WorkSchedule entity)
+        public override void Save(WorkSchedule entity)
         {
-            var existingList = Context.WorkSchedule.ToList().FindAll(i => i.Employee.Id == entity.Employee.Id &&
-                                                                          i.ScheduleDate.GetStartOfDay() == entity.ScheduleDate.GetStartOfDay());
+            var existing = Context.WorkSchedule.Find(entity.Id);
 
-            var existing = existingList == null || existingList.Count == 0 ? null : existingList.FirstOrDefault(i => i.LastModifiedOn == existingList.Max(ws => ws.LastModifiedOn));
+            if(existing == null)
+            {
+                existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id && 
+                                                                    i.ScheduleDate == entity.ScheduleDate);
+            }
 
-            entity.IsActive = true;
-            entity.CreatedBy = existing?.CreatedBy ?? CurrentUser;
-            entity.CreatedOn = existing?.CreatedOn ?? DateTime.Now;
-            entity.LastModifiedBy = CurrentUser;
-            entity.LastModifiedOn = DateTime.Now;
+            if (existing == default(WorkSchedule))
+            {
+                entity.IsActive = true;
+                entity.CreatedBy = CurrentUser;
+                entity.CreatedOn = DateTime.Now;
+                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedOn = DateTime.Now;
 
-            foreach (var item in existingList)
-                Context.WorkSchedule.Remove(item);
+                CreateAuditLog(entity);
 
-            CreateAuditLog(entity, existing);
+                Context.WorkSchedule.Add(entity);
 
-            Context.WorkSchedule.Add(entity);
+                Context.Entry(entity.Employee).State = EntityState.Unchanged;
+                Context.Entry(entity.Shift).State = EntityState.Unchanged;
+            }
+            else
+            {
+                existing.LastModifiedBy = CurrentUser;
+                existing.LastModifiedOn = DateTime.Now;
 
-            Context.Entry(entity.Employee).State = EntityState.Unchanged;
-            Context.Entry(entity.Shift).State = EntityState.Unchanged;
+                CreateAuditLog(entity, existing);
+
+                if (existing.ScheduleDate != entity.ScheduleDate)
+                {
+                    existing.ScheduleDate = entity.ScheduleDate;
+                }
+                if (existing.Shift.Id != entity.Shift.Id)
+                {
+                    existing.Shift = entity.Shift;
+
+                    Context.Entry(existing.Shift).State = EntityState.Unchanged;
+                }
+                if (existing.Employee.Id != entity.Employee.Id)
+                {
+                    existing.Employee = entity.Employee;
+
+                    Context.Entry(existing.Employee).State = EntityState.Unchanged;
+                }
+            }
 
             if (AutoSaveChanges)
                 SaveChanges();

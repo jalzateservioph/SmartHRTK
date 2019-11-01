@@ -50,6 +50,18 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<User, TK.User>();
                 cfg.CreateMap<TK.User, User>();
 
+                cfg.CreateMap<WorkSchedule, WorkSchedule>();
+                cfg.CreateMap<WorkSchedule, WorkSchedule>();
+
+                cfg.CreateMap<Employee, Employee>();
+                cfg.CreateMap<Employee, Employee>();
+
+                cfg.CreateMap<Shift, Shift>();
+                cfg.CreateMap<Shift, Shift>();
+
+                cfg.CreateMap<User, User>();
+                cfg.CreateMap<User, User>();
+
             }).CreateMapper();
 
             openFileDialog = new OpenFileDialog();
@@ -91,7 +103,13 @@ namespace TKProcessor.WPF.ViewModels
 
                         foreach (var item in service.List())
                         {
-                            App.Current.Dispatcher.Invoke(() => { EmployeeList.Add(mapper.Map<Employee>(item)); });
+                            var emp = mapper.Map<Employee>(item);
+
+                            emp.IsSelected = false;
+                            emp.IsDirty = false;
+                            emp.IsValid = true;
+
+                            App.Current.Dispatcher.Invoke(() => { EmployeeList.Add(emp); });
                         }
                     }
 
@@ -167,7 +185,10 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Edit()
         {
-            App.Current.Dispatcher.Invoke(() => { CurrentItem = ActiveItem; });
+            CurrentItem = mapper.Map<WorkSchedule>(ActiveItem);
+
+            CurrentItem.Employee = EmployeeList.FirstOrDefault(i => i.Id == ActiveItem.Employee.Id);
+            CurrentItem.Shift = ShiftList.FirstOrDefault(i => i.Id == ActiveItem.Shift.Id);
 
             StartEditing();
         }
@@ -286,13 +307,13 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     var forSave = new WorkSchedule()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = CurrentItem.Id,
                         ScheduleDate = CurrentItem.ScheduleDate,
                         Employee = CurrentItem.Employee,
                         Shift = CurrentItem.Shift
                     };
 
-                    var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id && 
+                    var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id &&
                                                              i.ScheduleDate.GetStartOfDay() == forSave.ScheduleDate.GetStartOfDay());
 
                     service.Save(mapper.Map<TK.WorkSchedule>(forSave));
@@ -321,7 +342,8 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Delete()
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 StartProcessing();
 
                 foreach (var item in Items.Where(i => i.IsSelected))
