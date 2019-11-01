@@ -8,7 +8,7 @@ using TKProcessor.Models.DP;
 
 namespace TKProcessor.Services
 {
-    public class JobGradeBandService
+    public class JobGradeBandService : IDisposable
     {
         readonly SHRContext context;
 
@@ -17,13 +17,18 @@ namespace TKProcessor.Services
             context = new SHRContext();
         }
 
+        public void Dispose()
+        {
+            context.Dispose();
+        }
+
         public IList<string> List()
         {
             return context.JobGradeBandLu.Select(i => i.JobGradeBand).Distinct().ToList();
         }
     }
 
-    public class PayrollCodeService
+    public class PayrollCodeService : IDisposable
     {
         readonly DPContext context;
 
@@ -32,19 +37,29 @@ namespace TKProcessor.Services
             context = new DPContext();
         }
 
+        public void Dispose()
+        {
+            context.Dispose();
+        }
+
         public List<PayrollCode> List()
         {
             return context.PayrollCode.ToList();
         }
     }
 
-    public class PayPackageService
+    public class PayPackageService : IDisposable
     {
         readonly DPContext context;
 
         public PayPackageService()
         {
             context = new DPContext();
+        }
+
+        public void Dispose()
+        {
+            context.Dispose();
         }
 
         public List<PayPackage> List()

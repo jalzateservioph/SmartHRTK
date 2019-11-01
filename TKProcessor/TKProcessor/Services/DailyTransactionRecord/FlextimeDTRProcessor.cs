@@ -26,8 +26,6 @@ namespace TKProcessor.Services
             GetRequiredWorkHours();
         }
 
-
-
         public void ComputeRegular()
         {
             if (leaveDuration == 1M || leaveDuration == 0.5M)
@@ -40,9 +38,9 @@ namespace TKProcessor.Services
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
                 AdjustWorkHours();
 
-                if (workHours > requiredWorkHours)
+                if (workHours > requiredWorkHours * 60)
                 {
-                    regularWorkHours = requiredWorkHours;
+                    regularWorkHours = requiredWorkHours * 60;
                 }
                 else
                 {

@@ -148,7 +148,10 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information));
 
-                    service.Process(StartDate, EndDate, PayrollCode);
+                    service.Process(StartDate, EndDate, PayrollCode, message =>
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent(message, MessageType.Information));
+                    });
 
                     Populate();
 
@@ -220,6 +223,12 @@ namespace TKProcessor.WPF.ViewModels
                 return true;
 
             return false;
+        }
+
+        public override void Sort()
+        {
+            View.SortDescriptions.Add(new SortDescription(nameof(Employee.EmployeeCode), ListSortDirection.Ascending));
+            View.SortDescriptions.Add(new SortDescription(nameof(DailyTransactionRecord.TransactionDate), ListSortDirection.Descending));
         }
 
         public DateTime StartDate

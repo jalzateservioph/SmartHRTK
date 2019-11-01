@@ -38,15 +38,16 @@ namespace TKProcessor.Services
             {
                 workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
             }
+
             else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                 AdjustWorkHours();
 
-                if (workHours > requiredWorkHours)
+                if (workHours > requiredWorkHours * 60)
                 {
-                    regularWorkHours = requiredWorkHours;
+                    regularWorkHours = requiredWorkHours * 60;
                 }
                 else
                 {
@@ -287,6 +288,11 @@ namespace TKProcessor.Services
 
         public void ComputeHolidayAndRestDay()
         {
+            if(DTR.TransactionDate.Value == DateTime.Parse("9/20/2019"))
+            {
+                var breakHere = true;
+            }
+
             if (leaveDuration == 1M || leaveDuration == 0.5M)
             {
                 workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;

@@ -56,651 +56,650 @@
                  Text="{Binding FilterString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                  cal:Message.Attach="[Event PreviewKeyDown] = [Action InvokeFilter($eventArgs)]"/>
 
-        <ScrollViewer Margin="0,34,0,0" Grid.Row="3" HorizontalScrollBarVisibility="Visible" IsEnabled="{Binding IsEnabled}">
-            <DataGrid CanUserAddRows="False" CanUserDeleteRows="False"
+        <DataGrid CanUserAddRows="False" CanUserDeleteRows="False"  Margin="0,34,0,0" Grid.Row="3" IsEnabled="{Binding IsEnabled}"
+                  ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Employee.EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding TransactionDate}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Reg Work Hours" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding WorkHours}" Header="Work Hours" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding AbsentHours}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding ActualLate}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLate}" Foreground="Black"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLate}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualUndertime}" Header="Actual Undertime" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Undertime" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedUndertime}" Foreground="Black" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedUndertime}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualOvertime}" Header="Actual Overtime" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Overtime" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedOvertime}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedOvertime}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualPreOvertime}" Header="Actual Pre Overtime" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Pre Overtime" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedPreOvertime}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedPreOvertime}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualPostOvertime}" Header="Actual Post Overtime" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Post Overtime" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedPostOvertime}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedPostOvertime}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding NightDifferential}" Header="ND" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding NightDifferentialOt}" Header="NDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding ActualRestDay}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Rest Day" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedRestDay}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedRestDay}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualRestDayOt}" Header="Actual Rest Day OT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved Rest Day OT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedRestDayOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedRestDayOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDRD}" Header="Actual NDRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDRDot}" Header="Actual NDRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegHol}" Header="Actual LegHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegHolOt}" Header="Actual LegHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualSpeHol}" Header="Actual SpeHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved SpeHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedSpeHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualSpeHolOt}" Header="Actual SpeHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved SpeHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedSpeHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegSpeHol}" Header="Actual LegSpeHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegSpeHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegSpeHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegSpeHolOt}" Header="Actual LegSpeHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegSpeHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegSpeHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegHolRD}" Header="Actual LegHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegHolRDot}" Header="Actual LegHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualSpeHolRD}" Header="Actual SpeHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved SpeHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedSpeHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualSpeHolRDot}" Header="Actual SpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved SpeHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedSpeHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegSpeHolRD}" Header="Actual LegSpeHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegSpeHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegSpeHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualLegSpeHolRDot}" Header="Actual LegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved LegSpeHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedLegSpeHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegHol}" Header="Actual NDLegHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegHolOT}" Header="Actual NDLegHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDSpeHol}" Header="Actual NDSpeHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDSpeHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDSpeHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDSpeHolOt}" Header="Actual NDSpeHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDSpeHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDSpeHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegSpeHol}" Header="Actual NDLegSpeHol" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegSpeHol" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHol}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegSpeHol}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolOt}" Header="Actual NDLegSpeHolOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegSpeHolOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolOt}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegSpeHolOt}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegHolRD}" Header="Actual NDLegHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegHolRDot}" Header="Actual NDLegHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDSpeHolRD}" Header="Actual NDSpeHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDSpeHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDSpeHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDSpeHolRDot}" Header="Actual NDSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDSpeHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDSpeHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRD}" Header="Actual NDLegSpeHolRD" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegSpeHolRD" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRD}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegSpeHolRD}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRDot}" Header="Actual NDLegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                    <DataGridTemplateColumn Header="Approved NDLegSpeHolRDOT" Width="auto" IsReadOnly="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRDot}" >
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ApprovedNDLegSpeHolRDot}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding Remarks}" Header="Remarks" Width="auto" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Employee.EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TransactionDate}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Reg Work Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding WorkHours}" Header="Work Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding AbsentHours}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLate}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLate}" Foreground="Black"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLate}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualUndertime}" Header="Actual Undertime" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Undertime" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedUndertime}" Foreground="Black" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedUndertime}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualOvertime}" Header="Actual Overtime" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Overtime" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedOvertime}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedOvertime}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualPreOvertime}" Header="Actual Pre Overtime" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Pre Overtime" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedPreOvertime}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedPreOvertime}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualPostOvertime}" Header="Actual Post Overtime" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Post Overtime" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedPostOvertime}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedPostOvertime}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding NightDifferential}" Header="ND" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding NightDifferentialOt}" Header="NDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualRestDay}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Rest Day" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDay}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedRestDay}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualRestDayOt}" Header="Actual Rest Day OT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved Rest Day OT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDayOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedRestDayOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDRD}" Header="Actual NDRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDRDot}" Header="Actual NDRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegHol}" Header="Actual LegHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegHolOt}" Header="Actual LegHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualSpeHol}" Header="Actual SpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved SpeHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedSpeHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolOt}" Header="Actual SpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved SpeHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedSpeHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHol}" Header="Actual LegSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegSpeHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegSpeHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolOt}" Header="Actual LegSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegSpeHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegSpeHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegHolRD}" Header="Actual LegHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegHolRDot}" Header="Actual LegHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolRD}" Header="Actual SpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved SpeHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedSpeHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolRDot}" Header="Actual SpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved SpeHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedSpeHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRD}" Header="Actual LegSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegSpeHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegSpeHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRDot}" Header="Actual LegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved LegSpeHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedLegSpeHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHol}" Header="Actual NDLegHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolOt}" Header="Actual NDLegHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHol}" Header="Actual NDSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDSpeHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDSpeHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolOt}" Header="Actual NDSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDSpeHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDSpeHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHol}" Header="Actual NDLegSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegSpeHol" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHol}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegSpeHol}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolOt}" Header="Actual NDLegSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolOt}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegSpeHolOt}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolRD}" Header="Actual NDLegHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolRDot}" Header="Actual NDLegHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRD}" Header="Actual NDSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDSpeHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDSpeHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRDot}" Header="Actual NDSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDSpeHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDSpeHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRD}" Header="Actual NDLegSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolRD" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRD}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegSpeHolRD}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRDot}" Header="Actual NDLegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolRDOT" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRDot}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding ApprovedNDLegSpeHolRDot}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Remarks}" Header="Remarks" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

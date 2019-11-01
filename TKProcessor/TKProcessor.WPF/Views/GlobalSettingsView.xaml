@@ -109,7 +109,7 @@
             <Label Content="Processing Behavior" VerticalAlignment="Top"
                 Grid.Row="4" Grid.ColumnSpan="4" FontStyle="Italic" Margin="0,1,0,0" FontWeight="Bold"/>
 
-            <CheckBox Content="Create DTR for No Work Days" Margin="5,0,0,0" Grid.Row="5" VerticalAlignment="Top" Grid.ColumnSpan="4"/>
+            <CheckBox Content="Create DTR for No Work Days" Margin="5,0,0,0" Grid.Row="5" VerticalAlignment="Top" Grid.ColumnSpan="4" IsChecked="{Binding ActiveItem.CreateDTRForNoWorkDays}"/>
 
         </Grid>
 

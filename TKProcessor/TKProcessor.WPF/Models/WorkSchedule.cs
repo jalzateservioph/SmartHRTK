@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TKProcessor.Common;
 
 namespace TKProcessor.WPF.Models
 {
@@ -31,7 +32,7 @@ namespace TKProcessor.WPF.Models
             get => _scheduleDate;
             set
             {
-                _scheduleDate = value;
+                _scheduleDate = value.GetStartOfDay();
                 NotifyOfPropertyChange();
             }
         }

@@ -62,14 +62,14 @@ namespace TKProcessor.Services
             }
         }
 
-        public void Process(DateTime start, DateTime end, string payrollCode)
+        public void Process(DateTime start, DateTime end, string payrollCode, Action<string> iterationCallback = null)
         {
             try
             {
                 start = start.GetStartOfDay();
                 end = end.GetStartOfDay();
 
-                if (start >= end)
+                if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
                 if (string.IsNullOrEmpty(payrollCode))
@@ -93,12 +93,16 @@ namespace TKProcessor.Services
                 if (workschedules.Count == 0)
                     throw new Exception($"No Raw Data was found");
 
+                var globalSettings = Context.GlobalSetting.FirstOrDefault();
+
                 while (start <= end)
                 {
                     foreach (var employee in employees)
                     {
                         try
                         {
+                            iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()}...");
+
                             var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.GetStartOfDay() == start);
 
                             foreach (var item in existing)
@@ -115,12 +119,12 @@ namespace TKProcessor.Services
                             var timeout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
                                                                         (i.ScheduleDate.HasValue && i.ScheduleDate.Value.GetStartOfDay() == start.GetStartOfDay()) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
-                            //if (timeout == null)
-                            //{
-                            //    timeout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                            //                                            (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay().AddDays(1)) &&
-                            //                                            i.TransactionType == (int) TransactionType.TimeOut);
-                            //}
+
+                            if (!globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
+                            {
+                                iterationCallback?.Invoke($"Skipping {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()} due to No Work, No DTR Setup");
+                                continue;
+                            }
 
                             var ambreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
                                                                         (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&

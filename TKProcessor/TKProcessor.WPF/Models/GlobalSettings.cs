@@ -14,6 +14,9 @@ namespace TKProcessor.WPF.Models
     {
         private ObservableCollection<Mapping> _payrollCodeMappings;
         private ObservableCollection<Mapping> _payPackageMappings;
+        private DateTime _defaultNDStart;
+        private DateTime _defaultNDEnd;
+        private bool _createDTRForNoWorkDays;
 
         public GlobalSettings()
         {
@@ -46,9 +49,33 @@ namespace TKProcessor.WPF.Models
             PayPackageMappingsView.SortDescriptions.Add(new SortDescription("Order", ListSortDirection.Ascending));
         }
 
-        public DateTime DefaultNDStart { get; set; }
-        public DateTime DefaultNDEnd { get; set; }
-        public bool CreateDTRForNoWorkDays { get; set; }
+        public DateTime DefaultNDStart
+        {
+            get => _defaultNDStart;
+            set
+            {
+                _defaultNDStart = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public DateTime DefaultNDEnd
+        {
+            get => _defaultNDEnd;
+            set
+            {
+                _defaultNDEnd = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public bool CreateDTRForNoWorkDays
+        {
+            get => _createDTRForNoWorkDays;
+            set
+            {
+                _createDTRForNoWorkDays = value;
+                NotifyOfPropertyChange();
+            }
+        }
 
         public ObservableCollection<Mapping> PayrollCodeMappings
         {

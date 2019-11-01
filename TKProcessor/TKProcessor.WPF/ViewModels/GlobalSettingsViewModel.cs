@@ -17,8 +17,6 @@ namespace TKProcessor.WPF.ViewModels
 {
     public class GlobalSettingsViewModel : ViewModelBase<GlobalSettings>, IDisposable
     {
-        private readonly IEventAggregator eventAggregator;
-        private readonly IWindowManager windowManager;
         private readonly IMapper mapper;
         private readonly GlobalSettingsService service;
         private readonly PayrollCodeService payCodeService;
@@ -27,7 +25,7 @@ namespace TKProcessor.WPF.ViewModels
         private ObservableCollection<string> _payrollCodeList;
         private ObservableCollection<string> _payPackageList;
 
-        public GlobalSettingsViewModel()
+        public GlobalSettingsViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
             mapper = new MapperConfiguration(cfg =>
             {
@@ -44,25 +42,23 @@ namespace TKProcessor.WPF.ViewModels
             }).CreateMapper();
 
             service = new GlobalSettingsService();
+
             payCodeService = new PayrollCodeService();
+
             payPackageService = new PayPackageService();
+
             jobGradeBandService = new JobGradeBandService();
 
             Populate();
         }
 
-        public GlobalSettingsViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : this()
-        {
-            this.eventAggregator = eventAggregator;
-            this.windowManager = windowManager;
-        }
-
         public void Populate()
         {
-            StartProcessing();
-
             Task.Run(() =>
             {
+
+                StartProcessing();
+
                 try
                 {
                     App.Current.Dispatcher.Invoke(() =>
@@ -84,6 +80,7 @@ namespace TKProcessor.WPF.ViewModels
                         }
 
                     });
+
                     // load global settings
                     TKModels.GlobalSetting data = service.List().ToList().FirstOrDefault();
 
@@ -136,6 +133,7 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
                 }
+
                 EndProcessing();
             });
         }
@@ -175,7 +173,13 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            service.Dispose();
+
+            payCodeService.Dispose();
+
+            payPackageService.Dispose();
+
+            jobGradeBandService.Dispose();
         }
     }
 }

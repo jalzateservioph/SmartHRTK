@@ -124,7 +124,8 @@ namespace TKProcessor.WPF.Models
             get => _scheduleIn;
             set
             {
-                _scheduleIn = value;
+                _scheduleIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
+
                 NotifyOfPropertyChange();
             }
         }
@@ -133,7 +134,7 @@ namespace TKProcessor.WPF.Models
             get => _scheduleOut;
             set
             {
-                _scheduleOut = value;
+                _scheduleOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -160,7 +161,7 @@ namespace TKProcessor.WPF.Models
             get => _nightDiffStart;
             set
             {
-                _nightDiffStart = value;
+                _nightDiffStart = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -169,7 +170,7 @@ namespace TKProcessor.WPF.Models
             get => _nightDiffEnd;
             set
             {
-                _nightDiffEnd = value;
+                _nightDiffEnd = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -178,7 +179,7 @@ namespace TKProcessor.WPF.Models
             get => _amBreakIn;
             set
             {
-                _amBreakIn = value;
+                _amBreakIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -187,7 +188,7 @@ namespace TKProcessor.WPF.Models
             get => _amBreakOut;
             set
             {
-                _amBreakOut = value;
+                _amBreakOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -196,7 +197,7 @@ namespace TKProcessor.WPF.Models
             get => _pmBreakIn;
             set
             {
-                _pmBreakIn = value;
+                _pmBreakIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -205,7 +206,7 @@ namespace TKProcessor.WPF.Models
             get => _pmBreakOut;
             set
             {
-                _pmBreakOut = value;
+                _pmBreakOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -214,7 +215,7 @@ namespace TKProcessor.WPF.Models
             get => _lunchIn;
             set
             {
-                _lunchIn = value;
+                _lunchIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -223,7 +224,7 @@ namespace TKProcessor.WPF.Models
             get => _lunchOut;
             set
             {
-                _lunchOut = value;
+                _lunchOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -232,7 +233,7 @@ namespace TKProcessor.WPF.Models
             get => _dinnerIn;
             set
             {
-                _dinnerIn = value;
+                _dinnerIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -241,7 +242,7 @@ namespace TKProcessor.WPF.Models
             get => _dinnerOut;
             set
             {
-                _dinnerOut = value;
+                _dinnerOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -494,7 +495,7 @@ namespace TKProcessor.WPF.Models
             get => _earliestTimeIn;
             set
             {
-                _earliestTimeIn = value;
+                _earliestTimeIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -503,7 +504,7 @@ namespace TKProcessor.WPF.Models
             get => _latestTimeIn;
             set
             {
-                _latestTimeIn = value;
+                _latestTimeIn = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -512,7 +513,7 @@ namespace TKProcessor.WPF.Models
             get => _earliestTimeOut;
             set
             {
-                _earliestTimeOut = value;
+                _earliestTimeOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
@@ -521,7 +522,7 @@ namespace TKProcessor.WPF.Models
             get => _latestTimeOut;
             set
             {
-                _latestTimeOut = value;
+                _latestTimeOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second) : value;
                 NotifyOfPropertyChange();
             }
         }
