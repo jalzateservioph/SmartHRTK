@@ -162,6 +162,12 @@ namespace TKProcessor.Services
                                 TimeOut = timeout?.TransactionDateTime?.RemoveSeconds(),
                             };
 
+                            if (DTR.Shift == null)
+                                DTR.AddRemarks($"Employee has no work schdedule setup for this day");
+
+                            if (DTR.TimeIn == null && DTR.TimeOut == null)
+                                DTR.AddRemarks($"There is no time in and time out data for this day");
+
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
 
@@ -235,6 +241,7 @@ namespace TKProcessor.Services
             {
                 start = start.Date;
                 end = end.Date;
+                payOutDate = payOutDate.Date;
 
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
@@ -245,7 +252,8 @@ namespace TKProcessor.Services
                 if (string.IsNullOrEmpty(payPackageCode))
                     throw new ArgumentNullException("Payroll code cannot be empty");
 
-                GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings).Include(i => i.PayrollCodeMappings).FirstOrDefault();
+                GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings)
+                                                                    .Include(i => i.PayrollCodeMappings).FirstOrDefault();
 
                 if (globalSettings == default(GlobalSetting) ||
                     globalSettings.PayPackageMappings.Count == 0 ||
@@ -255,8 +263,8 @@ namespace TKProcessor.Services
                 }
 
                 var dtrGroups = List(start, end, payPackageCode).Where(i => i.Employee.JobGradeBand == payPackageCode)
-                                        .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
-                                        .ToList().GroupBy(i => i.Employee);
+                                                                .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
+                                                                .ToList().GroupBy(i => i.Employee);
 
                 if (dtrGroups.Count() == 0)
                     throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
@@ -268,9 +276,9 @@ namespace TKProcessor.Services
                     throw new Exception($"Please setup pay package mapping for Job Grade Band '{payPackageCode}' in the Settings");
 
                 var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
-                                                .Include(i => i.PayPackageSeq)
-                                                .Include(i => i.PayFreqCalendarSeq)
-                                                .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
+                                               .Include(i => i.PayPackageSeq)
+                                               .Include(i => i.PayFreqCalendarSeq)
+                                               .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
 
                 if (payFreqCalendar == null)
                     throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{payPackageCode}'");
@@ -294,7 +302,7 @@ namespace TKProcessor.Services
 
                 foreach (var group in dtrGroups)
                 {
-                    short displayOrder = 0;
+                    short displayOrder = 1;
 
                     foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
                     {
@@ -305,13 +313,12 @@ namespace TKProcessor.Services
                             fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
                         }
 
-                        // do not export to DP if value is 0
                         if (fieldValue == 0)
                             continue;
 
                         var line = new PayrollTrxLines()
                         {
-                            DisplayOrder = ++displayOrder,
+                            DisplayOrder = displayOrder++,
                             EmployeeCode = group.Key.EmployeeCode,
                             LineDate = payOutDate,
                             PayPackageCode = payPackage.Code,
@@ -322,9 +329,9 @@ namespace TKProcessor.Services
                             PostingAction = 0,
                             InstanceCount = 0,
                             CreatedOn = DateTime.Now,
-                            CreatedBy = Guid.Empty,
+                            CreatedBy = CurrentUser.DPUserId ?? Guid.Empty,
                             ModifiedOn = DateTime.Now,
-                            ModifiedBy = Guid.Empty
+                            ModifiedBy = CurrentUser.DPUserId ?? Guid.Empty
                         };
 
                         trx.PayrollTrxLines.Add(line);

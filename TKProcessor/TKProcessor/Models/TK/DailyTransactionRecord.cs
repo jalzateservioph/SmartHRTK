@@ -9,6 +9,15 @@ namespace TKProcessor.Models.TK
         {
             Id = Guid.NewGuid();
         }
+
+        public void AddRemarks(string message)
+        {
+            if (!string.IsNullOrEmpty(Remarks))
+                Remarks += "; ";
+
+            Remarks += "Employee has no work schedule setup for this date";
+        }
+
         public Guid Id { get; set; }
         public User CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -22,7 +31,7 @@ namespace TKProcessor.Models.TK
         public DateTime? TransactionDate { get; set; }
         public DateTime? TimeIn { get; set; }
         public DateTime? TimeOut { get; set; }
-        public decimal RegularWorkHours { get;set; }
+        public decimal RegularWorkHours { get; set; }
         public decimal WorkHours { get; set; }
         public decimal AbsentHours { get; set; }
         public decimal ActualLate { get; set; }
