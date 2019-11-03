@@ -250,7 +250,7 @@ namespace TKProcessor.Services
                     postShiftOvertime = workHours - (requiredWorkHours * 60);
                     approvedPostShiftOvertime = postShiftOvertime;
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
@@ -460,7 +460,7 @@ namespace TKProcessor.Services
                         approvedPreShiftOvertime = preShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value < preShiftOvertime)
+                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
                     {
                         approvedPreShiftOvertime = 0;
                     }
@@ -483,7 +483,7 @@ namespace TKProcessor.Services
                         approvedPostShiftOvertime = postShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
@@ -709,7 +709,7 @@ namespace TKProcessor.Services
                         approvedPreShiftOvertime = preShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value < preShiftOvertime)
+                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
                     {
                         approvedPreShiftOvertime = 0;
                     }
@@ -734,7 +734,7 @@ namespace TKProcessor.Services
                         approvedPostShiftOvertime = postShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
