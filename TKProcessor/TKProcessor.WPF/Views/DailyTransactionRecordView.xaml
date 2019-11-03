@@ -62,7 +62,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Employee.EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TransactionDate}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=d}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Reg Work Hours" Width="auto" IsReadOnly="True"/>

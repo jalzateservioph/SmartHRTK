@@ -166,7 +166,8 @@ namespace TKProcessor.Services
             DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
             DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
             DTR.ApprovedLate = DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
-            DTR.ApprovedOvertime = DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+            DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
             DTR.AbsentHours = Math.Round(absentHours / 60, 2) + 0.00m;
 
             DTR.ApprovedUndertime = DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;

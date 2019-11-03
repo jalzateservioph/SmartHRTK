@@ -73,7 +73,7 @@ namespace TKProcessor.Services
                 absentHours = (decimal)(requiredWorkHours * 60);
             }
 
-    
+
             MapFieldsToDTR();
         }
 
@@ -249,11 +249,11 @@ namespace TKProcessor.Services
                     postShiftOvertime = workHours - (requiredWorkHours * 60);
                     approvedPostShiftOvertime = postShiftOvertime;
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && postShiftOvertime < DTR.Shift.MinimumPostShiftOt.Value)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
-                    else if (DTR.Shift.MaximumPostShiftOt.HasValue && postShiftOvertime > DTR.Shift.MaximumPostShiftOt.Value)
+                    else if (DTR.Shift.MaximumPostShiftOt.HasValue && DTR.Shift.MaximumPostShiftOt.Value < postShiftOvertime)
                     {
                         approvedPostShiftOvertime = DTR.Shift.MaximumPostShiftOt.Value;
                     }
@@ -453,7 +453,7 @@ namespace TKProcessor.Services
                         approvedPreShiftOvertime = preShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
+                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value < preShiftOvertime)
                     {
                         approvedPreShiftOvertime = 0;
                     }
@@ -476,7 +476,7 @@ namespace TKProcessor.Services
                         approvedPostShiftOvertime = postShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
@@ -701,7 +701,7 @@ namespace TKProcessor.Services
                         approvedPreShiftOvertime = preShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
+                    if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value < preShiftOvertime)
                     {
                         approvedPreShiftOvertime = 0;
                     }
@@ -726,7 +726,7 @@ namespace TKProcessor.Services
                         approvedPostShiftOvertime = postShiftOvertime;
                     }
 
-                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
+                    if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
                     {
                         approvedPostShiftOvertime = 0;
                     }
@@ -838,7 +838,7 @@ namespace TKProcessor.Services
             }
             #endregion
         }
-        
+
         private IEnumerable<DateTime> GetTimeRange(DateTime earliest, DateTime latest, Increment increment)
         {
             DateTime currentItem = earliest;

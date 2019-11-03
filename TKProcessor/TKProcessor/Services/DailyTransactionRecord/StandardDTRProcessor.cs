@@ -151,7 +151,7 @@ namespace TKProcessor.Services
                     approvedPreShiftOvertime = preShiftOvertime;
                 }
 
-                if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
+                if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value < preShiftOvertime)
                 {
                     approvedPreShiftOvertime = 0;
                 }
@@ -174,7 +174,7 @@ namespace TKProcessor.Services
                     approvedPostShiftOvertime = postShiftOvertime;
                 }
 
-                if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
+                if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value < postShiftOvertime)
                 {
                     approvedPostShiftOvertime = 0;
                 }
@@ -288,11 +288,6 @@ namespace TKProcessor.Services
 
         public void ComputeHolidayAndRestDay()
         {
-            if(DTR.TransactionDate.Value == DateTime.Parse("9/20/2019"))
-            {
-                var breakHere = true;
-            }
-
             if (leaveDuration == 1M || leaveDuration == 0.5M)
             {
                 workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
