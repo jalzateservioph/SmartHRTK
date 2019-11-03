@@ -89,9 +89,9 @@ namespace TKProcessor.Services
                 workHours = Convert.ToDecimal((actualTimeOut - actualTimeIn).TotalMinutes);
                 AdjustWorkHours();
 
-                if (workHours > requiredWorkHours)
+                if (workHours > requiredWorkHours * 60)
                 {
-                    regularWorkHours = requiredWorkHours;
+                    regularWorkHours = requiredWorkHours * 60;
                 }
                 else
                 {
