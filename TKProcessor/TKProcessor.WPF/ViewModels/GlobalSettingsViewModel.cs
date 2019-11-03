@@ -92,21 +92,21 @@ namespace TKProcessor.WPF.ViewModels
                     int index = 0;
 
                     // load pay packages
-                    if (ActiveItem.PayrollCodeMappings.Count == 0)
+                    var list = typeof(DailyTransactionRecord).GetProperties();
+                    var props = list.Where(i => (i.PropertyType == typeof(decimal) || i.PropertyType == typeof(decimal?)));
+
+                    foreach (var propInfo in props)
                     {
-                        var list = typeof(DailyTransactionRecord).GetProperties();
-                        var props = list.Where(i => (i.PropertyType == typeof(decimal) || i.PropertyType == typeof(decimal?)));
+                        if (propInfo.Name.Contains("Actual"))
+                            continue;
 
-                        foreach (var propInfo in props)
+                        if (ActiveItem.PayrollCodeMappings.Any(i => i.Source == propInfo.Name))
+                            continue;
+
+                        App.Current.Dispatcher.Invoke(() =>
                         {
-                            if (propInfo.Name.Contains("Actual"))
-                                continue;
-
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                ActiveItem.PayrollCodeMappings.Add(new Mapping() { Target = propInfo.Name, Source = "", Order = index++ });
-                            });
-                        }
+                            ActiveItem.PayrollCodeMappings.Add(new Mapping() { Target = propInfo.Name, Source = "", Order = index++ });
+                        });
                     }
 
                     App.Current.Dispatcher.Invoke(() => { ActiveItem.ViewAndSort(); });
@@ -114,15 +114,15 @@ namespace TKProcessor.WPF.ViewModels
                     index = 0;
 
                     // load pay packages
-                    if (ActiveItem.PayPackageMappings.Count == 0)
+                    foreach (var jobGradeBand in jobGradeBandService.List())
                     {
-                        foreach (var jobGradeBand in jobGradeBandService.List())
+                        if (ActiveItem.PayPackageMappings.Any(i => i.Source == jobGradeBand))
+                            continue;
+
+                        App.Current.Dispatcher.Invoke(() =>
                         {
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                ActiveItem.PayPackageMappings.Add(new Mapping() { Target = jobGradeBand, Source = "", Order = index++ });
-                            });
-                        }
+                            ActiveItem.PayPackageMappings.Add(new Mapping() { Target = jobGradeBand, Source = "", Order = index++ });
+                        });
                     }
 
                     App.Current.Dispatcher.Invoke(() => { ActiveItem.ViewAndSort(); });

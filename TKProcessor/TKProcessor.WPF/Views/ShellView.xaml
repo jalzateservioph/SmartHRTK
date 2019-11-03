@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TKProcessor.WPF.Views"
         xmlns:common="clr-namespace:TKProcessor.WPF.Common"
         mc:Ignorable="d"
-        Title="SmartHR Timekeeing" Height="760" Width="1280">
+        Title="Servio SmartHR Timekeeing" Height="760" Width="1280">
 
     <Window.Resources>
 
