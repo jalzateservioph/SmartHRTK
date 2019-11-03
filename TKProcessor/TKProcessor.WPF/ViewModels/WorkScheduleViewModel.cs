@@ -264,7 +264,7 @@ namespace TKProcessor.WPF.ViewModels
                                 service.Save(mapper.Map<TK.WorkSchedule>(forSave));
 
                                 var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id &&
-                                                                         i.ScheduleDate.GetStartOfDay() == forSave.ScheduleDate.GetStartOfDay());
+                                                                         i.ScheduleDate.Date == forSave.ScheduleDate.Date);
 
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
@@ -314,7 +314,7 @@ namespace TKProcessor.WPF.ViewModels
                     };
 
                     var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id &&
-                                                             i.ScheduleDate.GetStartOfDay() == forSave.ScheduleDate.GetStartOfDay());
+                                                             i.ScheduleDate.Date == forSave.ScheduleDate.Date);
 
                     service.Save(mapper.Map<TK.WorkSchedule>(forSave));
 

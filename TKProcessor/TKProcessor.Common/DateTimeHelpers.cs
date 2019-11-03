@@ -21,16 +21,6 @@ namespace TKProcessor.Common
                     );
         }
 
-        public static DateTime GetStartOfDay(this DateTime time)
-        {
-            return new DateTime(
-                        time.Year,
-                        time.Month,
-                        time.Day,
-                        0, 0, 0, 0
-                    );
-        }
-
         public static DateTime RemoveSeconds(this DateTime time)
         {
             return new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute, 0);

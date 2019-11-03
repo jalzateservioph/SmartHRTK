@@ -29,8 +29,8 @@ namespace TKProcessor.Services
         {
             try
             {
-                start = start.GetStartOfDay();
-                end = end.GetStartOfDay();
+                start = start.Date;
+                end = end.Date;
 
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
@@ -40,7 +40,7 @@ namespace TKProcessor.Services
 
 
                 var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
-                                            .Where(i => i.ScheduleDate.GetStartOfDay() >= start && i.ScheduleDate.GetStartOfDay() <= end)
+                                            .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end)
                                             .ToList();
 
                 if (workschedules.Count == 0)
@@ -52,7 +52,7 @@ namespace TKProcessor.Services
                     throw new Exception($"No employees found with payroll code {payrollCode}");
 
                 return Context.DailyTransactionRecord.Include(i => i.Employee).Include(i => i.Shift)
-                                .Where(i => i.TransactionDate.Value.GetStartOfDay() >= start && i.TransactionDate.Value.GetStartOfDay() <= end && employees.Any(emp => emp == i.Employee));
+                                .Where(i => i.TransactionDate.Value.Date >= start && i.TransactionDate.Value.Date <= end && employees.Any(emp => emp == i.Employee));
             }
             catch (Exception ex)
             {
@@ -62,32 +62,32 @@ namespace TKProcessor.Services
             }
         }
 
-        public void Process(DateTime start, DateTime end, string payrollCode, Action<string> iterationCallback = null)
+        public void Process(DateTime start, DateTime end, string payPackageCode, Action<string> iterationCallback = null)
         {
             try
             {
-                start = start.GetStartOfDay();
-                end = end.GetStartOfDay();
+                start = start.Date;
+                end = end.Date;
 
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                if (string.IsNullOrEmpty(payrollCode))
+                if (string.IsNullOrEmpty(payPackageCode))
                     throw new ArgumentNullException("Payroll code cannot be empty");
 
 
                 var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
-                                            .Where(i => i.ScheduleDate.GetStartOfDay() >= start && i.ScheduleDate.GetStartOfDay() <= end).ToList();
+                                            .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end).ToList();
 
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == payrollCode).Distinct().ToList();
+                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == payPackageCode).Distinct().ToList();
 
                 if (employees.Count == 0)
-                    throw new Exception($"No employees found with payroll code {payrollCode}");
+                    throw new Exception($"No employees found with payroll code {payPackageCode}");
 
-                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.GetStartOfDay() <= end &&
+                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
 
                 if (workschedules.Count == 0)
@@ -103,7 +103,7 @@ namespace TKProcessor.Services
                         {
                             iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()}...");
 
-                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.GetStartOfDay() == start);
+                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == start);
 
                             foreach (var item in existing)
                             {
@@ -113,11 +113,11 @@ namespace TKProcessor.Services
                             var shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == start);
 
                             var timein = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeIn);
 
                             var timeout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
 
                             if (!globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
@@ -127,30 +127,30 @@ namespace TKProcessor.Services
                             }
 
                             var ambreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                                        (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.AMBreakIn);
 
                             var ambreakout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.AMBreakOut);
 
                             var lunchin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchIn);
                             var lunchout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchOut);
                             var pmbreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakIn);
                             var pmbreakout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakOut);
                             var dinnerin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerIn);
                             var dinnerout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.GetStartOfDay() == start.GetStartOfDay()) &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerOut);
 
                             DailyTransactionRecord DTR = new DailyTransactionRecord()
@@ -228,17 +228,20 @@ namespace TKProcessor.Services
             }
         }
 
-        public void Export(DateTime start, DateTime end, DateTime payOutDate, string payrollCode)
+        public void Export(DateTime start, DateTime end, DateTime payOutDate, string payPackageCode)
         {
             try
             {
+                start = start.Date;
+                end = end.Date;
+
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
                 if (end > payOutDate)
                     throw new Exception("Payout date cannot be less than the set end date");
 
-                if (string.IsNullOrEmpty(payrollCode))
+                if (string.IsNullOrEmpty(payPackageCode))
                     throw new ArgumentNullException("Payroll code cannot be empty");
 
                 GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings).Include(i => i.PayrollCodeMappings).FirstOrDefault();
@@ -250,18 +253,26 @@ namespace TKProcessor.Services
                     throw new Exception("Please setup mappings in Global Settings first");
                 }
 
-                var dtrGroups = List().Where(i => i.Employee.JobGradeBand == payrollCode)
+                var dtrGroups = List(start, end, payPackageCode).Where(i => i.Employee.JobGradeBand == payPackageCode)
                                         .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
                                         .ToList().GroupBy(i => i.Employee);
 
                 if (dtrGroups.Count() == 0)
-                    throw new Exception("No DTR records has been found");
+                    throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
+                                        $"to {end.ToLongDateString()} with Pay package code '{payPackageCode}'");
 
-                var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == payrollCode).Source);
+                var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == payPackageCode).Source);
+
+                if (payPackage == null)
+                    throw new Exception($"Please setup pay package mapping for Job Grade Band '{payPackageCode}' in the Settings");
+
                 var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
                                                 .Include(i => i.PayPackageSeq)
                                                 .Include(i => i.PayFreqCalendarSeq)
-                                                .First(i => i.PayPackageSeqId == payPackage.SeqId).PayFreqCalendarSeq;
+                                                .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
+
+                if (payFreqCalendar == null)
+                    throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{payPackageCode}'");
 
                 var maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
 

@@ -32,7 +32,7 @@ namespace TKProcessor.WPF.Models
             get => _scheduleDate;
             set
             {
-                _scheduleDate = value.GetStartOfDay();
+                _scheduleDate = value.Date;
                 NotifyOfPropertyChange();
             }
         }
