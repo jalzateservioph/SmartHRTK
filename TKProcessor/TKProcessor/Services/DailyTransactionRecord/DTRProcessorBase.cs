@@ -111,19 +111,19 @@ namespace TKProcessor.Services
 
             if (DTR.Shift.AmbreakIn.HasValue && DTR.Shift.AmbreakOut.HasValue)
             {
-                sum += Convert.ToDecimal((DTR.Shift.AmbreakIn.Value - DTR.Shift.AmbreakOut.Value).TotalMinutes);
+                sum += Convert.ToDecimal((DTR.Shift.AmbreakIn.Value.RemoveSeconds() - DTR.Shift.AmbreakOut.Value.RemoveSeconds()).TotalMinutes);
             }
             if (DTR.Shift.PmbreakIn.HasValue && DTR.Shift.PmbreakOut.HasValue)
             {
-                sum += Convert.ToDecimal((DTR.Shift.PmbreakIn.Value - DTR.Shift.PmbreakOut.Value).TotalMinutes);
+                sum += Convert.ToDecimal((DTR.Shift.PmbreakIn.Value.RemoveSeconds() - DTR.Shift.PmbreakOut.Value.RemoveSeconds()).TotalMinutes);
             }
             if (DTR.Shift.LunchIn.HasValue && DTR.Shift.LunchOut.HasValue)
             {
-                sum += Convert.ToDecimal((DTR.Shift.LunchIn.Value - DTR.Shift.LunchOut.Value).TotalMinutes);
+                sum += Convert.ToDecimal((DTR.Shift.LunchIn.Value.RemoveSeconds() - DTR.Shift.LunchOut.Value.RemoveSeconds()).TotalMinutes);
             }
             if (DTR.Shift.DinnerIn.HasValue && DTR.Shift.DinnerOut.HasValue)
             {
-                sum += Convert.ToDecimal((DTR.Shift.DinnerIn.Value - DTR.Shift.DinnerOut.Value).TotalMinutes);
+                sum += Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
             }
             return sum;
         }
@@ -134,28 +134,28 @@ namespace TKProcessor.Services
             {
                 if (DTR.TimeOut.Value > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
                 {
-                    workHours -= Convert.ToDecimal((DTR.Shift.AmbreakIn.Value - DTR.Shift.AmbreakOut.Value).TotalMinutes);
+                    workHours -= Convert.ToDecimal((DTR.Shift.AmbreakIn.Value.RemoveSeconds() - DTR.Shift.AmbreakOut.Value.RemoveSeconds()).TotalMinutes);
                 }
             }
             if (DTR.Shift.PmbreakIn.HasValue && DTR.Shift.PmbreakOut.HasValue)
             {
                 if (DTR.TimeOut.Value > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
                 {
-                    workHours -= Convert.ToDecimal((DTR.Shift.PmbreakIn.Value - DTR.Shift.PmbreakOut.Value).TotalMinutes);
+                    workHours -= Convert.ToDecimal((DTR.Shift.PmbreakIn.Value.RemoveSeconds() - DTR.Shift.PmbreakOut.Value.RemoveSeconds()).TotalMinutes);
                 }
             }
             if (DTR.Shift.LunchIn.HasValue && DTR.Shift.LunchOut.HasValue)
             {
                 if (DTR.TimeOut.Value > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
                 {
-                    workHours -= Convert.ToDecimal((DTR.Shift.LunchIn.Value - DTR.Shift.LunchOut.Value).TotalMinutes);
+                    workHours -= Convert.ToDecimal((DTR.Shift.LunchIn.Value.RemoveSeconds() - DTR.Shift.LunchOut.Value.RemoveSeconds()).TotalMinutes);
                 }
             }
             if (DTR.Shift.DinnerIn.HasValue && DTR.Shift.DinnerOut.HasValue)
             {
                 if (DTR.TimeOut.Value > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
                 {
-                    workHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value - DTR.Shift.DinnerOut.Value).TotalMinutes);
+                    workHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
                 }
 
             }
@@ -229,7 +229,7 @@ namespace TKProcessor.Services
             }
             else
             {
-                requiredWorkHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value - DTR.Shift.ScheduleIn.Value).TotalMinutes - totalBreak) / 60, 2);
+                requiredWorkHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 60, 2);
             }
         }
     }

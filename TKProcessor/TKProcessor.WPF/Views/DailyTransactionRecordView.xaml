@@ -65,8 +65,8 @@
                 <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=d}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Reg Work Hours" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding WorkHours}" Header="Work Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding WorkHours}" Header="Total Work Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Regular Work Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding AbsentHours}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualLate}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False">

@@ -158,12 +158,13 @@ namespace TKProcessor.Services
                                 Employee = employee,
                                 TransactionDate = start,
                                 Shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == start)?.Shift,
-                                TimeIn = timein?.TransactionDateTime,
-                                TimeOut = timeout?.TransactionDateTime,
+                                TimeIn = timein?.TransactionDateTime?.RemoveSeconds(),
+                                TimeOut = timeout?.TransactionDateTime?.RemoveSeconds(),
                             };
 
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
+
                             if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
                             {
                                 holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);

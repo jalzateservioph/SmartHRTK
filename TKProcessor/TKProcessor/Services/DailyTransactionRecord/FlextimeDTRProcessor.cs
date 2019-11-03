@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TKProcessor.Common;
 using TKProcessor.Models.TK;
 
 namespace TKProcessor.Services
@@ -117,7 +118,7 @@ namespace TKProcessor.Services
                 #region Legal and Special Holiday plus Rest Day
                 if (isLegalHoliday && isSpecialHoliday && isRestDay)
                 {
-                    legalSpecialHolidayRestDay = workHours;
+                    legalSpecialHolidayRestDay = regularWorkHours;
                     legalSpecialHolidayRestDayOvertime = totalOvertime;
                     approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
                     legalSpecialHolidayRestDayNightDifferential = nightDifferential;
@@ -129,7 +130,7 @@ namespace TKProcessor.Services
                 #region Legal and Special Holiday
                 else if (isLegalHoliday && isSpecialHoliday)
                 {
-                    legalSpecialHoliday = workHours;
+                    legalSpecialHoliday = regularWorkHours;
                     legalSpecialHolidayOvertime = totalOvertime;
                     approvedLegalSpecialHolidayOvertime = approvedOvertime;
                     legalSpecialHolidayNightDifferential = nightDifferential;
@@ -141,7 +142,7 @@ namespace TKProcessor.Services
                 #region Special Holiday and Rest Day
                 else if (isSpecialHoliday && isRestDay)
                 {
-                    specialHolidayRestDay = workHours;
+                    specialHolidayRestDay = regularWorkHours;
                     specialHolidayRestDayOvertime = totalOvertime;
                     approvedSpecialHolidayRestDayOvertime = approvedOvertime;
                     specialHolidayRestDayNightDifferential = nightDifferential;
@@ -153,7 +154,7 @@ namespace TKProcessor.Services
                 #region Legal Holiday and Rest Day
                 else if (isLegalHoliday && isRestDay)
                 {
-                    legalHolidayRestDay = workHours;
+                    legalHolidayRestDay = regularWorkHours;
                     legalHolidayRestDayOvertime = totalOvertime;
                     approvedLegalHolidayRestDayOvertime = approvedOvertime;
                     legalHolidayRestDayNightDifferential = nightDifferential;
@@ -165,7 +166,7 @@ namespace TKProcessor.Services
                 #region Legal Holiday
                 else if (isLegalHoliday)
                 {
-                    legalHoliday = workHours;
+                    legalHoliday = regularWorkHours;
                     legalHolidayOvertime = totalOvertime;
                     approvedLegalHolidayOvertime = approvedOvertime;
                     legalHolidayNightDifferential = nightDifferential;
@@ -177,7 +178,7 @@ namespace TKProcessor.Services
                 #region Special Holiday
                 else if (isSpecialHoliday)
                 {
-                    specialHoliday = workHours;
+                    specialHoliday = regularWorkHours;
                     specialHolidayOvertime = totalOvertime;
                     approvedSpecialHolidayOvertime = approvedOvertime;
                     specialHolidayNightDifferential = nightDifferential;
@@ -189,7 +190,7 @@ namespace TKProcessor.Services
                 #region Rest Day
                 else if (isRestDay)
                 {
-                    restDay = workHours;
+                    restDay = regularWorkHours;
                     restDayOvertime = totalOvertime;
                     approvedRestDayOvertime = approvedOvertime;
                     restDayNightDifferential = nightDifferential;
@@ -266,8 +267,13 @@ namespace TKProcessor.Services
             #region Night Differential
             if (DTR.Shift.NightDiffStart.HasValue && DTR.Shift.NightDiffEnd.HasValue)
             {
-                DateTime expectedNightDifferentialStart = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.NightDiffStart.Value.TimeOfDay);
-                DateTime expectedNightDifferentialEnd = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.NightDiffEnd.Value.TimeOfDay);
+                DateTime expectedNightDifferentialStart = new DateTime(DTR.TransactionDate.Value.Year,
+                                                                       DTR.TransactionDate.Value.Month,
+                                                                       DTR.TransactionDate.Value.Day).Add(DTR.Shift.NightDiffStart.Value.TimeOfDay).RemoveSeconds();
+
+                DateTime expectedNightDifferentialEnd = new DateTime(DTR.TransactionDate.Value.Year,
+                                                                     DTR.TransactionDate.Value.Month,
+                                                                     DTR.TransactionDate.Value.Day).Add(DTR.Shift.NightDiffEnd.Value.TimeOfDay).RemoveSeconds();
 
                 if (expectedNightDifferentialEnd < expectedNightDifferentialStart)
                 {
@@ -327,6 +333,7 @@ namespace TKProcessor.Services
             }
             #endregion
         }
+
         private void SemiOnTheDot()
         {
             DateTime latestIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LatestTimeIn.Value.TimeOfDay);
@@ -394,7 +401,7 @@ namespace TKProcessor.Services
                 {
                     if (late > DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value)
                     {
-                        absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value - DTR.Shift.ScheduleIn.Value).TotalMinutes - totalBreak) / 2, 2);
+                        absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 2, 2);
                     }
                 }
                 #endregion
@@ -588,6 +595,7 @@ namespace TKProcessor.Services
             }
             #endregion
         }
+
         private void SemiFixedIncrements()
         {
             DateTime earliestIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.EarliestTimeIn.Value.TimeOfDay);

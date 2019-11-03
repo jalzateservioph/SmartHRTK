@@ -353,6 +353,11 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
+        public void Dispose()
+        {
+            service.Dispose();
+        }
+
         public override void Sort()
         {
             View.SortDescriptions.Add(new SortDescription("Employee.EmployeeCode", ListSortDirection.Ascending));
@@ -379,10 +384,6 @@ namespace TKProcessor.WPF.ViewModels
             return false;
         }
 
-        public void Dispose()
-        {
-            service.Dispose();
-        }
 
         public ObservableCollection<Shift> ShiftList
         {
