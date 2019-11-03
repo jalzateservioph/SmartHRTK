@@ -100,7 +100,7 @@ namespace TKProcessor.WPF.ViewModels
                         if (propInfo.Name.Contains("Actual"))
                             continue;
 
-                        if (ActiveItem.PayrollCodeMappings.Any(i => i.Source == propInfo.Name))
+                        if (ActiveItem.PayrollCodeMappings.Any(i => i.Target == propInfo.Name))
                             continue;
 
                         App.Current.Dispatcher.Invoke(() =>
@@ -116,7 +116,7 @@ namespace TKProcessor.WPF.ViewModels
                     // load pay packages
                     foreach (var jobGradeBand in jobGradeBandService.List())
                     {
-                        if (ActiveItem.PayPackageMappings.Any(i => i.Source == jobGradeBand))
+                        if (ActiveItem.PayPackageMappings.Any(i => i.Target == jobGradeBand))
                             continue;
 
                         App.Current.Dispatcher.Invoke(() =>
@@ -152,6 +152,17 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
+        public void Dispose()
+        {
+            service.Dispose();
+
+            payCodeService.Dispose();
+
+            payPackageService.Dispose();
+
+            jobGradeBandService.Dispose();
+        }
+
         public ObservableCollection<string> PayrollCodeList
         {
             get => _payrollCodeList;
@@ -171,15 +182,5 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public void Dispose()
-        {
-            service.Dispose();
-
-            payCodeService.Dispose();
-
-            payPackageService.Dispose();
-
-            jobGradeBandService.Dispose();
-        }
     }
 }

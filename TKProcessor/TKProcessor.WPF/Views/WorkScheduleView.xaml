@@ -64,7 +64,7 @@
                     </Grid.RowDefinitions>
 
                     <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
-                        <Label Content="Edit Employee Work Schedule" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
+                        <Label Content="Add/Edit Employee Work Schedule" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
                     </Border>
 
                     <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
