@@ -30,6 +30,7 @@ namespace TKProcessor.WPF.ViewModels
         private DateTime _startDate;
         private DateTime _endDate;
         private DateTime _payOutDate;
+        private string _payrollCode;
 
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -72,6 +73,10 @@ namespace TKProcessor.WPF.ViewModels
                 });
             });
 
+            PayrollCodeList = new ObservableCollection<string>(payCodeService.List());
+
+            PayrollCode = PayrollCodeList[0];
+
             AutoFilter = false;
         }
 
@@ -92,10 +97,6 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    PayrollCodeList = new ObservableCollection<string>(payCodeService.List());
-
-                    PayrollCode = PayrollCodeList[0];
-
                     Items.Clear();
 
                     foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
@@ -258,7 +259,15 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
-        public string PayrollCode { get; set; }
+        public string PayrollCode
+        {
+            get => _payrollCode;
+            set
+            {
+                _payrollCode = value;
+                NotifyOfPropertyChange();
+            }
+        }
         public ObservableCollection<string> PayrollCodeList
         {
             get => _payrollCodeList;
