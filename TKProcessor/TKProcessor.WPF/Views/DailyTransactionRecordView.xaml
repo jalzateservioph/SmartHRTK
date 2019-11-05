@@ -47,7 +47,7 @@
             <ComboBox Grid.Column="5" Width="102" ItemsSource="{Binding PayrollCodeList}" 
                       SelectedItem="{Binding PayrollCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Label Grid.Column="6" Content="Pay Out Date:" Margin="10,0,0,0"/>
+            <Label Grid.Column="6" Content="Reference Date:" Margin="10,0,0,0"/>
             <DatePicker Grid.Column="7" SelectedDate="{Binding PayOutDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 

@@ -52,8 +52,8 @@ namespace TKProcessor.Services
                     throw new Exception($"No employees found with Job Grade Band {jobGradeBand}");
 
                 return Context.DailyTransactionRecord.Include(i => i.Employee).Include(i => i.Shift)
-                                                     .Where(i => i.TransactionDate.Value.Date >= start && 
-                                                                 i.TransactionDate.Value.Date <= end && 
+                                                     .Where(i => i.TransactionDate.Value.Date >= start &&
+                                                                 i.TransactionDate.Value.Date <= end &&
                                                                  employees.Any(emp => emp == i.Employee));
             }
             catch (Exception ex)
@@ -244,116 +244,120 @@ namespace TKProcessor.Services
 
         public void Export(DateTime start, DateTime end, DateTime payOutDate, string jobGradeBand)
         {
-            try
+            using (DPContext dPContext = new DPContext())
             {
-                start = start.Date;
-                end = end.Date;
-                payOutDate = payOutDate.Date;
 
-                if (start > end)
-                    throw new Exception("Start date should not be greater than the end date");
-
-                if (end > payOutDate)
-                    throw new Exception("Payout date cannot be less than the set end date");
-
-                if (string.IsNullOrEmpty(jobGradeBand))
-                    throw new ArgumentNullException("Job Grade Band cannot be empty");
-
-                GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings)
-                                                                    .Include(i => i.PayrollCodeMappings).FirstOrDefault();
-
-                if (globalSettings == default(GlobalSetting) ||
-                    globalSettings.PayPackageMappings.Count == 0 ||
-                    globalSettings.PayrollCodeMappings.Count == 0)
+                try
                 {
-                    throw new Exception("Please setup mappings in Global Settings first");
-                }
+                    start = start.Date;
+                    end = end.Date;
+                    payOutDate = payOutDate.Date;
 
-                var dtrGroups = List(start, end, jobGradeBand).Where(i => i.Employee.JobGradeBand == jobGradeBand)
-                                                                .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
-                                                                .ToList().GroupBy(i => i.Employee);
+                    if (start > end)
+                        throw new Exception("Start date should not be greater than the end date");
 
-                if (dtrGroups.Count() == 0)
-                    throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
-                                        $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
+                    if (start > payOutDate || payOutDate > end)
+                        throw new Exception("Reference date should be in between start and end date");
 
-                var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
+                    if (string.IsNullOrEmpty(jobGradeBand))
+                        throw new ArgumentNullException("Job Grade Band cannot be empty");
 
-                if (payPackage == null)
-                    throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
+                    GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings)
+                                                                        .Include(i => i.PayrollCodeMappings).FirstOrDefault();
 
-                var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
-                                               .Include(i => i.PayPackageSeq)
-                                               .Include(i => i.PayFreqCalendarSeq)
-                                               .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
-
-                if (payFreqCalendar == null)
-                    throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
-
-                var maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
-
-                PayrollTrx trx = new PayrollTrx()
-                {
-                    CountryId = dPContext.Country.FirstOrDefault()?.CountryId,
-                    Type = 1,
-                    TrxNo = maxTrxNo,
-                    Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
-                    Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
-                    RefDate = DateTime.Now,
-                    CreatedOn = DateTime.Now,
-                    CreatedBy = Guid.Empty,
-                    ModifiedOn = DateTime.Now,
-                    ModifiedBy = Guid.Empty
-                };
-
-
-                foreach (var group in dtrGroups)
-                {
-                    short displayOrder = 1;
-
-                    foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
+                    if (globalSettings == default(GlobalSetting) ||
+                        globalSettings.PayPackageMappings.Count == 0 ||
+                        globalSettings.PayrollCodeMappings.Count == 0)
                     {
-                        decimal fieldValue = 0;
-
-                        foreach (var groupItem in group)
-                        {
-                            fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
-                        }
-
-                        if (fieldValue == 0)
-                            continue;
-
-                        var line = new PayrollTrxLines()
-                        {
-                            DisplayOrder = displayOrder++,
-                            EmployeeCode = group.Key.EmployeeCode,
-                            LineDate = payOutDate,
-                            PayPackageCode = payPackage.Code,
-                            PayFreqCalendarCode = payFreqCalendar.Code,
-                            PayrollCodeCode = mapping.Source,
-                            AttributeCode = "PHNumHours",
-                            InputValue = fieldValue.ToString(),
-                            PostingAction = 0,
-                            InstanceCount = 0,
-                            CreatedOn = DateTime.Now,
-                            CreatedBy = CurrentUser.DPUserId ?? Guid.Empty,
-                            ModifiedOn = DateTime.Now,
-                            ModifiedBy = CurrentUser.DPUserId ?? Guid.Empty
-                        };
-
-                        trx.PayrollTrxLines.Add(line);
+                        throw new Exception("Please setup mappings in Global Settings first");
                     }
+
+                    var dtrGroups = List(start, end, jobGradeBand).Where(i => i.Employee.JobGradeBand == jobGradeBand)
+                                                                    .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
+                                                                    .ToList().GroupBy(i => i.Employee);
+
+                    if (dtrGroups.Count() == 0)
+                        throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
+                                            $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
+
+                    var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
+
+                    if (payPackage == null)
+                        throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
+
+                    var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
+                                                   .Include(i => i.PayPackageSeq)
+                                                   .Include(i => i.PayFreqCalendarSeq)
+                                                   .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
+
+                    if (payFreqCalendar == null)
+                        throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
+
+                    var maxTrxNo = ++dPContext.Company.First().NextPayrollTrxNo;
+
+                    PayrollTrx trx = new PayrollTrx()
+                    {
+                        CountryId = dPContext.Country.FirstOrDefault()?.CountryId,
+                        Type = 1,
+                        TrxNo = maxTrxNo,
+                        Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
+                        Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
+                        RefDate = DateTime.Now,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = Guid.Empty,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = Guid.Empty
+                    };
+
+
+                    foreach (var group in dtrGroups)
+                    {
+                        short displayOrder = 1;
+
+                        foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
+                        {
+                            decimal fieldValue = 0;
+
+                            foreach (var groupItem in group)
+                            {
+                                fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
+                            }
+
+                            if (fieldValue == 0)
+                                continue;
+
+                            var line = new PayrollTrxLines()
+                            {
+                                DisplayOrder = displayOrder++,
+                                EmployeeCode = group.Key.EmployeeCode,
+                                LineDate = payOutDate,
+                                PayPackageCode = payPackage.Code,
+                                PayFreqCalendarCode = payFreqCalendar.Code,
+                                PayrollCodeCode = mapping.Source,
+                                AttributeCode = "PHNumHours", // make this maintainable 
+                                InputValue = fieldValue.ToString(),
+                                PostingAction = 0,
+                                InstanceCount = 0,
+                                CreatedOn = DateTime.Now,
+                                CreatedBy = CurrentUser.DPUserId ?? Guid.Empty,
+                                ModifiedOn = DateTime.Now,
+                                ModifiedBy = CurrentUser.DPUserId ?? Guid.Empty
+                            };
+
+                            trx.PayrollTrxLines.Add(line);
+                        }
+                    }
+
+                    dPContext.PayrollTrx.Add(trx);
+
+                    dPContext.SaveChanges();
                 }
+                catch (Exception ex)
+                {
+                    CreateErrorLog(ex);
 
-                dPContext.PayrollTrx.Add(trx);
-
-                dPContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                CreateErrorLog(ex);
-
-                throw ex;
+                    throw ex;
+                }
             }
         }
     }
