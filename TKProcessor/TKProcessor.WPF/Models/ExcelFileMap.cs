@@ -41,7 +41,7 @@ namespace TKProcessor.WPF.Models
             {
                 var possibleReplacements = replacementRuleDictionary[value].Split(',');
 
-                var replacement = ;
+                var replacement = "";
 
                 
 

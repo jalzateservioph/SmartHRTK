@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class ExcelFileMapperViewModel : 
+    public class ExcelFileMapperViewModel 
     {
     }
 }
