@@ -81,7 +81,7 @@ namespace TKProcessor.Services
 
             try
             {
-                var data = ExcelFileHander.Import(filename);
+                var data = ExcelFileHandler.Import(filename);
 
                 foreach (DataColumn col in data.Columns)
                 {
@@ -128,7 +128,7 @@ namespace TKProcessor.Services
         {
             try
             {
-                ExcelFileHander.Export(filename, columns);
+                ExcelFileHandler.Export(filename, columns);
             }
             catch (Exception ex)
             {

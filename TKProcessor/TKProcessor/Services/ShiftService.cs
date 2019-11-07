@@ -47,7 +47,7 @@ namespace TKProcessor.Services
 
         public void ExportTemplate(string filename)
         {
-            ExcelFileHander.Export(filename, columns);
+            ExcelFileHandler.Export(filename, columns);
         }
 
         public void Import(string filename, Action<WorkSchedule> iterationCallback)
@@ -55,7 +55,7 @@ namespace TKProcessor.Services
             if (!File.Exists(filename))
                 throw new FileNotFoundException($"{filename} was not found.");
 
-            var data = ExcelFileHander.Import(filename);
+            var data = ExcelFileHandler.Import(filename);
 
             var shiftProperties = typeof(Shift).GetProperties();
 

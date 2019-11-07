@@ -178,7 +178,7 @@ namespace TKProcessor.WPF.ViewModels
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information));
 
-                    service.Export(StartDate, EndDate, PayOutDate, PayrollCode);
+                    service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode);
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));
 
@@ -200,9 +200,22 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     StartProcessing();
 
-                    var DTRs = service.List(StartDate, EndDate, PayrollCode);
+                    try
+                    {
 
-                    DataTableHelpers.ToDataTable(DTRs);
+                        var data = service.GetExportExcelData(StartDate, EndDate, PayrollCode);
+
+                        ExcelFileHandler.Export(saveDiag.FileName, data);
+
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Exported to {saveDiag.FileName}", MessageType.Success));
+
+                    }
+                    catch (Exception ex)
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    }
+
+                    Populate();
 
                     EndProcessing();
                 });

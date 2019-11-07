@@ -10,6 +10,16 @@ namespace TKProcessor.Models.TK
             Id = Guid.NewGuid();
         }
 
+        public int CompareTo(Employee other)
+        {
+            return EmployeeCode.CompareTo(other.EmployeeCode);
+        }
+
+        public override string ToString()
+        {
+            return $"{EmployeeCode} - {FullName}";
+        }
+
         public Guid Id { get; set; }
         public User CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -23,10 +33,5 @@ namespace TKProcessor.Models.TK
         public string BiometricsId { get; set; }
         public string JobGradeBand { get; set; }
         public DateTime? TerminationDate { get; set; }
-
-        public int CompareTo(Employee other)
-        {
-            return EmployeeCode.CompareTo(other.EmployeeCode);
-        }
     }
 }

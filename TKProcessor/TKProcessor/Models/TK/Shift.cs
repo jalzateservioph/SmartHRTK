@@ -5,6 +5,11 @@ namespace TKProcessor.Models.TK
 {
     public partial class Shift : Entity
     {
+        public override string ToString()
+        {
+            return ShiftCode;
+        }
+
         public string ShiftCode { get; set; }
         public string Description { get; set; }
         public int? ShiftType { get; set; }

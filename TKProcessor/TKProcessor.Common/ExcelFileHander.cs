@@ -5,7 +5,7 @@ using System.Data;
 
 namespace TKProcessor.Common
 {
-    public class ExcelFileHander
+    public class ExcelFileHandler
     {
         public static DataTable Import(string filename)
         {

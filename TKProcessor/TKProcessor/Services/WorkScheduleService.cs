@@ -108,7 +108,7 @@ namespace TKProcessor.Services
 
             try
             {
-                var data = ExcelFileHander.Import(filename);
+                var data = ExcelFileHandler.Import(filename);
 
                 if (TryGetDefinition(data, out int defIndex))
                 {
