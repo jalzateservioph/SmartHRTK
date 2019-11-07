@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TKProcessor.Common;
+using TKProcessor.Models;
 using TKProcessor.Models.DP;
 using TKProcessor.Models.TK;
 
@@ -52,8 +54,8 @@ namespace TKProcessor.Services
                     throw new Exception($"No employees found with Job Grade Band {jobGradeBand}");
 
                 return Context.DailyTransactionRecord.Include(i => i.Employee).Include(i => i.Shift)
-                                                     .Where(i => i.TransactionDate.Value.Date >= start && 
-                                                                 i.TransactionDate.Value.Date <= end && 
+                                                     .Where(i => i.TransactionDate.Value.Date >= start &&
+                                                                 i.TransactionDate.Value.Date <= end &&
                                                                  employees.Any(emp => emp == i.Employee));
             }
             catch (Exception ex)
@@ -237,7 +239,7 @@ namespace TKProcessor.Services
             }
         }
 
-        public void Export(DateTime start, DateTime end, DateTime payOutDate, string jobGradeBand)
+        public void ExportToDP(DateTime start, DateTime end, DateTime payOutDate, string jobGradeBand)
         {
             try
             {
@@ -349,6 +351,32 @@ namespace TKProcessor.Services
                 CreateErrorLog(ex);
 
                 throw ex;
+            }
+        }
+
+        public DataTable GetExportExcelData(DateTime start, DateTime end, string jobGradeBand)
+        {
+            try
+            {
+                var data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBand));
+
+                foreach(var propInfo in typeof(IEntity).GetProperties())
+                {
+                    data.Columns.Remove(propInfo.Name);
+                }
+
+                foreach (var propInfo in typeof(IModel).GetProperties())
+                {
+                    data.Columns.Remove(propInfo.Name);
+                }
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                CreateErrorLog(ex);
+
+                throw ex; ;
             }
         }
     }

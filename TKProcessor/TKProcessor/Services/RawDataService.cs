@@ -27,7 +27,7 @@ namespace TKProcessor.Services
 
         public void ExportTemplate(string filename)
         {
-            ExcelFileHander.Export(filename, columns);
+            ExcelFileHandler.Export(filename, columns);
         }
 
         public new void Save(RawData entity)
@@ -49,7 +49,7 @@ namespace TKProcessor.Services
 
             try
             {
-                var data = ExcelFileHander.Import(filename);
+                var data = ExcelFileHandler.Import(filename);
 
                 var cols = data.Columns.Cast<DataColumn>().Select(i => i.ColumnName).ToArray();
 

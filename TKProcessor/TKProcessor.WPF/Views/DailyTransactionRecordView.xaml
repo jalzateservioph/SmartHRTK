@@ -21,7 +21,7 @@
             <Button x:Name="Populate" Content="View Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Process" Content="Process" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="Export" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
+            <Button x:Name="ExportToDP" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
         </StackPanel>
 
