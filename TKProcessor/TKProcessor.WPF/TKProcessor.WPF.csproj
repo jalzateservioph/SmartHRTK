@@ -167,6 +167,7 @@
     <Compile Include="Models\DailyTransactionRecord.cs" />
     <Compile Include="Models\Dashboard.cs" />
     <Compile Include="Models\ErrorLog.cs" />
+    <Compile Include="Models\ExcelFileMap.cs" />
     <Compile Include="Models\GlobalSettings.cs" />
     <Compile Include="Models\Mapping.cs" />
     <Compile Include="Models\PayrollCode.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="ViewModels\DashboardViewModel.cs" />
     <Compile Include="ViewModels\EmployeeViewModel.cs" />
     <Compile Include="ViewModels\ErrorLogsViewModel.cs" />
+    <Compile Include="ViewModels\ExcelFileMapperViewModel.cs" />
     <Compile Include="ViewModels\GlobalSettingsViewModel.cs" />
     <Compile Include="ViewModels\HolidayViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />

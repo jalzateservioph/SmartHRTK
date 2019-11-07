@@ -55,13 +55,20 @@ namespace TKProcessor.Services
                                        BiometricsId = int.Parse(p.PayrollEmployeeNum.Trim()).ToString(),
                                        TerminationDate = p.TerminationDate,
                                        JobGradeBand = p1.JobGradeBand
-                                   }).ToList();
+                                   });
 
                     foreach (var emp in empList)
                     {
-                        Save(emp);
+                        try
+                        {
+                            Save(emp);
 
-                        successCount++;
+                            successCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
                     }
 
                     Context.AuditLog.Add(new AuditLog() { Target = nameof(Employee), Action = $"Sync {successCount} employees." });

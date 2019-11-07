@@ -178,8 +178,6 @@ namespace TKProcessor.WPF.ViewModels
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information));
 
-                    Populate();
-
                     service.Export(StartDate, EndDate, PayOutDate, PayrollCode);
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));

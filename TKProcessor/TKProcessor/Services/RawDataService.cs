@@ -50,6 +50,7 @@ namespace TKProcessor.Services
             try
             {
                 var data = ExcelFileHander.Import(filename);
+
                 var cols = data.Columns.Cast<DataColumn>().Select(i => i.ColumnName).ToArray();
 
                 if (cols.Count() != columns.Count())
@@ -79,11 +80,16 @@ namespace TKProcessor.Services
                             var importedRawData = new RawData()
                             {
                                 BiometricsId = row[columns[0]].ToString(),
+
                                 TransactionType = row[columns[1]].ToString().ToLower() == "in" ? 1 :
                                                      row[columns[1]].ToString().ToLower() == "out" ? 2 :
                                                         int.Parse(row[columns[1]].ToString()),
+
                                 TransactionDateTime = DateTime.Parse(row[columns[2]].ToString()),
-                                ScheduleDate = DateTime.Parse(row[columns[3]].ToString()).Date
+
+                                ScheduleDate = string.IsNullOrEmpty(row[columns[3]].ToString()) ?
+                                                    DateTime.Parse(row[columns[2]].ToString()).Date :
+                                                    DateTime.Parse(row[columns[3]].ToString()).Date
                             };
 
                             Save(importedRawData);
