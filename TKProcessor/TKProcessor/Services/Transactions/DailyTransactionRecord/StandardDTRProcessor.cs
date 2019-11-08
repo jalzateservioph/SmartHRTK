@@ -33,6 +33,151 @@ namespace TKProcessor.Services
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
         }
 
+        public void Compute()
+        {
+            if (leaveDuration == 1M || leaveDuration == 0.5M)
+            {
+                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
+            }
+            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            {
+                GetActualTimeInAndOut();
+                workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
+                AdjustWorkHours();
+
+                if (workHours > requiredWorkHours * 60)
+                {
+                    regularWorkHours = requiredWorkHours * 60;
+                }
+                else
+                {
+                    regularWorkHours = workHours;
+                }
+
+                if (expectedTimeOut < expectedTimeIn)
+                {
+                    expectedTimeOut = expectedTimeOut.AddDays(1);
+                }
+
+
+                bool isLegalHoliday = false;
+                bool isSpecialHoliday = false;
+                bool isRestDay = false;
+
+                if (Holidays != null)
+                {
+                    foreach (var holiday in Holidays)
+                    {
+                        if (holiday.Type == (int)HolidayType.Legal) isLegalHoliday = true;
+                        if (holiday.Type == (int)HolidayType.Special) isSpecialHoliday = true;
+                    }
+                }
+
+                if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
+
+                ComputeLate();
+                ComputeUndertime();
+                ComputeOvertime();
+                ComputeNightDifferential();
+
+
+                #region Legal and Special Holiday plus Rest Day
+                if (isLegalHoliday && isSpecialHoliday && isRestDay)
+                {
+                    legalSpecialHolidayRestDay = regularWorkHours;
+                    legalSpecialHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
+                    legalSpecialHolidayRestDayNightDifferential = nightDifferential;
+                    legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Legal and Special Holiday
+                else if (isLegalHoliday && isSpecialHoliday)
+                {
+                    legalSpecialHoliday = regularWorkHours;
+                    legalSpecialHolidayOvertime = totalOvertime;
+                    approvedLegalSpecialHolidayOvertime = approvedOvertime;
+                    legalSpecialHolidayNightDifferential = nightDifferential;
+                    legalSpecialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Special Holiday and Rest Day
+                else if (isSpecialHoliday && isRestDay)
+                {
+                    specialHolidayRestDay = regularWorkHours;
+                    specialHolidayRestDayOvertime = totalOvertime;
+                    approvedSpecialHolidayRestDayOvertime = approvedOvertime;
+                    specialHolidayRestDayNightDifferential = nightDifferential;
+                    specialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Legal Holiday and Rest Day
+                else if (isLegalHoliday && isRestDay)
+                {
+                    legalHolidayRestDay = regularWorkHours;
+                    legalHolidayRestDayOvertime = totalOvertime;
+                    approvedLegalHolidayRestDayOvertime = approvedOvertime;
+                    legalHolidayRestDayNightDifferential = nightDifferential;
+                    legalHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayRestDayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Legal Holiday
+                else if (isLegalHoliday)
+                {
+                    legalHoliday = regularWorkHours;
+                    legalHolidayOvertime = totalOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
+                    legalHolidayNightDifferential = nightDifferential;
+                    legalHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedLegalHolidayOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Special Holiday
+                else if (isSpecialHoliday)
+                {
+                    specialHoliday = regularWorkHours;
+                    specialHolidayOvertime = totalOvertime;
+                    approvedSpecialHolidayOvertime = approvedOvertime;
+                    specialHolidayNightDifferential = nightDifferential;
+                    specialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedSpecialHolidayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+                #region Rest Day
+                else if (isRestDay)
+                {
+                    restDay = regularWorkHours;
+                    restDayOvertime = totalOvertime;
+                    approvedRestDayOvertime = approvedOvertime;
+                    restDayNightDifferential = nightDifferential;
+                    restDayNightDifferentialOvertime = nightDifferentialOvertime;
+                    approvedRestDayNightDifferentialOvertime = approvedOvertime;
+                }
+                #endregion
+
+            }
+            else
+            {
+                if (!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false)
+                {
+                    absentHours = (decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak;
+                }
+            }
+
+            MapFieldsToDTR();
+
+        }
+
         public void ComputeRegular()
         {
             if (leaveDuration == 1M || leaveDuration == 0.5M)
@@ -92,6 +237,9 @@ namespace TKProcessor.Services
                     {
                         approvedLate = late;
                     }
+
+                    latePeriodStart = expectedTimeIn;
+                    latePeriodEnd = actualTimeIn;
                 }
 
                 #region Half day
@@ -126,6 +274,9 @@ namespace TKProcessor.Services
                     {
                         approvedUndertime = undertime;
                     }
+
+                    undertimePeriodStart = actualTimeOut;
+                    undertimePeriodEnd = expectedTimeOut;
                 }
 
                 #region Half day
@@ -150,6 +301,8 @@ namespace TKProcessor.Services
                 {
                     preShiftOvertime = (decimal)(expectedTimeIn - actualTimeIn).TotalMinutes;
                     approvedPreShiftOvertime = preShiftOvertime;
+                    preShiftOvertimePeriodStart = actualTimeIn;
+                    preShiftOvertimePeriodEnd = expectedTimeIn;
                 }
 
                 if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
@@ -173,6 +326,8 @@ namespace TKProcessor.Services
                 {
                     postShiftOvertime = (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
                     approvedPostShiftOvertime = postShiftOvertime;
+                    postShiftOvertimePeriodStart = expectedTimeOut;
+                    postShiftOvertimePeriodEnd = actualTimeOut;
                 }
 
                 if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)

@@ -92,6 +92,17 @@ namespace TKProcessor.Services
         protected decimal legalSpecialHolidayRestDayNightDifferential = 0;
         protected decimal legalSpecialHolidayRestDayNightDifferentialOvertime = 0;
         protected decimal approvedLegalSpecialHolidayRestDayNightDifferential = 0;
+
+
+        protected DateTime? latePeriodStart;
+        protected DateTime? latePeriodEnd;
+        protected DateTime? undertimePeriodStart;
+        protected DateTime? undertimePeriodEnd;
+
+        protected DateTime? preShiftOvertimePeriodStart;
+        protected DateTime? preShiftOvertimePeriodEnd;
+        protected DateTime? postShiftOvertimePeriodStart;
+        protected DateTime? postShiftOvertimePeriodEnd;
         #endregion
 
         public DTRProcessorBase()
@@ -231,6 +242,11 @@ namespace TKProcessor.Services
             {
                 requiredWorkHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 60, 2);
             }
+        }
+
+        public static Tuple<DailyTransactionRecord, DailyTransactionRecord> Split(DailyTransactionRecord DTR)
+        {
+            return Tuple.Create(new DailyTransactionRecord(), new DailyTransactionRecord()); //To do
         }
     }
 }

@@ -10,7 +10,6 @@ using TKProcessor.Models;
 using TKProcessor.Models.DP;
 using TKProcessor.Models.TK;
 using TKProcessor.Services.Maintenance;
-
 namespace TKProcessor.Services
 {
     public class DailyTransactionRecordService : TKService<DailyTransactionRecord>
@@ -240,6 +239,115 @@ namespace TKProcessor.Services
             }
         }
 
+        public void ProcessSplit(DateTime start, DateTime end, string jobGradeBand, Action<string> iterationCallback = null)
+        {
+            try
+            {
+                start = start.Date;
+                end = end.Date;
+
+                if (start > end)
+                    throw new Exception("Start date should not be greater than the end date");
+
+                if (string.IsNullOrEmpty(jobGradeBand))
+                    throw new ArgumentNullException("Job Grade Band cannot be empty");
+
+
+                var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
+                                            .Where(i => i.ScheduleDate.Date >= start.AddDays(-1) && i.ScheduleDate.Date <= end).ToList(); //Include work schedule of day before start day... Filter split shifts
+
+
+                if (workschedules.Count == 0)
+                    throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
+
+                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == jobGradeBand).Distinct().ToList();
+
+                if (employees.Count == 0)
+                    throw new Exception($"No employees found with payroll code {jobGradeBand}");
+
+                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.Date <= end &&
+                                                            employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
+
+                if (workschedules.Count == 0)
+                    throw new Exception($"No Raw Data was found");
+
+                var globalSettings = Context.GlobalSetting.FirstOrDefault();
+
+
+                foreach (var employee in employees)
+                {
+                    DailyTransactionRecord hangingDTR = new DailyTransactionRecord();
+
+                    bool firstIteration = true;
+                    while (start <= end)
+                    {
+                        if (firstIteration)
+                        {
+                            //Compute hanging DTR from day before
+                            firstIteration = false;
+                        }
+
+                        DailyTransactionRecord currentDayDTR = new DailyTransactionRecord(); //Get values from hanging dtr. Must consider holidays in mapping values
+
+                        hangingDTR = new DailyTransactionRecord(); //Reset hanging DTR
+
+                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int) TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => (raw.ScheduleDate == start || raw.ScheduleDate == start.AddDays(1)) && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
+
+                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == start).OrderBy(ws => ws.Shift.ScheduleIn);
+
+                        foreach (var workSchedule in workSchedules)
+                        {
+                            DailyTransactionRecord dtr = new DailyTransactionRecord(); //DTR for this work schedule
+
+                            dtr.Shift = workSchedule.Shift;
+
+                            var timeIn = rawDataTimeIn.FirstOrDefault(raw => raw.TransactionDateTime < workSchedule.Shift.ScheduleOut);
+                            if (timeIn != null)
+                            {
+                                dtr.TimeIn = timeIn.TransactionDateTime;
+                                rawDataTimeIn.Remove(timeIn);
+                                var timeOut = rawDataTimeOut.FirstOrDefault();
+                                if (timeOut != null)
+                                {
+                                    dtr.TimeOut = timeOut.TransactionDateTime;
+                                    rawDataTimeOut.Remove(timeOut);
+                                }
+                            }
+
+                            //Compute DTR
+
+                            //If DTR crosses to next day, split
+                            if (dtr.TimeOut.HasValue && dtr.TimeOut > start.AddDays(1))
+                            {
+                                var splitDTR = DTRProcessorBase.Split(dtr); //Figure out how to split
+                                
+
+                                //Add splitDTR.Item1 to currentDayDTR
+
+                                //Add splitDTR.Item2 to hangingDTR
+                            }
+
+                            //Combine dtr to currentDayDTR
+                        }
+
+                        Save(currentDayDTR);
+
+                        start = start.AddDays(1);
+                    }
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                CreateErrorLog(ex);
+
+                throw ex;
+            }
+        }
+
         public void ExportToDP(DateTime start, DateTime end, DateTime payOutDate, string jobGradeBand)
         {
             try
@@ -361,7 +469,7 @@ namespace TKProcessor.Services
             {
                 var data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBand));
 
-                foreach(var propInfo in typeof(IEntity).GetProperties())
+                foreach (var propInfo in typeof(IEntity).GetProperties())
                 {
                     data.Columns.Remove(propInfo.Name);
                 }
@@ -382,3 +490,5 @@ namespace TKProcessor.Services
         }
     }
 }
+
+
