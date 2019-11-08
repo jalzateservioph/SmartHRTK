@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TKProcessor.WPF.Views"
         xmlns:common="clr-namespace:TKProcessor.WPF.Common"
         mc:Ignorable="d"
-        Title="Servio SmartHR Timekeeing" Height="760" Width="1280">
+        Title="Servio SmartHR Timekeeping" Height="760" Width="1280">
 
     <Window.Resources>
 
@@ -45,8 +45,8 @@
                 <MenuItem x:Name="ShowDailyTransactionRecords" Header="Daily Transaction Records"/>
             </MenuItem>
 
-            <MenuItem x:Name="ShowReports" Header="Reports">
-
+            <MenuItem Header="Reports">
+                <MenuItem x:Name="ShowAbsenceReport" Header="Absence Report"/>
             </MenuItem>
         </Menu>
 

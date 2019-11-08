@@ -179,6 +179,11 @@ namespace TKProcessor.WPF.ViewModels
             ChangeActiveItem(new ReportViewModel(), true);
         }
 
+        public void ShowAbsenceReport()
+        {
+            ChangeActiveItem(new ReportAbsenceViewModel(), true);
+        }
+
         public void ShowDashboard()
         {
             ChangeActiveItem(new DashboardViewModel(), true);

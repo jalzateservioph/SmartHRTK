@@ -124,7 +124,7 @@ namespace TKProcessor.Services
                                                                         (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
 
-                            if (!globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
+                            if (globalSettings != null && !globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
                             {
                                 iterationCallback?.Invoke($"Skipping {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()} due to No Work, No DTR Setup");
                                 continue;
@@ -291,7 +291,7 @@ namespace TKProcessor.Services
 
                         hangingDTR = new DailyTransactionRecord(); //Reset hanging DTR
 
-                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int) TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
                         IList<RawData> rawDataTimeOut = rawdata.Where(raw => (raw.ScheduleDate == start || raw.ScheduleDate == start.AddDays(1)) && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
 
                         var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == start).OrderBy(ws => ws.Shift.ScheduleIn);
@@ -321,7 +321,7 @@ namespace TKProcessor.Services
                             if (dtr.TimeOut.HasValue && dtr.TimeOut > start.AddDays(1))
                             {
                                 var splitDTR = DTRProcessorBase.Split(dtr); //Figure out how to split
-                                
+
 
                                 //Add splitDTR.Item1 to currentDayDTR
 
@@ -370,7 +370,9 @@ namespace TKProcessor.Services
 
                 if (globalSettings == default(GlobalSetting) ||
                     globalSettings.PayPackageMappings.Count == 0 ||
-                    globalSettings.PayrollCodeMappings.Count == 0)
+                    globalSettings.PayPackageMappings.Count(i => i.Source != "") == 0 ||
+                    globalSettings.PayrollCodeMappings.Count == 0 ||
+                    globalSettings.PayrollCodeMappings.Count(i => i.Source != "") == 0)
                 {
                     throw new Exception("Please setup mappings in Global Settings first");
                 }
