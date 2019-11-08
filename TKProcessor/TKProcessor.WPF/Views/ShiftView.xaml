@@ -97,7 +97,7 @@
 
                 <Label Content="Work Hours:" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Grid.Row="1" Grid.Column="4" Width="78" />
-                <TextBox  Height="22" Margin="0" TextWrapping="Wrap" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                <xctk:DecimalUpDown  Height="22" Margin="0" VerticalAlignment="Center" VerticalContentAlignment="Center"
                          Grid.Row="1" Grid.Column="5" Text="{Binding CurrentItem.RequiredWorkHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Label Content="Shift Type:" HorizontalAlignment="Left" VerticalAlignment="Center"
