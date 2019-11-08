@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="dsData">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Data Source=PH-WWLT200\SQLSRVR17;Initial Catalog=PII_TK</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>8f9446b1-cc2e-46ee-b0bf-4abe7b2e2368</DataSourceID>
+</RptDataSource>

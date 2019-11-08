@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TKProcessor.Models.TK;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class ErrorLogService : TKService<ErrorLog>
     {

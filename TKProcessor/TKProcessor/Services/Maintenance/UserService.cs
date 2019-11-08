@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using TKProcessor.Models.TK;
 using System.Security.Cryptography;
 using System.Configuration;
-namespace TKProcessor.Services
+
+namespace TKProcessor.Services.Maintenance
 {
     public class UserService : TKService<User>
     {

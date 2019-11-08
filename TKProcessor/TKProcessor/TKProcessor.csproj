@@ -290,23 +290,25 @@
     <Compile Include="Models\TK\WorkSchedule.cs" />
     <Compile Include="Models\TK\WorkScheduleAdjustment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\AbsenceReportService.cs" />
-    <Compile Include="Services\DailyTransactionRecord\DailyTransactionRecordService.cs" />
-    <Compile Include="Services\DailyTransactionRecord\DTRProcessorBase.cs" />
-    <Compile Include="Services\DailyTransactionRecord\FlextimeDTRProcessor.cs" />
-    <Compile Include="Services\DailyTransactionRecord\StandardDTRProcessor.cs" />
-    <Compile Include="Services\DatabaseService.cs" />
-    <Compile Include="Services\ErrorLogService.cs" />
-    <Compile Include="Services\GlobalSettingsService.cs" />
-    <Compile Include="Services\HolidayService.cs" />
-    <Compile Include="Services\LeaveService.cs" />
-    <Compile Include="Services\PayrollCodeService.cs" />
-    <Compile Include="Services\UserService.cs" />
-    <Compile Include="Services\EmployeeService.cs" />
-    <Compile Include="Services\RawDataService.cs" />
+    <Compile Include="Services\Reports\AbsenceReportService.cs" />
+    <Compile Include="Services\Reports\DailyTransactionRecordReportService.cs" />
+    <Compile Include="Services\Reports\LateReportService.cs" />
+    <Compile Include="Services\Transactions\DailyTransactionRecord\DailyTransactionRecordService.cs" />
+    <Compile Include="Services\Transactions\DailyTransactionRecord\DTRProcessorBase.cs" />
+    <Compile Include="Services\Transactions\DailyTransactionRecord\FlextimeDTRProcessor.cs" />
+    <Compile Include="Services\Transactions\DailyTransactionRecord\StandardDTRProcessor.cs" />
+    <Compile Include="Services\Maintenance\DatabaseService.cs" />
+    <Compile Include="Services\Maintenance\ErrorLogService.cs" />
+    <Compile Include="Services\Maintenance\GlobalSettingsService.cs" />
+    <Compile Include="Services\Maintenance\HolidayService.cs" />
+    <Compile Include="Services\Maintenance\LeaveService.cs" />
+    <Compile Include="Services\Maintenance\PayrollCodeService.cs" />
+    <Compile Include="Services\Maintenance\UserService.cs" />
+    <Compile Include="Services\Maintenance\EmployeeService.cs" />
+    <Compile Include="Services\Maintenance\RawDataService.cs" />
     <Compile Include="Services\ServiceBase.cs" />
-    <Compile Include="Services\ShiftService.cs" />
-    <Compile Include="Services\WorkScheduleService.cs" />
+    <Compile Include="Services\Maintenance\ShiftService.cs" />
+    <Compile Include="Services\Maintenance\WorkScheduleService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -320,6 +322,7 @@
       <Name>TKProcessor.Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

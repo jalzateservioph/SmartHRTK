@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TKProcessor.Common;
 using TKProcessor.Services;
+using TKProcessor.Services.Reports;
 using TKProcessor.WPF.Models;
 using TKProcessor.WPF.Views;
 

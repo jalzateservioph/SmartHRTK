@@ -8,7 +8,7 @@ using TKProcessor.Contexts;
 using TKProcessor.Models.SHR;
 using TKProcessor.Models.TK;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class EmployeeService : TKService<Employee>
     {
