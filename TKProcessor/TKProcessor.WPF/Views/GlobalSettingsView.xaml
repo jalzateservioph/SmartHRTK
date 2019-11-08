@@ -41,7 +41,8 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="23*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="261*"/>
             </Grid.RowDefinitions>
 
@@ -61,7 +62,7 @@
             <Label Content="Payroll Code Mapping" Margin="0" VerticalAlignment="Top"
                    Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="3" FontStyle="Italic" FontWeight="Bold"/>
 
-            <DataGrid Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="3" ItemsSource="{Binding ActiveItem.PayrollCodeMappingsView}" AutoGenerateColumns="False" Grid.RowSpan="7"
+            <DataGrid Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="3" ItemsSource="{Binding ActiveItem.PayrollCodeMappingsView}" AutoGenerateColumns="False" Grid.RowSpan="99"
                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="DTR Fields" Binding="{Binding Target}" Width="*" IsReadOnly="True"/>
@@ -106,10 +107,17 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <Label Content="Processing Behavior" VerticalAlignment="Top"
+            <Label Content="DTR Display Behavior" VerticalAlignment="Top" Visibility="Collapsed"
                 Grid.Row="4" Grid.ColumnSpan="4" FontStyle="Italic" Margin="0,1,0,0" FontWeight="Bold"/>
 
-            <CheckBox Content="Create DTR for No Work Days" Margin="5,0,0,0" Grid.Row="5" VerticalAlignment="Top" Grid.ColumnSpan="4" IsChecked="{Binding ActiveItem.CreateDTRForNoWorkDays}"/>
+            <CheckBox Content="Display DTR Columns As Minutes" Margin="5,0,0,0" Grid.Row="5" VerticalAlignment="Top" Grid.ColumnSpan="4" Visibility="Collapsed"
+                      IsChecked="{Binding ActiveItem.DisplayDTRColumnsAsMinutes}" HorizontalAlignment="Left"/>
+            
+            <Label Content="Processing Behavior" VerticalAlignment="Top"
+                Grid.Row="6" Grid.ColumnSpan="4" FontStyle="Italic" Margin="0,1,0,0" FontWeight="Bold"/>
+
+            <CheckBox Content="Create DTR for No Work Days" Margin="5,0,0,0" Grid.Row="7" VerticalAlignment="Top" Grid.ColumnSpan="4" IsChecked="{Binding ActiveItem.CreateDTRForNoWorkDays}"/>
+
 
         </Grid>
 

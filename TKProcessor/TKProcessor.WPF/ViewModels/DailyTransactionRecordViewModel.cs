@@ -168,7 +168,7 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
-        public void Export()
+        public void ExportToDP()
         {
             Task.Run(() =>
             {
@@ -176,7 +176,6 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information));
 
                     service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode);

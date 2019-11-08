@@ -17,6 +17,7 @@ namespace TKProcessor.WPF.Models
         private DateTime _defaultNDStart;
         private DateTime _defaultNDEnd;
         private bool _createDTRForNoWorkDays;
+        private bool displayDTRColumnsAsMinutes;
 
         public GlobalSettings()
         {
@@ -73,6 +74,15 @@ namespace TKProcessor.WPF.Models
             set
             {
                 _createDTRForNoWorkDays = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public bool DisplayDTRColumnsAsMinutes
+        {
+            get => displayDTRColumnsAsMinutes;
+            set
+            {
+                displayDTRColumnsAsMinutes = value;
                 NotifyOfPropertyChange();
             }
         }

@@ -15,7 +15,7 @@ using TKProcessor.WPF.Models;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class ShellViewModel : Conductor<IConductor>, IHandle<NewMessageEvent>, IHandle<LoginEvent>
+    public class ShellViewModel : Conductor<Screen>, IHandle<NewMessageEvent>, IHandle<LoginEvent>
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IWindowManager windowManager;

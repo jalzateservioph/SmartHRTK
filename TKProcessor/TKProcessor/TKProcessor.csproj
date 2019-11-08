@@ -258,6 +258,10 @@
     <Compile Include="Migrations\20191101091230_UpdateDTRAddRegularWorkHours.designer.cs">
       <DependentUpon>20191101091230_UpdateDTRAddRegularWorkHours.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191108075106_UpdateGlobalSettingsAddFieldDTRColumnsToMinutes.cs" />
+    <Compile Include="Migrations\20191108075106_UpdateGlobalSettingsAddFieldDTRColumnsToMinutes.designer.cs">
+      <DependentUpon>20191108075106_UpdateGlobalSettingsAddFieldDTRColumnsToMinutes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
@@ -291,6 +295,7 @@
     <Compile Include="Models\TK\WorkScheduleAdjustment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Reports\AbsenceReportService.cs" />
+    <Compile Include="Services\Reports\AbsenceReportSummaryService.cs" />
     <Compile Include="Services\Reports\DailyTransactionRecordReportService.cs" />
     <Compile Include="Services\Reports\LateReportService.cs" />
     <Compile Include="Services\Transactions\DailyTransactionRecord\DailyTransactionRecordService.cs" />

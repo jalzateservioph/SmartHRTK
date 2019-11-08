@@ -27,6 +27,18 @@ namespace TKProcessor.Services
         void SaveChanges();
     }
 
+    public class ErrorLogBase
+    {
+        protected void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
+        {
+            using (TKContext Context = new TKContext())
+            {
+                Context.ErrorLog.Add(new ErrorLog(ex, source));
+                Context.SaveChanges();
+            }
+        }
+    }
+
     public class TKService<T> : IService<T>, IDisposable
         where T : class, IEntity, new()
     {

@@ -47,6 +47,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -56,6 +57,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>B0818AA2AD4DD7FED2ECDF8F247E5A90B2A1A1E3</ManifestCertificateThumbprint>
@@ -72,6 +74,9 @@
   <PropertyGroup>
     <StartupObject>
     </StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=9.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
@@ -190,6 +195,7 @@
     <Compile Include="ViewModels\HolidayViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\RawDataViewModel.cs" />
+    <Compile Include="ViewModels\ReportAbsenceViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\ShiftViewModel.cs" />
@@ -199,6 +205,7 @@
     <Compile Include="Views\AuditLogsView.xaml.cs">
       <DependentUpon>AuditLogsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\BaseViewClasses.cs" />
     <Compile Include="Views\DailyTransactionRecordView.xaml.cs">
       <DependentUpon>DailyTransactionRecordView.xaml</DependentUpon>
     </Compile>
@@ -222,6 +229,12 @@
     </Compile>
     <Compile Include="Views\RawDataView.xaml.cs">
       <DependentUpon>RawDataView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReportAbsenceView.xaml.cs">
+      <DependentUpon>ReportAbsenceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReportParamAbsenceReportView.xaml.cs">
+      <DependentUpon>ReportParamAbsenceReportView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ReportView.xaml.cs">
       <DependentUpon>ReportView.xaml</DependentUpon>
@@ -284,6 +297,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RawDataView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportAbsenceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportParamAbsenceReportView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,4 +399,9 @@
     <Error Condition="!Exists('..\packages\Microsoft.NetCore.Analyzers.2.9.6\build\Microsoft.NetCore.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.NetCore.Analyzers.2.9.6\build\Microsoft.NetCore.Analyzers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.NetFramework.Analyzers.2.9.6\build\Microsoft.NetFramework.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.NetFramework.Analyzers.2.9.6\build\Microsoft.NetFramework.Analyzers.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(TargetDir)reports" (md "$(TargetDir)reports")
+rem ==========================================
+copy "$(SolutionDir)TKProcessor.Reports\bin\Debug\*.rdl" "$(TargetDir)reports\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

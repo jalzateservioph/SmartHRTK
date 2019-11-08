@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:cal="http://www.caliburnproject.org"
              xmlns:validators="clr-namespace:TKProcessor.WPF.Validators"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
@@ -24,7 +25,8 @@
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" IsEnabled="{Binding IsEnabled}"/>
         <TextBox Height="26" Margin="53,10,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"
-                 Text="{Binding FilterString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled}"/>
+                 Text="{Binding FilterString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled}"
+                 cal:Message.Attach="[Event PreviewKeyDown] = [Action InvokeFilter($eventArgs)]"/>
 
         <DataGrid Margin="0,41,0,0" Grid.Row="2" CanUserAddRows="False" CanUserDeleteRows="False" IsEnabled="{Binding IsEnabled}"
                   ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">

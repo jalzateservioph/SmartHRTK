@@ -1,7 +1,5 @@
-﻿using Microsoft.Reporting.WinForms;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,18 +16,13 @@ using System.Windows.Shapes;
 namespace TKProcessor.WPF.Views
 {
     /// <summary>
-    /// Interaction logic for ReportView.xaml
+    /// Interaction logic for ReportParamAbsenceReportView.xaml
     /// </summary>
-    public partial class ReportView : UserControl, IReportView
+    public partial class ReportParamAbsenceReportView : UserControl
     {
-        public ReportView()
+        public ReportParamAbsenceReportView()
         {
             InitializeComponent();
-        }
-
-        public ReportViewer ReportViewer
-        {
-            get => reportViewer;
         }
     }
 }

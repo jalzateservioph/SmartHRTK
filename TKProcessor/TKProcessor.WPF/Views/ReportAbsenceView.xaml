@@ -1,0 +1,60 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:rv="clr-namespace:Microsoft.Reporting.WinForms;assembly=Microsoft.ReportViewer.WinForms" x:Class="TKProcessor.WPF.Views.ReportAbsenceView"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Absence Report" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Semibold"/>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Content="Employee:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"/>
+            <xctk:CheckComboBox Grid.Column="1" HorizontalAlignment="Left" Height="26" Margin="0" VerticalAlignment="Center" Width="120"
+                            SelectedItemsOverride="{Binding Employees}" ItemsSource="{Binding EmployeeList}"/>
+
+            <Label Grid.Column="3" Content="Shift:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"/>
+            <xctk:CheckComboBox Grid.Column="4" HorizontalAlignment="Left" Height="26" Margin="0" VerticalAlignment="Center" Width="120"
+                            SelectedItemsOverride="{Binding Shifts}" ItemsSource="{Binding ShiftList}"/>
+
+            <Label Grid.Column="6" Content="From:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"/>
+            <DatePicker Grid.Column="7" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Width="120"
+                    SelectedDate="{Binding StartDate}"/>
+
+            <Label Grid.Column="9" Content="To:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center"/>
+            <DatePicker Grid.Column="10" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Width="120"
+                    SelectedDate="{Binding StartDate}"/>
+
+            <Button x:Name="Generate"  Grid.Column="12" Padding="15,1" Content="Generate Report"/>
+        </Grid>
+
+        <WindowsFormsHost Grid.Row="2" Margin="0,10,0,0">
+            <rv:ReportViewer x:Name="reportViewer" />
+        </WindowsFormsHost>
+    </Grid>
+</UserControl>

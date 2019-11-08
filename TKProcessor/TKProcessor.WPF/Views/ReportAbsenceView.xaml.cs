@@ -18,11 +18,11 @@ using System.Windows.Shapes;
 namespace TKProcessor.WPF.Views
 {
     /// <summary>
-    /// Interaction logic for ReportView.xaml
+    /// Interaction logic for ReportAbsenceView.xaml
     /// </summary>
-    public partial class ReportView : UserControl, IReportView
+    public partial class ReportAbsenceView : UserControl, IReportView
     {
-        public ReportView()
+        public ReportAbsenceView()
         {
             InitializeComponent();
         }

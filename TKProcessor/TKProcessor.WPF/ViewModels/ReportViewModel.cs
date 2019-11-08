@@ -13,25 +13,25 @@ using TKProcessor.WPF.Views;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class ReportViewModel : Conductor<Report>.Collection.OneActive
+    public class ReportViewModel : Screen
     {
-        public ReportViewModel()
+        public void LoadReport(Microsoft.Reporting.WinForms.ReportViewer reportViewer, string reportName, DataTable dt)
         {
-            Items.Add(new Report() { DisplayName = "Absence Report", Name = "TK_AbsencesRpt" });
-        }
-
-        public void SelectionChanged()
-        {
-            if (ActiveItem != null)
+            Microsoft.Reporting.WinForms.ReportDataSource reportDataSource = new Microsoft.Reporting.WinForms.ReportDataSource
             {
-                var reportView = (Views.First().Value as ReportView);
+                Name = "dsData", // Name of the DataSet we set in .rdlc
+                Value = dt
+            };
 
-                reportView.LoadReport(ActiveItem.Name, ReportDataFactory.GetData(ActiveItem.Name));
-            }
+            reportViewer.LocalReport.ReportPath = $"reports\\{reportName}.rdl";
+
+            reportViewer.LocalReport.DataSources.Add(reportDataSource);
+
+            reportViewer.RefreshReport();
         }
     }
 
-    public class ReportDataFactory
+    public static class ReportDataFactory
     {
         public static DataTable GetData(string reportName)
         {
