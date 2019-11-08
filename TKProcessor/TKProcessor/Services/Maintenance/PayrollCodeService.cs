@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TKProcessor.Contexts;
 using TKProcessor.Models.DP;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class JobGradeBandService : IDisposable
     {

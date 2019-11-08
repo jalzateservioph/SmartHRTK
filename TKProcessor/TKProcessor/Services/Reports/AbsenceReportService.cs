@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TKProcessor.Contexts;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Reports
 {
     public class AbsenceReportService : IReportService<AbsenceReportModel>
     {

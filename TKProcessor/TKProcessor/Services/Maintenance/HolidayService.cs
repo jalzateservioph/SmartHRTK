@@ -10,7 +10,7 @@ using TKProcessor.Contexts;
 using TKProcessor.Models;
 using TKProcessor.Models.TK;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class HolidayService : TKService<Holiday>, IExportTemplate
     {

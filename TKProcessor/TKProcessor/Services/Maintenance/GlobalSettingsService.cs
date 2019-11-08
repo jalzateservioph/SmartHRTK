@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using TKProcessor.Models.DP;
 using TKProcessor.Models.TK;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class GlobalSettingsService : TKService<GlobalSetting>
     {

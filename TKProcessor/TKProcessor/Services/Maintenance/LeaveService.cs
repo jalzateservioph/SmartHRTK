@@ -7,7 +7,7 @@ using TKProcessor.Contexts;
 using SHR = TKProcessor.Models.SHR;
 using TK = TKProcessor.Models.TK;
 
-namespace TKProcessor.Services
+namespace TKProcessor.Services.Maintenance
 {
     public class LeaveService : TKService<TK.Leave>
     {
