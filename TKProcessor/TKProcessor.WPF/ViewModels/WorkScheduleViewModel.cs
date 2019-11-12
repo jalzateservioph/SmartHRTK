@@ -73,9 +73,7 @@ namespace TKProcessor.WPF.ViewModels
         private void WorkScheduleViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsCheckedAll))
-            {
-                Items.ToList().ForEach(i => i.IsSelected = IsCheckedAll);
-            }
+                View.Cast<WorkSchedule>().ToList().ForEach(i => i.IsSelected = IsCheckedAll);
         }
 
         public void Populate()
@@ -221,18 +219,18 @@ namespace TKProcessor.WPF.ViewModels
 
                         var errMsg = "";
 
-                        if ((wsObject.EndDate - wsObject.StartDate).Days > 7)
-                        {
-                            var nullShift = shifts.ToList().FindAll(i => i == null);
+                        //if ((wsObject.EndDate - wsObject.StartDate).Days > 7)
+                        //{
+                        //    for (int i = 0; i < shifts.Length; i++)
+                        //    {
+                        //        var item = shifts[i];
 
-                            foreach (var item in nullShift)
-                            {
-                                if (string.IsNullOrEmpty(errMsg))
-                                    errMsg = "Please fill selet shift for ";
+                        //        if (string.IsNullOrEmpty(errMsg))
+                        //            errMsg = "Please fill selet shift for ";
 
-                                errMsg += item.ToString() + " ";
-                            }
-                        }
+                        //        errMsg += ((DayOfWeek)i).ToString() + " ";
+                        //    }   
+                        //}
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving work schedules for {wsObject.Employee} ", MessageType.Information));
 
@@ -246,7 +244,13 @@ namespace TKProcessor.WPF.ViewModels
                             try
                             {
                                 if (shifts[(int)start.DayOfWeek] == null)
-                                    throw new Exception($"No shift setup for {start.DayOfWeek.ToString()}");
+                                {
+                                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Skipping because {start.DayOfWeek.ToString()} " +
+                                        $"has no shift setup", MessageType.Information));
+
+                                    start = start.AddDays(1);
+                                    continue;
+                                }
 
                                 forSave = new WorkSchedule()
                                 {
@@ -348,7 +352,10 @@ namespace TKProcessor.WPF.ViewModels
                 StartProcessing();
 
                 foreach (var item in Items.Where(i => i.IsSelected))
+                {
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting {item.Employee} - {item.ScheduleDate.ToShortDateString()}", MessageType.Error));
                     service.Delete(mapper.Map<TK.WorkSchedule>(item));
+                }
 
                 EndProcessing();
             });
