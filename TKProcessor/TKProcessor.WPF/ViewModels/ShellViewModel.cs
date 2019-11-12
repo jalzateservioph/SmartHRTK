@@ -120,8 +120,11 @@ namespace TKProcessor.WPF.ViewModels
 
             HasMessage = true;
 
-            t.Stop();
-            t.Start();
+            if (message.Duration >= 0)
+            {
+                t.Stop();
+                t.Start();
+            }
         }
 
         public void ShowEmployees()
