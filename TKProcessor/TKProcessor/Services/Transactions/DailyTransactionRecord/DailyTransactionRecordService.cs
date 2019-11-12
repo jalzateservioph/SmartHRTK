@@ -359,7 +359,7 @@ namespace TKProcessor.Services
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                if (end > payOutDate)
+                if (end < payOutDate)
                     throw new Exception("Payout date cannot be less than the set end date");
 
                 if (string.IsNullOrEmpty(jobGradeBand))

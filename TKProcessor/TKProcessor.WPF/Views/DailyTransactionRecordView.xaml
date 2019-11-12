@@ -18,7 +18,7 @@
         <Label Content="Daily Transaction Records" Margin="0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Semibold"/>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="20" Grid.Row="1" IsEnabled="{Binding IsEnabled}">
-            <Button x:Name="Populate" Content="View Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
+            <Button x:Name="PopulateAsync" Content="View Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Process" Content="Process" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="ExportToDP" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>

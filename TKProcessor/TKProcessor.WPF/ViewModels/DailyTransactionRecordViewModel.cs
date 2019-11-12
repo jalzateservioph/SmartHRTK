@@ -90,28 +90,33 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public void Populate()
+        public void PopulateAsync()
         {
             Task.Run(() =>
             {
                 StartProcessing();
 
-                try
-                {
-                    Items.Clear();
-
-                    foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
-                    {
-                        Items.Add(mapper.Map<DailyTransactionRecord>(item));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
-                }
+                
 
                 EndProcessing();
             });
+        }
+
+        public void Populate()
+        {
+            try
+            {
+                Items.Clear();
+
+                foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
+                {
+                    Items.Add(mapper.Map<DailyTransactionRecord>(item));
+                }
+            }
+            catch (Exception ex)
+            {
+                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+            }
         }
 
         public void Save()
@@ -178,6 +183,8 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information));
 
+                        Populate();
+
                     service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode);
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));
@@ -202,6 +209,7 @@ namespace TKProcessor.WPF.ViewModels
 
                     try
                     {
+                        Populate();
 
                         var data = service.GetExportExcelData(StartDate, EndDate, PayrollCode);
 

@@ -34,6 +34,7 @@ namespace TKProcessor.WPF.ViewModels
             mapper = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<TK.Employee, Employee>();
+                cfg.CreateMap<Employee, TK.Employee>();
 
                 cfg.CreateMap<TK.Shift, Shift>();
 
