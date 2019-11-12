@@ -21,7 +21,7 @@ namespace TKProcessor.Common
             return table;
         }
 
-        public static DataTable ToDataTable<T>(IEnumerable<T> data)
+        public static DataTable ToDataTable<T>(this IEnumerable<T> data)
             where T : class, new()
         {
             if (data is null)

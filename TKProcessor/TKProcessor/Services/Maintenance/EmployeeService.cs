@@ -17,6 +17,11 @@ namespace TKProcessor.Services.Maintenance
 
         }
 
+        public override IEnumerable<Employee> List()
+        {
+            return base.List();
+        }
+
         public override void Save(Employee entity)
         {
             try

@@ -233,9 +233,6 @@
     <Compile Include="Views\ReportAbsenceView.xaml.cs">
       <DependentUpon>ReportAbsenceView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ReportParamAbsenceReportView.xaml.cs">
-      <DependentUpon>ReportParamAbsenceReportView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ReportView.xaml.cs">
       <DependentUpon>ReportView.xaml</DependentUpon>
     </Compile>
@@ -301,10 +298,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ReportAbsenceView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ReportParamAbsenceReportView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

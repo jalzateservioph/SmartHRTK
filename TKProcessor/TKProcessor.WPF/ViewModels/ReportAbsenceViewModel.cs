@@ -6,30 +6,69 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TKProcessor.Common;
+using TKProcessor.Services.Maintenance;
 using TKProcessor.Services.Reports;
+using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Models;
+using TKProcessor.WPF.Views;
 using TK = TKProcessor.Models.TK;
 
 namespace TKProcessor.WPF.ViewModels
 {
     public class ReportAbsenceViewModel : ReportViewModel
     {
-        private IList<Employee> employees;
-        private IList<Shift> shifts;
+        private BindingList<Employee> employees;
+        private BindingList<Shift> shifts;
+
+        private BindingList<Employee> employeeList;
+        private BindingList<Shift> shiftList;
+
         private DateTime startDate;
         private DateTime endDate;
 
-        IMapper mapper;
-        private BindingList<Employee> employeeList;
-        private BindingList<Shift> shiftList;
+        readonly IMapper mapper;
 
         public ReportAbsenceViewModel()
         {
             mapper = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Employee, TK.Employee>();
-                cfg.CreateMap<Shift, TK.Shift>();
+                cfg.CreateMap<TK.Employee, Employee>();
+
+                cfg.CreateMap<TK.Shift, Shift>();
+
+                cfg.CreateMap<TK.User, User>();
             }).CreateMapper();
+
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            EmployeeList = new BindingList<Employee>();
+            Employees = new BindingList<Employee>();
+
+            ShiftList = new BindingList<Shift>();
+            Shifts = new BindingList<Shift>();
+
+            using (var empService = new EmployeeService(Session.Default.CurrentUser.Id))
+            {
+                foreach (var emp in empService.List())
+                {
+                    EmployeeList.Add(mapper.Map<Employee>(emp));
+                }
+            }
+
+            using (var shiftService = new ShiftService(Session.Default.CurrentUser.Id))
+            {
+                foreach (var shift in shiftService.List())
+                {
+                    ShiftList.Add(mapper.Map<Shift>(shift));
+                }
+            }
+
+            StartDate = DateTime.Today;
+            EndDate = DateTime.Today;
         }
 
         public void Generate()
@@ -41,6 +80,12 @@ namespace TKProcessor.WPF.ViewModels
                 StartDate = StartDate,
                 EndDate = EndDate
             };
+
+            var data = service.GetData();
+
+            IReportView view = Views.FirstOrDefault().Value as IReportView;
+
+            LoadReport(view.ReportViewer, "TK_AbsencesRpt", data.ToDataTable());
         }
 
         public BindingList<Employee> EmployeeList
@@ -62,7 +107,7 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public IList<Employee> Employees
+        public BindingList<Employee> Employees
         {
             get => employees;
             set
@@ -71,7 +116,7 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
-        public IList<Shift> Shifts
+        public BindingList<Shift> Shifts
         {
             get => shifts;
             set
@@ -80,6 +125,7 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
         public DateTime StartDate
         {
             get => startDate;
