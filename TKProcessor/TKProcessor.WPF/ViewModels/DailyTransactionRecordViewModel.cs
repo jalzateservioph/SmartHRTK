@@ -96,7 +96,7 @@ namespace TKProcessor.WPF.ViewModels
             {
                 StartProcessing();
 
-                
+                Populate();
 
                 EndProcessing();
             });
