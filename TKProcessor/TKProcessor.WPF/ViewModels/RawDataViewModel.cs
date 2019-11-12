@@ -55,7 +55,7 @@ namespace TKProcessor.WPF.ViewModels
         private void RawDataViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsCheckedAll))
-                Items.ToList().ForEach(i => i.IsSelected = IsCheckedAll);
+                View.Cast<RawData>().ToList().ForEach(i => i.IsSelected = IsCheckedAll);
         }
 
         public void Populate()
