@@ -42,7 +42,8 @@ namespace TKProcessor.WPF.ViewModels
             mapper = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<DailyTransactionRecord, TK.DailyTransactionRecord>();
-                cfg.CreateMap<TK.DailyTransactionRecord, DailyTransactionRecord>();
+                cfg.CreateMap<TK.DailyTransactionRecord, DailyTransactionRecord>()
+                   .AfterMap((tkdtr, wpfdtr) => { wpfdtr.IsDirty = false; });
 
                 cfg.CreateMap<Employee, TK.Employee>();
                 cfg.CreateMap<TK.Employee, Employee>();
@@ -90,28 +91,33 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public void Populate()
+        public void PopulateAsync()
         {
             Task.Run(() =>
             {
                 StartProcessing();
 
-                try
-                {
-                    Items.Clear();
-
-                    foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
-                    {
-                        Items.Add(mapper.Map<DailyTransactionRecord>(item));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
-                }
+                Populate();
 
                 EndProcessing();
             });
+        }
+
+        public void Populate()
+        {
+            try
+            {
+                Items.Clear();
+
+                foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
+                {
+                    Items.Add(mapper.Map<DailyTransactionRecord>(item));
+                }
+            }
+            catch (Exception ex)
+            {
+                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+            }
         }
 
         public void Save()
@@ -122,9 +128,9 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updating DTR records...", MessageType.Information));
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updating DTR records...", MessageType.Information,0));
 
-                    foreach (var item in Items)
+                    foreach (var item in View.Cast<DailyTransactionRecord>().Where(i => i.IsDirty))
                     {
                         service.Save(mapper.Map<TK.DailyTransactionRecord>(item));
                     }
@@ -148,7 +154,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information));
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information, 0));
 
                     service.Process(StartDate, EndDate, PayrollCode, message =>
                     {
@@ -176,9 +182,11 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information));
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information, 0));
 
-                    service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode);
+                    Populate();
+
+                    service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode); // add callback for message handling
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));
 
@@ -202,6 +210,7 @@ namespace TKProcessor.WPF.ViewModels
 
                     try
                     {
+                        Populate();
 
                         var data = service.GetExportExcelData(StartDate, EndDate, PayrollCode);
 

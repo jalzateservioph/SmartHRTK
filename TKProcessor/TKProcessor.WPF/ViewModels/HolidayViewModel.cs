@@ -60,7 +60,7 @@ namespace TKProcessor.WPF.ViewModels
         private void HolidayViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsCheckedAll))
-                Items.ToList().ForEach(i => i.IsSelected = IsCheckedAll);
+                View.Cast<Holiday>().ToList().ForEach(i => i.IsSelected = IsCheckedAll);
         }
 
         public void New()

@@ -18,10 +18,19 @@ namespace TKProcessor.WPF.Events
         {
             Message = message;
             MessageType = messageType;
+            Duration = 3000;
+        }
+
+        public NewMessageEvent(string message, MessageType messageType, int duration)
+        {
+            Message = message;
+            MessageType = messageType;
+            Duration = duration * 1000;
         }
 
         public string Message { get; set; }
         public MessageType MessageType { get; set; }
+        public int Duration { get;set; }
     }
 
     public enum MessageType

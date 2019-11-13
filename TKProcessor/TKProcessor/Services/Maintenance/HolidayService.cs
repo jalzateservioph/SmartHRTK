@@ -28,7 +28,7 @@ namespace TKProcessor.Services.Maintenance
 
         public IEnumerable<Holiday> GetHolidays(DateTime date)
         {
-            var holidays = Context.Holiday.Where(i => i.Date == date).Select(i => i);
+            var holidays = Context.Holiday.Where(i => i.Date == date.Date).Select(i => i);
 
             return holidays.AsEnumerable();
         }

@@ -42,7 +42,7 @@ namespace TKProcessor.Services.Maintenance
 
         public IEnumerable<TK.Leave> GetLeaves(string employeeCode, DateTime date)
         {
-            return tKContext.Leave.Where(l => l.EmployeeCode == employeeCode && l.LeaveDate == date);
+            return tKContext.Leave.Where(l => l.EmployeeCode == employeeCode && l.LeaveDate == date.Date);
         }
     }
 }

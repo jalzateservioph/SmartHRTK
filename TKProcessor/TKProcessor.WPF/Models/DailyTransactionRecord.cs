@@ -96,6 +96,8 @@ namespace TKProcessor.WPF.Models
 
                     throw new Exception($"Appoved {baseFieldName} cannot be greater than Actual {baseFieldName}");
                 }
+
+                IsDirty = true;
             }
         }
 
