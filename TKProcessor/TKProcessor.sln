@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKProcessor", "TKProcessor\TKProcessor.csproj", "{46CF0544-F0AF-448B-8F7A-01EE04ABCF09}"
 EndProject
@@ -12,6 +12,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKProcessor.Common", "TKProcessor.Common\TKProcessor.Common.csproj", "{FC281C27-5DC5-431D-9176-86E3EC953077}"
 EndProject
 Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "TKProcessor.Reports", "TKProcessor.Reports\TKProcessor.Reports.rptproj", "{031AC499-C332-4BD0-94C5-36AB511B7E53}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Biometrics Integration", "Biometrics Integration", "{D7B7C841-922B-4CE8-B416-448F3A079289}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiometricsIntegrationWebAPI", "BiometricsIntegrationWebAPI\BiometricsIntegrationWebAPI.csproj", "{3E24914F-6AE4-453E-B399-F92849712377}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationClient", "IntegrationClient\IntegrationClient.csproj", "{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,9 +58,25 @@ Global
 		{031AC499-C332-4BD0-94C5-36AB511B7E53}.Release|Any CPU.ActiveCfg = Release
 		{031AC499-C332-4BD0-94C5-36AB511B7E53}.Release|Any CPU.Build.0 = Release
 		{031AC499-C332-4BD0-94C5-36AB511B7E53}.Release|Any CPU.Deploy.0 = Release
+		{3E24914F-6AE4-453E-B399-F92849712377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E24914F-6AE4-453E-B399-F92849712377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E24914F-6AE4-453E-B399-F92849712377}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E24914F-6AE4-453E-B399-F92849712377}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{3E24914F-6AE4-453E-B399-F92849712377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E24914F-6AE4-453E-B399-F92849712377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3E24914F-6AE4-453E-B399-F92849712377} = {D7B7C841-922B-4CE8-B416-448F3A079289}
+		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2} = {D7B7C841-922B-4CE8-B416-448F3A079289}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4E935FC4-E0D2-4F36-86CF-8F54EF89FAE2}
