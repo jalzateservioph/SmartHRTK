@@ -8,6 +8,13 @@ namespace TKProcessor.Services
 {
     public class FlextimeDTRProcessor : DTRProcessorBase, IDTRProcessor
     {
+        private void GetRequiredWorkHours()
+        {
+            if (DTR.Shift.RequiredWorkHours.HasValue)
+            {
+                requiredWorkHours = DTR.Shift.RequiredWorkHours.Value;
+            }
+        }
         public FlextimeDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves) : base()
         {
             this.DTR = DTR;

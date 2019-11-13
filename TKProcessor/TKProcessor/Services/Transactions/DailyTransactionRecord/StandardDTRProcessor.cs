@@ -10,6 +10,11 @@ namespace TKProcessor.Services
         DateTime expectedTimeIn;
         DateTime expectedTimeOut;
 
+        private void GetRequiredWorkHours()
+        {
+            requiredWorkHours = Math.Round(((decimal)(expectedTimeOut - expectedTimeIn).TotalMinutes - totalBreak) / 60, 2);
+        }
+
         public StandardDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves) : base()
         {
             this.DTR = DTR;
@@ -19,6 +24,12 @@ namespace TKProcessor.Services
             GetRequiredWorkHours();
             expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
             expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
+
+            if (expectedTimeOut < expectedTimeIn)
+            {
+                expectedTimeOut = expectedTimeOut.AddDays(1);
+                IsSplittable = true;
+            }
         }
 
         public StandardDTRProcessor(DailyTransactionRecord DTR, IEnumerable<Leave> leaves, IEnumerable<Holiday> holidays) : base()
@@ -28,9 +39,26 @@ namespace TKProcessor.Services
             this.Holidays = holidays;
             totalBreak = GetTotalBreakDuration();
             GetLeaveDuration();
+            expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
+            expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
+            if (expectedTimeOut < expectedTimeIn)
+            {
+                expectedTimeOut = expectedTimeOut.AddDays(1);
+                IsSplittable = true;
+            }
             GetRequiredWorkHours();
-            expectedTimeIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleIn.Value.TimeOfDay);
-            expectedTimeOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.ScheduleOut.Value.TimeOfDay);
+            HalfDayPoint = expectedTimeIn.AddHours((double)(expectedTimeOut - expectedTimeIn).TotalHours / 2).RemoveSeconds();
+
+            if (Holidays != null)
+            {
+                foreach (var holiday in Holidays)
+                {
+                    if (holiday.Type == (int)HolidayType.Legal) isLegalHoliday = true;
+                    if (holiday.Type == (int)HolidayType.Special) isSpecialHoliday = true;
+                }
+            }
+
+            if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
         }
 
         public void Compute()
@@ -43,6 +71,74 @@ namespace TKProcessor.Services
             {
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
+
+                if (IsSplittable) 
+                {
+                    //Split
+
+                    if (actualTimeIn.Date == expectedTimeIn.Date) 
+                    {
+                        if (actualTimeOut >= expectedTimeOut.Date) //If actual time out crosses to next day
+                        {
+                            splitHeadWorkHours = (decimal)(expectedTimeOut.Date - actualTimeIn).TotalMinutes;
+                            if (actualTimeIn < expectedTimeIn)
+                            {
+                                splitHeadRegularWorkHours = (decimal)(expectedTimeOut.Date - expectedTimeIn).TotalMinutes;
+                            }
+                            else
+                            { 
+                                splitHeadRegularWorkHours = (decimal)(expectedTimeOut.Date - actualTimeIn).TotalMinutes;
+                            }
+                        }
+                        else 
+                        {
+                            splitHeadWorkHours = workHours;
+                            if (actualTimeIn < expectedTimeIn)
+                            {
+                                splitHeadRegularWorkHours = (decimal)(actualTimeOut - expectedTimeIn).TotalMinutes;
+                            }
+                            else
+                            {
+                                splitHeadRegularWorkHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
+                            }
+                        }
+
+                    }
+                    if (actualTimeOut.Date == expectedTimeOut.Date)
+                    {
+                        if (actualTimeIn < expectedTimeOut.Date) //if actual time in is from the previous day
+                        {
+                            splitTailWorkHours = (decimal)(actualTimeOut - expectedTimeOut.Date).TotalMinutes;
+                            if (actualTimeOut > expectedTimeOut)
+                            {
+                                splitTailRegularWorkHours = (decimal)(expectedTimeOut - expectedTimeOut.Date).TotalMinutes;
+                            }
+                            else
+                            { 
+                                splitTailRegularWorkHours = (decimal)(actualTimeOut - expectedTimeOut.Date).TotalMinutes;
+                            }
+                        }
+                        else 
+                        {
+                            splitTailWorkHours = workHours;
+                            if (actualTimeOut < expectedTimeOut)
+                            {
+                                splitTailRegularWorkHours = (decimal)(actualTimeOut - expectedTimeOut.Date).TotalMinutes;
+                            }
+                            else
+                            {
+                                splitTailRegularWorkHours = (decimal)(expectedTimeOut - actualTimeIn).TotalMinutes;
+                            }
+                        }
+                    }
+
+                    splitHeadWorkHours = AdjustWorkHours(actualTimeIn, actualTimeIn.AddDays(1).Date, splitHeadWorkHours);
+                    splitTailWorkHours = AdjustWorkHours(actualTimeOut.Date, actualTimeOut, splitTailWorkHours);
+                    splitHeadRegularWorkHours = AdjustWorkHours(actualTimeIn, actualTimeIn.AddDays(1).Date, splitHeadRegularWorkHours);
+                    splitTailRegularWorkHours = AdjustWorkHours(actualTimeOut.Date, actualTimeOut, splitTailRegularWorkHours);
+
+                }
+
                 AdjustWorkHours();
 
                 if (workHours > requiredWorkHours * 60)
@@ -54,128 +150,29 @@ namespace TKProcessor.Services
                     regularWorkHours = workHours;
                 }
 
-                if (expectedTimeOut < expectedTimeIn)
-                {
-                    expectedTimeOut = expectedTimeOut.AddDays(1);
-                }
-
-
-                bool isLegalHoliday = false;
-                bool isSpecialHoliday = false;
-                bool isRestDay = false;
-
-                if (Holidays != null)
-                {
-                    foreach (var holiday in Holidays)
-                    {
-                        if (holiday.Type == (int)HolidayType.Legal) isLegalHoliday = true;
-                        if (holiday.Type == (int)HolidayType.Special) isSpecialHoliday = true;
-                    }
-                }
-
-                if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
-
                 ComputeLate();
                 ComputeUndertime();
                 ComputeOvertime();
                 ComputeNightDifferential();
-
-
-                #region Legal and Special Holiday plus Rest Day
-                if (isLegalHoliday && isSpecialHoliday && isRestDay)
-                {
-                    legalSpecialHolidayRestDay = regularWorkHours;
-                    legalSpecialHolidayRestDayOvertime = totalOvertime;
-                    approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
-                    legalSpecialHolidayRestDayNightDifferential = nightDifferential;
-                    legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Legal and Special Holiday
-                else if (isLegalHoliday && isSpecialHoliday)
-                {
-                    legalSpecialHoliday = regularWorkHours;
-                    legalSpecialHolidayOvertime = totalOvertime;
-                    approvedLegalSpecialHolidayOvertime = approvedOvertime;
-                    legalSpecialHolidayNightDifferential = nightDifferential;
-                    legalSpecialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Special Holiday and Rest Day
-                else if (isSpecialHoliday && isRestDay)
-                {
-                    specialHolidayRestDay = regularWorkHours;
-                    specialHolidayRestDayOvertime = totalOvertime;
-                    approvedSpecialHolidayRestDayOvertime = approvedOvertime;
-                    specialHolidayRestDayNightDifferential = nightDifferential;
-                    specialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Legal Holiday and Rest Day
-                else if (isLegalHoliday && isRestDay)
-                {
-                    legalHolidayRestDay = regularWorkHours;
-                    legalHolidayRestDayOvertime = totalOvertime;
-                    approvedLegalHolidayRestDayOvertime = approvedOvertime;
-                    legalHolidayRestDayNightDifferential = nightDifferential;
-                    legalHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalHolidayRestDayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Legal Holiday
-                else if (isLegalHoliday)
-                {
-                    legalHoliday = regularWorkHours;
-                    legalHolidayOvertime = totalOvertime;
-                    approvedLegalHolidayOvertime = approvedOvertime;
-                    legalHolidayNightDifferential = nightDifferential;
-                    legalHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalHolidayOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Special Holiday
-                else if (isSpecialHoliday)
-                {
-                    specialHoliday = regularWorkHours;
-                    specialHolidayOvertime = totalOvertime;
-                    approvedSpecialHolidayOvertime = approvedOvertime;
-                    specialHolidayNightDifferential = nightDifferential;
-                    specialHolidayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedSpecialHolidayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
-                #region Rest Day
-                else if (isRestDay)
-                {
-                    restDay = regularWorkHours;
-                    restDayOvertime = totalOvertime;
-                    approvedRestDayOvertime = approvedOvertime;
-                    restDayNightDifferential = nightDifferential;
-                    restDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedRestDayNightDifferentialOvertime = approvedOvertime;
-                }
-                #endregion
-
+  
             }
             else
             {
                 if (!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false)
                 {
-                    absentHours = (decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak;
+                    absentHours = requiredWorkHours * 60;
+
+                    if (IsSplittable)
+                    {
+                        splitHeadAbsentHours = AdjustWorkHours(expectedTimeIn, expectedTimeOut.Date,(decimal)(expectedTimeOut.Date - expectedTimeIn).TotalMinutes);
+                        splitTailAbsentHours = AdjustWorkHours(expectedTimeOut.Date, expectedTimeOut, (decimal)(expectedTimeOut - expectedTimeOut.Date).TotalMinutes);
+                    }
                 }
             }
 
-            MapFieldsToDTR();
 
+            //MapFieldsToDTR();
+            MapFields();
         }
 
         public void ComputeRegular()
@@ -198,11 +195,6 @@ namespace TKProcessor.Services
                 else
                 {
                     regularWorkHours = workHours;
-                }
-
-                if (expectedTimeOut < expectedTimeIn)
-                {
-                    expectedTimeOut = expectedTimeOut.AddDays(1);
                 }
 
                 ComputeLate();
@@ -240,14 +232,40 @@ namespace TKProcessor.Services
 
                     latePeriodStart = expectedTimeIn;
                     latePeriodEnd = actualTimeIn;
+
+                    if (IsSplittable)
+                    {
+                        if (latePeriodEnd.Value.Date > latePeriodStart.Value.Date)
+                        {
+                            splitTailLate += (decimal)(latePeriodEnd.Value.RemoveSeconds() - latePeriodEnd.Value.Date).TotalMinutes;
+                            splitHeadLate += (decimal)(latePeriodStart.Value.Date.AddDays(1) - latePeriodStart.Value.RemoveSeconds()).TotalMinutes;
+                        }
+                        else 
+                        {
+                            splitHeadLate += (decimal)(latePeriodEnd.Value.RemoveSeconds() - latePeriodStart.Value.RemoveSeconds()).TotalMinutes;
+                        }
+                    }
                 }
 
                 #region Half day
-                if (DTR.Shift.MaximumMinutesConsideredAsHalfDay.HasValue)
+                if (DTR.Shift.MaximumMinutesConsideredAsHalfDay.HasValue && DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value > 0)
                 {
                     if (late > DTR.Shift.MaximumMinutesConsideredAsHalfDay.Value)
                     {
-                        absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 2, 2);
+                        absentHours = Math.Round(requiredWorkHours * 60 / 2, 2);
+
+                        if (IsSplittable)
+                        {
+                            if (HalfDayPoint.Value.Date > expectedTimeIn.Date)
+                            {
+                                splitHeadAbsentHours += AdjustWorkHours(expectedTimeIn, HalfDayPoint.Value.Date, absentHours); //assuming that shift is split exactly in half.
+                                splitTailAbsentHours += AdjustWorkHours(HalfDayPoint.Value.Date, HalfDayPoint.Value, absentHours);
+                            }
+                            else 
+                            {
+                                splitHeadAbsentHours += AdjustWorkHours(expectedTimeIn, HalfDayPoint.Value, absentHours); //assuming that shift is split exactly in half.
+                            }
+                        }
                         approvedLate = 0;
                     }
                 }
@@ -277,14 +295,39 @@ namespace TKProcessor.Services
 
                     undertimePeriodStart = actualTimeOut;
                     undertimePeriodEnd = expectedTimeOut;
+
+                    if (actualTimeOut.Date > actualTimeIn.Date)
+                    {
+                        if (undertimePeriodEnd.Value.Date > undertimePeriodStart.Value.Date)
+                        {
+                            splitTailUndertime += (decimal)(undertimePeriodEnd.Value - undertimePeriodEnd.Value.Date).TotalMinutes;
+                            splitHeadUndertime += (decimal)(undertimePeriodStart.Value.Date.AddDays(1) - undertimePeriodStart.Value).TotalMinutes;
+                        }
+                        else 
+                        {
+                            splitTailUndertime += (decimal)(undertimePeriodEnd.Value.RemoveSeconds() - undertimePeriodStart.Value.RemoveSeconds()).TotalMinutes;
+                        }
+                    }
                 }
 
                 #region Half day
-                if (DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.HasValue)
+                if (DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.HasValue && DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.Value > 0)
                 {
                     if (undertime > DTR.Shift.MaximumMinutesConsideredAsHalfAayEarlyOut.Value)
                     {
-                        absentHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 2, 2);
+                        absentHours = Math.Round(requiredWorkHours * 60 / 2, 2);
+                        if (IsSplittable)
+                        {
+                            if (HalfDayPoint.Value.Date < expectedTimeOut.Date)
+                            {
+                                splitHeadAbsentHours += AdjustWorkHours(HalfDayPoint.Value, expectedTimeOut.Date, absentHours); 
+                                splitTailAbsentHours += AdjustWorkHours(expectedTimeOut.Date, expectedTimeOut, absentHours);
+                            }
+                            else
+                            {
+                                splitTailAbsentHours += AdjustWorkHours(expectedTimeIn, HalfDayPoint.Value, absentHours);
+                            }
+                        }
                         approvedUndertime = 0;
                     }
                 }
@@ -466,11 +509,6 @@ namespace TKProcessor.Services
                 else
                 {
                     regularWorkHours = workHours;
-                }
-
-                if (expectedTimeOut < expectedTimeIn)
-                {
-                    expectedTimeOut = expectedTimeOut.AddDays(1);
                 }
 
 

@@ -93,6 +93,11 @@ namespace TKProcessor.Services
         protected decimal legalSpecialHolidayRestDayNightDifferentialOvertime = 0;
         protected decimal approvedLegalSpecialHolidayRestDayNightDifferential = 0;
 
+        protected bool isLegalHoliday = false;
+        protected bool isSpecialHoliday = false;
+        protected bool isRestDay = false;
+
+        protected DateTime? HalfDayPoint;
 
         protected DateTime? latePeriodStart;
         protected DateTime? latePeriodEnd;
@@ -103,6 +108,21 @@ namespace TKProcessor.Services
         protected DateTime? preShiftOvertimePeriodEnd;
         protected DateTime? postShiftOvertimePeriodStart;
         protected DateTime? postShiftOvertimePeriodEnd;
+
+        public bool IsSplittable = false;
+
+        protected decimal splitHeadWorkHours = 0;
+        protected decimal splitHeadLate = 0;
+        protected decimal splitHeadUndertime = 0;
+        protected decimal splitHeadAbsentHours = 0;
+        protected decimal splitHeadRegularWorkHours = 0;
+
+        protected decimal splitTailWorkHours = 0;
+        protected decimal splitTailLate = 0;
+        protected decimal splitTailUndertime = 0;
+        protected decimal splitTailAbsentHours = 0;
+        protected decimal splitTailRegularWorkHours = 0;
+
         #endregion
 
         public DTRProcessorBase()
@@ -168,8 +188,74 @@ namespace TKProcessor.Services
                 {
                     workHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
                 }
-
             }
+        }
+
+        protected decimal AdjustWorkHours(DateTime timeIn, DateTime timeOut, decimal workHours) //for removing break hours of split DTRs
+        {
+            decimal adjustedWorkHours = workHours;
+            if (DTR.Shift.AmbreakIn.HasValue && DTR.Shift.AmbreakOut.HasValue)
+            {
+                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.AmbreakIn.Value.RemoveSeconds() - DTR.Shift.AmbreakOut.Value.RemoveSeconds()).TotalMinutes);
+                }
+                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                }
+                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                { 
+                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay)).TotalMinutes);
+                }
+            }
+            if (DTR.Shift.PmbreakIn.HasValue && DTR.Shift.PmbreakOut.HasValue)
+            {
+                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.PmbreakIn.Value.RemoveSeconds() - DTR.Shift.PmbreakOut.Value.RemoveSeconds()).TotalMinutes);
+                }
+                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                }
+                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay)).TotalMinutes);
+                }
+            }
+            if (DTR.Shift.LunchIn.HasValue && DTR.Shift.LunchOut.HasValue)
+            {
+                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.LunchIn.Value.RemoveSeconds() - DTR.Shift.LunchOut.Value.RemoveSeconds()).TotalMinutes);
+                }
+                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                }
+                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay)).TotalMinutes);
+                }
+            }
+            if (DTR.Shift.DinnerIn.HasValue && DTR.Shift.DinnerOut.HasValue)
+            {
+                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
+                }
+                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                }
+                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                {
+                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay)).TotalMinutes);
+                }
+            }
+
+            return adjustedWorkHours;
         }
 
         protected void MapFieldsToDTR()
@@ -225,28 +311,69 @@ namespace TKProcessor.Services
 
         }
 
+        protected void MapFields() //new map
+        {
+            DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
+            if (DTR.Shift.IsRestDay.HasValue && DTR.Shift.IsRestDay.Value)
+            {
+                DTR.ActualRestDay = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+                //DTR.ApprovedRestDay
+                DTR.ActualRestDayOt = Math.Round(totalOvertime / 60, 2) + 0.00m;
+                //DTR.ApprovedRestDayOt
+                DTR.ActualNDRD = Math.Round(nightDifferential / 60, 2) + 0.00m;
+                //DTR.ApprovedNDRD
+                DTR.ActualNDRDot = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
+                //DTR.ApprovedNDRDot
+            }
+            else
+            { 
+                DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+                DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+                //DTR.ApprovedOvertime
+                DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
+                DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
+            }
+        }
+
         protected void GetLeaveDuration()
         {
-            if (Leaves.Count() > 0)
+            if (Leaves != null && Leaves.Count() > 0)
             {
                 leaveDuration = Leaves.OrderByDescending(e => e.LeaveHours).FirstOrDefault().LeaveHours;
             }
         }
-        protected void GetRequiredWorkHours()
+ 
+        public Tuple<DailyTransactionRecord, DailyTransactionRecord> Split(DailyTransactionRecord DTR)
         {
-            if (DTR.Shift.RequiredWorkHours.HasValue)
-            {
-                requiredWorkHours = DTR.Shift.RequiredWorkHours.Value;
-            }
-            else
-            {
-                requiredWorkHours = Math.Round(((decimal)(DTR.Shift.ScheduleOut.Value.RemoveSeconds() - DTR.Shift.ScheduleIn.Value.RemoveSeconds()).TotalMinutes - totalBreak) / 60, 2);
-            }
-        }
 
-        public static Tuple<DailyTransactionRecord, DailyTransactionRecord> Split(DailyTransactionRecord DTR)
-        {
-            return Tuple.Create(new DailyTransactionRecord(), new DailyTransactionRecord()); //To do
+            DailyTransactionRecord head = new DailyTransactionRecord()
+            {
+                WorkHours = Math.Round(splitHeadWorkHours / 60, 2),
+                ActualLate = Math.Round(splitHeadLate / 60, 2),
+                ActualUndertime = Math.Round(splitHeadUndertime / 60,2),
+                AbsentHours = Math.Round(splitHeadAbsentHours / 60, 2)
+            };
+
+            DailyTransactionRecord tail = new DailyTransactionRecord()
+            {
+                RegularWorkHours = Math.Round(splitTailRegularWorkHours / 60, 2),
+                WorkHours = Math.Round(splitTailWorkHours / 60, 2),
+                ActualLate = Math.Round(splitTailLate / 60, 2),
+                ActualUndertime = Math.Round(splitTailUndertime / 60, 2),
+                AbsentHours = Math.Round(splitTailAbsentHours / 60, 2)
+            };
+
+            if (DTR.Shift.IsRestDay.HasValue && DTR.Shift.IsRestDay.Value)
+            {
+                head.ActualRestDay = Math.Round(splitHeadRegularWorkHours / 60, 2);
+                tail.ActualRestDay = Math.Round(splitTailRegularWorkHours / 60, 2);
+            }
+            else 
+            {
+                head.RegularWorkHours = Math.Round(splitHeadRegularWorkHours / 60, 2);
+                tail.RegularWorkHours = Math.Round(splitTailRegularWorkHours / 60, 2);
+            }
+            return Tuple.Create(head, tail);
         }
     }
 }

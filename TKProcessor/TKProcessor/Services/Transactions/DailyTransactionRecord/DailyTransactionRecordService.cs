@@ -265,7 +265,7 @@ namespace TKProcessor.Services
                 if (employees.Count == 0)
                     throw new Exception($"No employees found with payroll code {jobGradeBand}");
 
-                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.Date <= end &&
+                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Value.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
 
                 if (workschedules.Count == 0)
@@ -279,58 +279,140 @@ namespace TKProcessor.Services
                     DailyTransactionRecord hangingDTR = new DailyTransactionRecord();
 
                     bool firstIteration = true;
+                    start = start.AddDays(-1); //start from day before to compute hanging DTR
                     while (start <= end)
                     {
-                        if (firstIteration)
+                        if (!firstIteration)
                         {
-                            //Compute hanging DTR from day before
-                            firstIteration = false;
+                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == start);
+
+                            foreach (var item in existing)
+                            {
+                                Context.DailyTransactionRecord.Remove(item);
+                            }
                         }
 
-                        DailyTransactionRecord currentDayDTR = new DailyTransactionRecord(); //Get values from hanging dtr. Must consider holidays in mapping values
+                        IEnumerable<Holiday> holidays = holidayService.GetHolidays(start);
+
+                        var isLegalHoliday = false;
+                        var isSpecialHoliday = false;
+                        foreach (var holiday in holidays)
+                        {
+                            if (holiday.Type == (int)HolidayType.Legal)
+                            {
+                                isLegalHoliday = true;
+                            }
+                            else if (holiday.Type == (int)HolidayType.Special)
+                            { 
+                                isSpecialHoliday = true;
+                            }
+                        }
+
+                        //remap DTR values based on holidays
+
+
+
+                        DailyTransactionRecord currentDayDTR = hangingDTR; //consider holidays
+                        currentDayDTR.Employee = employee;
+                        currentDayDTR.TransactionDate = start;
+                        //currentDayDTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
+
 
                         hangingDTR = new DailyTransactionRecord(); //Reset hanging DTR
 
                         IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
-                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => (raw.ScheduleDate == start || raw.ScheduleDate == start.AddDays(1)) && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
 
-                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == start).OrderBy(ws => ws.Shift.ScheduleIn);
+                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == start).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
 
                         foreach (var workSchedule in workSchedules)
                         {
-                            DailyTransactionRecord dtr = new DailyTransactionRecord(); //DTR for this work schedule
+                            DailyTransactionRecord DTR = new DailyTransactionRecord(); //DTR for this work schedule
 
-                            dtr.Shift = workSchedule.Shift;
+                            DTR.Employee = employee;
+                            DTR.Shift = workSchedule.Shift;
+                            DTR.TransactionDate = start;
 
-                            var timeIn = rawDataTimeIn.FirstOrDefault(raw => raw.TransactionDateTime < workSchedule.Shift.ScheduleOut);
+                            //standard
+                            var _schedIn = start.Add(workSchedule.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
+                            var _schedOut = start.Add(workSchedule.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
+
+                            if (_schedOut < _schedIn)
+                            {
+                                _schedOut = _schedOut.AddDays(1);
+                            }
+
+                            var timeIn = rawDataTimeIn.FirstOrDefault(raw => raw.TransactionDateTime < _schedOut); //for standard, need to change for flex
                             if (timeIn != null)
                             {
-                                dtr.TimeIn = timeIn.TransactionDateTime;
+                                DTR.TimeIn = timeIn.TransactionDateTime;
                                 rawDataTimeIn.Remove(timeIn);
-                                var timeOut = rawDataTimeOut.FirstOrDefault();
+                                var timeOut = rawDataTimeOut.FirstOrDefault(raw => raw.TransactionDateTime > _schedIn);
                                 if (timeOut != null)
                                 {
-                                    dtr.TimeOut = timeOut.TransactionDateTime;
+                                    DTR.TimeOut = timeOut.TransactionDateTime;
                                     rawDataTimeOut.Remove(timeOut);
                                 }
                             }
 
-                            //Compute DTR
+                            IEnumerable<Leave> leaves = null; //todo
 
-                            //If DTR crosses to next day, split
-                            if (dtr.TimeOut.HasValue && dtr.TimeOut > start.AddDays(1))
+                            if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                             {
-                                var splitDTR = DTRProcessorBase.Split(dtr); //Figure out how to split
+                                processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                ((StandardDTRProcessor)processor).Compute(); // make changes to interface maybe.. temp solution
+                                DTR = processor.DTR;
+                            }
+                            //else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex) //todo
+                            //{
+                            //    if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                            //    {
+                            //        processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
+                            //        processor.ComputeHolidayAndRestDay();
+                            //        DTR = processor.DTR;
+                            //    }
+                            //    else
+                            //    {
+                            //        processor = new FlextimeDTRProcessor(DTR, leaves);
+                            //        processor.ComputeRegular();
+                            //        DTR = processor.DTR;
+                            //    }
+                            //}
 
+                            if (firstIteration)
+                            {
+                                firstIteration = false;
 
-                                //Add splitDTR.Item1 to currentDayDTR
+                                if (((DTRProcessorBase)processor).IsSplittable)
+                                {
+                                    var splitDTR = ((DTRProcessorBase)processor).Split(DTR);
 
-                                //Add splitDTR.Item2 to hangingDTR
+                                    var tail = splitDTR.Item2; //add values to hanging DTR
+                                    hangingDTR.Merge(tail);
+                                }
+                            }
+                            else
+                            {
+                                if (((DTRProcessorBase)processor).IsSplittable)
+                                {
+                                    var splitDTR = ((DTRProcessorBase)processor).Split(DTR);
+
+                                    var head = splitDTR.Item1; //add values to current day, consider holidays and restday
+                                    var tail = splitDTR.Item2; //add values to hanging DTR
+
+                                    currentDayDTR.Merge(head);
+                                    hangingDTR.Merge(tail);
+                                }
+                                else
+                                {
+                                    //add DTR to currentDayDTR
+                                    currentDayDTR.Merge(DTR);
+                                }
                             }
 
-                            //Combine dtr to currentDayDTR
                         }
 
+                        currentDayDTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                         Save(currentDayDTR);
 
                         start = start.AddDays(1);
