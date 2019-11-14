@@ -220,7 +220,7 @@ namespace TKProcessor.Models.TK
                     ApprovedNDLegSpeHolRDot += ApprovedNDRDot;
                     ResetRestDayHours();
                 }
-                else 
+                if (RegularWorkHours > 0) 
                 {
                     ActualLegSpeHol += RegularWorkHours;
                     //ApprovedLegSpeHol
@@ -250,7 +250,7 @@ namespace TKProcessor.Models.TK
                     ApprovedNDLegHolRDot += ApprovedNDRDot;
                     ResetRestDayHours();
                 }
-                else 
+                if (RegularWorkHours > 0)
                 {
                     ActualLegHol += RegularWorkHours;
                     //ApprovedLegHol
@@ -280,7 +280,7 @@ namespace TKProcessor.Models.TK
                     ApprovedNDSpeHolRDot += ApprovedNDRDot;
                     ResetRestDayHours();
                 }
-                else
+                if (RegularWorkHours > 0)
                 {
                     ActualSpeHol += RegularWorkHours;
                     //ApprovedSpeHol

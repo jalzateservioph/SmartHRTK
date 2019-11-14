@@ -346,6 +346,23 @@ namespace TKProcessor.Services
                     approvedPreShiftOvertime = preShiftOvertime;
                     preShiftOvertimePeriodStart = actualTimeIn;
                     preShiftOvertimePeriodEnd = expectedTimeIn;
+
+                    if (IsSplittable)
+                    {
+                        if (preShiftOvertimePeriodEnd.Value.Date > preShiftOvertimePeriodStart.Value.Date)
+                        {
+                            splitTailPreShiftOvertime += (decimal)(preShiftOvertimePeriodEnd.Value - preShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                            splitHeadPreShiftOvertime += (decimal)(preShiftOvertimePeriodStart.Value.AddDays(1).Date - preShiftOvertimePeriodStart.Value).TotalMinutes;
+
+                            splitTailTotalOvertime += splitTailPreShiftOvertime;
+                            splitHeadTotalOvertime += splitHeadPreShiftOvertime;
+                        }
+                        else 
+                        {
+                            splitHeadPreShiftOvertime += (decimal)(preShiftOvertimePeriodEnd.Value - preShiftOvertimePeriodStart.Value).TotalMinutes;
+                            splitHeadTotalOvertime += splitHeadPreShiftOvertime;
+                        }
+                    }
                 }
 
                 if (DTR.Shift.MinimumPreShiftOt.HasValue && DTR.Shift.MinimumPreShiftOt.Value > preShiftOvertime)
@@ -371,6 +388,24 @@ namespace TKProcessor.Services
                     approvedPostShiftOvertime = postShiftOvertime;
                     postShiftOvertimePeriodStart = expectedTimeOut;
                     postShiftOvertimePeriodEnd = actualTimeOut;
+
+
+                    if (IsSplittable)
+                    {
+                        if (postShiftOvertimePeriodEnd.Value.Date > postShiftOvertimePeriodStart.Value.Date)
+                        {
+                            splitTailPostShiftOvertime += (decimal)(postShiftOvertimePeriodEnd.Value - postShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                            splitHeadPostShiftOvertime += (decimal)(postShiftOvertimePeriodStart.Value.AddDays(1).Date - postShiftOvertimePeriodStart.Value).TotalMinutes;
+
+                            splitTailTotalOvertime += splitTailPostShiftOvertime;
+                            splitHeadTotalOvertime += splitHeadPostShiftOvertime;
+                        }
+                        else
+                        {
+                            splitTailPostShiftOvertime += (decimal)(postShiftOvertimePeriodEnd.Value - postShiftOvertimePeriodStart.Value).TotalMinutes;
+                            splitTailTotalOvertime += splitTailPostShiftOvertime;
+                        }
+                    }
                 }
 
                 if (DTR.Shift.MinimumPostShiftOt.HasValue && DTR.Shift.MinimumPostShiftOt.Value > postShiftOvertime)
@@ -409,18 +444,49 @@ namespace TKProcessor.Services
                 if (actualTimeIn >= expectedNightDifferentialStart && actualTimeIn < expectedNightDifferentialEnd)
                 {
                     nightDifferential = (decimal)(expectedNightDifferentialEnd - actualTimeIn).TotalMinutes;
+                    nightDifferential = AdjustWorkHours(actualTimeIn, expectedNightDifferentialEnd, nightDifferential);
+                    nightDifferentialPeriodStart = actualTimeIn;
+                    nightDifferentialPeriodEnd = expectedNightDifferentialEnd;
                 }
                 else if (expectedNightDifferentialStart >= actualTimeIn && expectedNightDifferentialEnd <= actualTimeOut)
                 {
                     nightDifferential = (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                    nightDifferential = AdjustWorkHours(expectedNightDifferentialStart, expectedNightDifferentialEnd, nightDifferential);
+                    nightDifferentialPeriodStart = expectedNightDifferentialStart;
+                    nightDifferentialPeriodEnd = expectedNightDifferentialEnd;
                 }
                 else if (expectedNightDifferentialStart < actualTimeOut && actualTimeOut < expectedNightDifferentialEnd)
                 {
                     nightDifferential = (decimal)(actualTimeOut - expectedNightDifferentialStart).TotalMinutes;
+                    nightDifferential = AdjustWorkHours(expectedNightDifferentialStart, actualTimeOut, nightDifferential);
+                    nightDifferentialPeriodStart = expectedNightDifferentialStart;
+                    nightDifferentialPeriodEnd = actualTimeOut;
                 }
                 else if (actualTimeIn >= expectedNightDifferentialStart && actualTimeOut <= expectedNightDifferentialEnd)
                 {
                     nightDifferential = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
+                    nightDifferential = AdjustWorkHours(actualTimeIn, actualTimeOut, nightDifferential);
+                    nightDifferentialPeriodStart = actualTimeIn;
+                    nightDifferentialPeriodEnd = actualTimeOut;
+                }
+
+                if (IsSplittable)
+                {
+                    if (nightDifferentialPeriodStart.HasValue && nightDifferentialPeriodEnd.HasValue)
+                    {
+                        if (nightDifferentialPeriodEnd.Value.Date > nightDifferentialPeriodStart.Value.Date)
+                        {
+                            splitTailNightDifferential += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodEnd.Value.Date).TotalMinutes;
+                            splitTailNightDifferential = AdjustWorkHours(nightDifferentialPeriodEnd.Value.Date, nightDifferentialPeriodEnd.Value, splitTailNightDifferential);
+                            splitHeadNightDifferential += (decimal)(nightDifferentialPeriodStart.Value.AddDays(1).Date - nightDifferentialPeriodStart.Value).TotalMinutes;
+                            splitHeadNightDifferential = AdjustWorkHours(nightDifferentialPeriodStart.Value, nightDifferentialPeriodStart.Value.AddDays(1).Date, splitHeadNightDifferential);
+                        }
+                        else
+                        {
+                            splitHeadNightDifferential += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                            splitHeadNightDifferential = AdjustWorkHours(nightDifferentialPeriodStart.Value, nightDifferentialPeriodEnd.Value, splitHeadNightDifferential);
+                        }
+                    }
                 }
 
                 #region Night Differential Overtime
@@ -428,28 +494,102 @@ namespace TKProcessor.Services
                 #region Pre-shift Overtime
                 if (DTR.Shift.IsPreShiftOt == true)
                 {
-                    if (expectedTimeIn > actualTimeIn)
+                    //if (expectedTimeIn > actualTimeIn)
+                    //{
+                    //    if (expectedNightDifferentialEnd >= expectedTimeIn)
+                    //    {
+                    //        if (expectedNightDifferentialStart < actualTimeIn)
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeIn).TotalMinutes;
+                    //            nightDifferentialPreShiftOvertimePeriodStart = expectedTimeIn;
+                    //            nightDifferentialPreShiftOvertimePeriodEnd = expectedNightDifferentialEnd;
+                    //        }
+                    //        else
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                    //            nightDifferentialPreShiftOvertimePeriodStart = expectedNightDifferentialStart;
+                    //            nightDifferentialPreShiftOvertimePeriodEnd = expectedNightDifferentialEnd;
+                    //        }
+                    //    }
+                    //    else if (expectedNightDifferentialEnd > actualTimeIn)
+                    //    {
+                    //        if (expectedNightDifferentialStart <= actualTimeIn)
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(actualTimeIn - expectedNightDifferentialStart).TotalMinutes;
+                    //            nightDifferentialPreShiftOvertimePeriodStart = expectedNightDifferentialStart;
+                    //            nightDifferentialPreShiftOvertimePeriodEnd = actualTimeIn;
+                    //        }
+                    //        else
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                    //            nightDifferentialPreShiftOvertimePeriodStart = expectedNightDifferentialStart;
+                    //            nightDifferentialPreShiftOvertimePeriodEnd = expectedNightDifferentialEnd;
+                    //        }
+                    //    }
+
+                    //    if (IsSplittable)
+                    //    {
+                    //        if (nightDifferentialPreShiftOvertimePeriodStart.HasValue && nightDifferentialPreShiftOvertimePeriodEnd.HasValue)
+                    //        {
+                    //            if (nightDifferentialPreShiftOvertimePeriodEnd.Value.Date > nightDifferentialPreShiftOvertimePeriodStart.Value.Date)
+                    //            {
+                    //                splitTailNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodEnd.Value - nightDifferentialPreShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                    //                splitHeadNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodStart.Value.AddDays(1).Date - nightDifferentialPreShiftOvertimePeriodStart.Value).TotalMinutes;
+                    //            }
+                    //            else
+                    //            { 
+                    //                splitHeadNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodEnd.Value - nightDifferentialPreShiftOvertimePeriodStart.Value).TotalMinutes;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    if (preShiftOvertimePeriodStart.HasValue && preShiftOvertimePeriodEnd.HasValue && nightDifferentialPeriodStart.HasValue && nightDifferentialPeriodEnd.HasValue)
                     {
-                        if (expectedNightDifferentialEnd >= expectedTimeIn)
+                        if (nightDifferentialPeriodStart.Value >= preShiftOvertimePeriodStart.Value)
                         {
-                            if (expectedNightDifferentialStart < actualTimeIn)
+                            if (nightDifferentialPeriodEnd.Value < preShiftOvertimePeriodEnd.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeIn).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialPreShiftOvertimePeriodStart = nightDifferentialPeriodStart;
+                                nightDifferentialPreShiftOvertimePeriodEnd = nightDifferentialPeriodEnd;
                             }
-                            else
+                            else if (preShiftOvertimePeriodEnd.Value >= nightDifferentialPeriodStart.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(preShiftOvertimePeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialPreShiftOvertimePeriodStart = nightDifferentialPeriodStart;
+                                nightDifferentialPreShiftOvertimePeriodEnd = preShiftOvertimePeriodEnd;
                             }
                         }
-                        else if (expectedNightDifferentialEnd > actualTimeIn)
+                        else
                         {
-                            if (expectedNightDifferentialStart <= actualTimeIn)
+                            if (nightDifferentialPeriodEnd.Value < preShiftOvertimePeriodEnd.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(actualTimeIn - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(nightDifferentialPeriodEnd.Value - preShiftOvertimePeriodStart.Value).TotalMinutes;
+                                nightDifferentialPreShiftOvertimePeriodStart = preShiftOvertimePeriodStart;
+                                nightDifferentialPreShiftOvertimePeriodEnd = nightDifferentialPeriodEnd;
                             }
-                            else
+                            else if (preShiftOvertimePeriodEnd.Value >= nightDifferentialPeriodEnd.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(preShiftOvertimePeriodEnd.Value - preShiftOvertimePeriodStart.Value).TotalMinutes;
+                                nightDifferentialPreShiftOvertimePeriodStart = preShiftOvertimePeriodStart;
+                                nightDifferentialPreShiftOvertimePeriodEnd = preShiftOvertimePeriodEnd;
+                            }
+                        }
+
+                        if (IsSplittable)
+                        {
+                            if (nightDifferentialPreShiftOvertimePeriodStart.HasValue && nightDifferentialPreShiftOvertimePeriodEnd.HasValue)
+                            {
+                                if (nightDifferentialPreShiftOvertimePeriodEnd.Value.Date > nightDifferentialPreShiftOvertimePeriodStart.Value.Date)
+                                {
+                                    splitTailNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodEnd.Value - nightDifferentialPreShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                                    splitHeadNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodStart.Value.AddDays(1).Date - nightDifferentialPreShiftOvertimePeriodStart.Value).TotalMinutes;
+                                }
+                                else
+                                {
+                                    splitHeadNightDifferentialPreShiftOvertime += (decimal)(nightDifferentialPreShiftOvertimePeriodEnd.Value - nightDifferentialPreShiftOvertimePeriodStart.Value).TotalMinutes;
+                                }
                             }
                         }
                     }
@@ -459,28 +599,102 @@ namespace TKProcessor.Services
                 #region Post-shift Overtime
                 if (DTR.Shift.IsPostShiftOt == true)
                 {
-                    if (actualTimeOut > expectedTimeOut)
+                    //if (actualTimeOut > expectedTimeOut)
+                    //{
+                    //    if (expectedNightDifferentialStart <= expectedTimeOut)
+                    //    {
+                    //        if (expectedNightDifferentialEnd > actualTimeOut)
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
+                    //            nightDifferentialPostShiftOvertimePeriodStart = expectedTimeOut;
+                    //            nightDifferentialPostShiftOvertimePeriodEnd = actualTimeOut;
+                    //        }
+                    //        else
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeOut).TotalMinutes;
+                    //            nightDifferentialPostShiftOvertimePeriodStart = expectedTimeOut;
+                    //            nightDifferentialPostShiftOvertimePeriodEnd = expectedNightDifferentialEnd;
+                    //        }
+                    //    }
+                    //    else if (expectedNightDifferentialStart < actualTimeOut)
+                    //    {
+                    //        if (expectedNightDifferentialEnd > actualTimeOut)
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(actualTimeOut - expectedNightDifferentialStart).TotalMinutes;
+                    //            nightDifferentialPostShiftOvertimePeriodStart = expectedNightDifferentialStart;
+                    //            nightDifferentialPostShiftOvertimePeriodEnd = actualTimeOut;
+                    //        }
+                    //        else
+                    //        {
+                    //            nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                    //            nightDifferentialPostShiftOvertimePeriodStart = expectedNightDifferentialStart;
+                    //            nightDifferentialPostShiftOvertimePeriodEnd = expectedNightDifferentialEnd;
+                    //        }
+                    //    }
+
+                    //    if (IsSplittable)
+                    //    {
+                    //        if (nightDifferentialPostShiftOvertimePeriodStart.HasValue && nightDifferentialPostShiftOvertimePeriodEnd.HasValue)
+                    //        {
+                    //            if (nightDifferentialPostShiftOvertimePeriodEnd.Value.Date > nightDifferentialPostShiftOvertimePeriodStart.Value.Date)
+                    //            {
+                    //                splitTailNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodEnd.Value - nightDifferentialPostShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                    //                splitHeadNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodStart.Value.AddDays(1).Date - nightDifferentialPostShiftOvertimePeriodStart.Value).TotalMinutes;
+                    //            }
+                    //            else
+                    //            {
+                    //                splitHeadNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodEnd.Value - nightDifferentialPostShiftOvertimePeriodStart.Value).TotalMinutes;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    if (postShiftOvertimePeriodStart.HasValue && postShiftOvertimePeriodEnd.HasValue && nightDifferentialPeriodStart.HasValue && nightDifferentialPeriodEnd.HasValue)
                     {
-                        if (expectedNightDifferentialStart <= expectedTimeOut)
+                        if (nightDifferentialPeriodStart.Value >= postShiftOvertimePeriodStart.Value)
                         {
-                            if (expectedNightDifferentialEnd > actualTimeOut)
+                            if (nightDifferentialPeriodEnd.Value < postShiftOvertimePeriodEnd.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
+                                nightDifferential += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialPostShiftOvertimePeriodStart = nightDifferentialPeriodStart;
+                                nightDifferentialPostShiftOvertimePeriodEnd = nightDifferentialPeriodEnd;
                             }
-                            else
+                            else if (postShiftOvertimePeriodEnd.Value > nightDifferentialPeriodStart.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedTimeOut).TotalMinutes;
+                                nightDifferential += (decimal)(postShiftOvertimePeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialPostShiftOvertimePeriodStart = nightDifferentialPeriodStart;
+                                nightDifferentialPostShiftOvertimePeriodEnd = postShiftOvertimePeriodEnd;
                             }
                         }
-                        else if (expectedNightDifferentialStart < actualTimeOut)
+                        else
                         {
-                            if (expectedNightDifferentialEnd > actualTimeOut)
+                            if (nightDifferentialPeriodEnd.Value < postShiftOvertimePeriodEnd.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(actualTimeOut - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(nightDifferentialPeriodEnd.Value - postShiftOvertimePeriodStart.Value).TotalMinutes;
+                                nightDifferentialPostShiftOvertimePeriodStart = postShiftOvertimePeriodStart;
+                                nightDifferentialPostShiftOvertimePeriodEnd = nightDifferentialPeriodEnd;
                             }
-                            else
+                            else if (postShiftOvertimePeriodEnd.Value > nightDifferentialPeriodStart.Value)
                             {
-                                nightDifferentialOvertime += (decimal)(expectedNightDifferentialEnd - expectedNightDifferentialStart).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(postShiftOvertimePeriodEnd.Value - postShiftOvertimePeriodStart.Value).TotalMinutes;
+                                nightDifferentialPostShiftOvertimePeriodStart = postShiftOvertimePeriodStart;
+                                nightDifferentialPostShiftOvertimePeriodEnd = postShiftOvertimePeriodEnd;
+                            }
+                        }
+
+                        if (IsSplittable)
+                        {
+                            if (nightDifferentialPostShiftOvertimePeriodStart.HasValue && nightDifferentialPostShiftOvertimePeriodEnd.HasValue)
+                            {
+                                if (nightDifferentialPostShiftOvertimePeriodEnd.Value.Date > nightDifferentialPostShiftOvertimePeriodStart.Value.Date)
+                                {
+                                    splitTailNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodEnd.Value - nightDifferentialPostShiftOvertimePeriodEnd.Value.Date).TotalMinutes;
+                                    splitHeadNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodStart.Value.AddDays(1).Date - nightDifferentialPostShiftOvertimePeriodStart.Value).TotalMinutes;
+                                }
+                                else
+                                {
+                                    splitTailNightDifferentialPostShiftOvertime += (decimal)(nightDifferentialPostShiftOvertimePeriodEnd.Value - nightDifferentialPostShiftOvertimePeriodStart.Value).TotalMinutes;
+                                }
                             }
                         }
                     }

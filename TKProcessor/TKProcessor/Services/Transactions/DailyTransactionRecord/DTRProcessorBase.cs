@@ -108,6 +108,12 @@ namespace TKProcessor.Services
         protected DateTime? preShiftOvertimePeriodEnd;
         protected DateTime? postShiftOvertimePeriodStart;
         protected DateTime? postShiftOvertimePeriodEnd;
+        protected DateTime? nightDifferentialPeriodStart;
+        protected DateTime? nightDifferentialPeriodEnd;
+        protected DateTime? nightDifferentialPreShiftOvertimePeriodStart;
+        protected DateTime? nightDifferentialPreShiftOvertimePeriodEnd;
+        protected DateTime? nightDifferentialPostShiftOvertimePeriodStart;
+        protected DateTime? nightDifferentialPostShiftOvertimePeriodEnd;
 
         public bool IsSplittable = false;
 
@@ -116,13 +122,24 @@ namespace TKProcessor.Services
         protected decimal splitHeadUndertime = 0;
         protected decimal splitHeadAbsentHours = 0;
         protected decimal splitHeadRegularWorkHours = 0;
+        protected decimal splitHeadPreShiftOvertime = 0;
+        protected decimal splitHeadPostShiftOvertime = 0;
+        protected decimal splitHeadTotalOvertime = 0;
+        protected decimal splitHeadNightDifferential = 0;
+        protected decimal splitHeadNightDifferentialPreShiftOvertime = 0;
+        protected decimal splitHeadNightDifferentialPostShiftOvertime = 0;
 
         protected decimal splitTailWorkHours = 0;
         protected decimal splitTailLate = 0;
         protected decimal splitTailUndertime = 0;
         protected decimal splitTailAbsentHours = 0;
         protected decimal splitTailRegularWorkHours = 0;
-
+        protected decimal splitTailPreShiftOvertime = 0;
+        protected decimal splitTailPostShiftOvertime = 0;
+        protected decimal splitTailTotalOvertime = 0;
+        protected decimal splitTailNightDifferential = 0;
+        protected decimal splitTailNightDifferentialPreShiftOvertime = 0;
+        protected decimal splitTailNightDifferentialPostShiftOvertime = 0;
         #endregion
 
         public DTRProcessorBase()
@@ -134,6 +151,11 @@ namespace TKProcessor.Services
         {
             actualTimeIn = DateTimeHelpers.RemoveSeconds(DTR.TimeIn.Value);
             actualTimeOut = DateTimeHelpers.RemoveSeconds(DTR.TimeOut.Value);
+
+            if (actualTimeOut.Date > actualTimeIn.Date)
+            {
+                IsSplittable = true;
+            }
         }
 
         protected decimal GetTotalBreakDuration()
@@ -350,28 +372,45 @@ namespace TKProcessor.Services
             {
                 WorkHours = Math.Round(splitHeadWorkHours / 60, 2),
                 ActualLate = Math.Round(splitHeadLate / 60, 2),
-                ActualUndertime = Math.Round(splitHeadUndertime / 60,2),
-                AbsentHours = Math.Round(splitHeadAbsentHours / 60, 2)
+                ActualUndertime = Math.Round(splitHeadUndertime / 60, 2),
+                AbsentHours = Math.Round(splitHeadAbsentHours / 60, 2),
+                ActualPreOvertime = Math.Round(splitHeadPreShiftOvertime / 60,2),
+                ActualPostOvertime = Math.Round(splitHeadPostShiftOvertime / 60 ,2)
             };
 
             DailyTransactionRecord tail = new DailyTransactionRecord()
             {
-                RegularWorkHours = Math.Round(splitTailRegularWorkHours / 60, 2),
                 WorkHours = Math.Round(splitTailWorkHours / 60, 2),
                 ActualLate = Math.Round(splitTailLate / 60, 2),
                 ActualUndertime = Math.Round(splitTailUndertime / 60, 2),
-                AbsentHours = Math.Round(splitTailAbsentHours / 60, 2)
+                AbsentHours = Math.Round(splitTailAbsentHours / 60, 2),
+                ActualPreOvertime = Math.Round(splitTailPreShiftOvertime / 60, 2),
+                ActualPostOvertime = Math.Round(splitTailPostShiftOvertime / 60, 2)
             };
 
             if (DTR.Shift.IsRestDay.HasValue && DTR.Shift.IsRestDay.Value)
             {
                 head.ActualRestDay = Math.Round(splitHeadRegularWorkHours / 60, 2);
+                head.ActualRestDayOt = Math.Round(splitHeadTotalOvertime / 60, 2);
+                head.ActualNDRD = Math.Round(splitHeadNightDifferential / 60, 2);
+                head.ActualNDRDot = Math.Round((splitHeadNightDifferentialPreShiftOvertime + splitHeadNightDifferentialPostShiftOvertime) / 60, 2);
+
                 tail.ActualRestDay = Math.Round(splitTailRegularWorkHours / 60, 2);
+                tail.ActualRestDayOt = Math.Round(splitTailTotalOvertime / 60, 2);
+                tail.ActualNDRD = Math.Round(splitTailNightDifferential / 60, 2);
+                tail.ActualNDRDot = Math.Round((splitTailNightDifferentialPreShiftOvertime + splitTailNightDifferentialPostShiftOvertime) / 60, 2);
             }
             else 
             {
                 head.RegularWorkHours = Math.Round(splitHeadRegularWorkHours / 60, 2);
+                head.ActualOvertime = Math.Round(splitHeadTotalOvertime / 60, 2);
+                head.NightDifferential = Math.Round(splitHeadNightDifferential / 60, 2);
+                head.NightDifferentialOt = Math.Round((splitHeadNightDifferentialPreShiftOvertime + splitHeadNightDifferentialPostShiftOvertime) / 60, 2);
+
                 tail.RegularWorkHours = Math.Round(splitTailRegularWorkHours / 60, 2);
+                tail.ActualOvertime = Math.Round(splitTailTotalOvertime / 60, 2);
+                tail.NightDifferential = Math.Round(splitTailNightDifferential / 60, 2);
+                tail.NightDifferentialOt = Math.Round((splitTailNightDifferentialPreShiftOvertime + splitTailNightDifferentialPostShiftOvertime) / 60, 2);
             }
             return Tuple.Create(head, tail);
         }
