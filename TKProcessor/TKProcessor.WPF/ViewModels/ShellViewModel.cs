@@ -157,7 +157,12 @@ namespace TKProcessor.WPF.ViewModels
             ChangeActiveItem(new DailyTransactionRecordViewModel(eventAggregator, windowManager), true);
         }
 
-        public void GlobalSettings()
+        public void ShowDashboard()
+        {
+            ChangeActiveItem(new DashboardViewModel(), true);
+        }
+
+        public void ShowGlobalSettings()
         {
             ChangeActiveItem(new GlobalSettingsViewModel(eventAggregator, windowManager), true);
         }
@@ -185,11 +190,6 @@ namespace TKProcessor.WPF.ViewModels
         public void ShowAbsenceReport()
         {
             ChangeActiveItem(new ReportAbsenceViewModel(), true);
-        }
-
-        public void ShowDashboard()
-        {
-            ChangeActiveItem(new DashboardViewModel(), true);
         }
 
         public void Handle(LoginEvent message)

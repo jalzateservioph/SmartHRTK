@@ -25,6 +25,16 @@
             <SolidColorBrush x:Key="ServioColors2" Color="#FFFED330"/>
             <SolidColorBrush x:Key="ServioColors3" Color="#FF4B7BEC"/>
 
+            <SolidColorBrush x:Key="CardBackground" Color="#FF12A1CB"/>
+            <SolidColorBrush x:Key="CardForeground" Color="#FFF1D17A"/>
+
+            <SolidColorBrush x:Key="OverlayBackground" Color="#BF000000"/>
+
+            <SolidColorBrush x:Key="ModalTopBarBackground" Color="#FFE0E0E0"/>
+            <SolidColorBrush x:Key="ModalCloseButtonBackground" Color="#FFC94D4D"/>
+
+            <SolidColorBrush x:Key="HeaderBackground" Color="#FF8BDAF1"/>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -14,7 +14,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Timekeeping Dashboard" Margin="0" FontSize="14" FontFamily="Segoe UI Semibold" Background="#FF8BDAF1"/>
+        <Label Content="Timekeeping Dashboard" Margin="0" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}"/>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -31,18 +31,48 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="0" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="0" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                    </Viewbox>
+
+                    <Viewbox Grid.Row="1" Margin="15,0">
+                        <Label Content="Total Employees" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                    </Viewbox>
+                </Grid>
+
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="1" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100*"/>
+                        <RowDefinition Height="35*"/>
+                    </Grid.RowDefinitions>
+
+                    <Viewbox>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                    </Viewbox>
+
+                    <Viewbox Grid.Row="1" Margin="15,0">
+                        <Label Content="Total Employee Count" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                    </Viewbox>
+                </Grid>
+
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="2" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100*"/>
+                        <RowDefinition Height="35*"/>
+                    </Grid.RowDefinitions>
+
+                    <Viewbox>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
@@ -50,14 +80,14 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="1" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
@@ -65,14 +95,14 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="2" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
@@ -80,44 +110,14 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="3" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
-                    </Viewbox>
-
-                    <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
-                    </Viewbox>
-                </Grid>
-
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="3" Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="100*"/>
-                        <RowDefinition Height="35*"/>
-                    </Grid.RowDefinitions>
-
-                    <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
-                    </Viewbox>
-
-                    <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
-                    </Viewbox>
-                </Grid>
-
-                <Grid Margin="0,3,3,3" Background="#FF12A1CB" Grid.Row="4" Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="100*"/>
-                        <RowDefinition Height="35*"/>
-                    </Grid.RowDefinitions>
-
-                    <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="#FFF1D17A"/>
+                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">

@@ -326,6 +326,8 @@ namespace TKProcessor.Services
 
                 foreach (var employee in employees)
                 {
+                    iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName}...");
+
                     DailyTransactionRecord hangingDTR = new DailyTransactionRecord();
 
                     bool firstIteration = true;

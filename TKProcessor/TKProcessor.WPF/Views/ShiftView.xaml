@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Employee Shift Setup" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Semibold"/>
+        <Label Content="Employee Shift Setup" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" IsEnabled="{Binding IsEnabled}">
             <Button x:Name="Populate" Content="Reload All" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" />
@@ -567,7 +567,7 @@
                         </Grid>
                     </ScrollViewer>
 
-                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="0,10,0,5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="0,10,0,5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
                 </Grid>
 
             </Border>

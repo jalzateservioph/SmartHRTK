@@ -15,15 +15,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Employee Work Schedule" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Semibold" Height="29" Width="171"/>
+        <Label Content="Employee Work Schedule" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Grid.ColumnSpan="2" Height="20" IsEnabled="{Binding IsEnabled}">
-            <Button x:Name="Populate" Content="Reload All" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="Edit" Content="Edit" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <Button x:Name="DownloadTemplate" Content="Download Templates" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
+            <Button x:Name="Populate" Content="Reload All" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="Edit" Content="Edit" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="DownloadTemplate" Content="Download Templates" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="48" IsEnabled="{Binding IsEnabled}"/>
@@ -95,7 +95,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="1" Background="#BF000000" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
+        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
             <Border Width="500" Height="350" BorderBrush="#FF767676" BorderThickness="1" VerticalAlignment="Center">
 
                 <Grid Background="White">
@@ -106,11 +106,11 @@
                     </Grid.RowDefinitions>
 
                     <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
-                        <Label Content="Add/Edit Employee Work Schedule" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
+                        <Label Content="Add/Edit Employee Work Schedule" FontFamily="Segoe UI Semibold" Background="{DynamicResource ModalTopBarBackground}"/>
                     </Border>
 
                     <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
-                            Background="#FFC94D4D" Foreground="White"/>
+                            Background="{DynamicResource ModalCloseButtonBackground}" Foreground="White"/>
 
                     <Grid Background="White" Grid.Row="1" Margin="0,5,5,0">
 
@@ -217,7 +217,7 @@
                         <!--advanced mode-->
                     </Grid>
 
-                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="0,0,0,5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" HorizontalAlignment="Center"/>
+                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="0,0,0,5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
                 </Grid>
 
             </Border>
