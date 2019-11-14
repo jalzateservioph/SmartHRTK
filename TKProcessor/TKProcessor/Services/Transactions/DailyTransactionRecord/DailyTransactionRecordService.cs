@@ -186,20 +186,44 @@ namespace TKProcessor.Services
                                 leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
                             }
 
+                            bool isLegalHoliday = false;
+                            bool isSpecialHoliday = false;
+
+                            if (holidays != null)
+                            {
+                                foreach (var holiday in holidays)
+                                {
+                                    if (holiday.Type == (int)HolidayType.Legal)
+                                    {
+                                        isLegalHoliday = true;
+                                    }
+                                    else if (holiday.Type == (int)HolidayType.Special)
+                                    {
+                                        isSpecialHoliday = true;
+                                    }
+                                }
+                            }
+
                             if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                             {
-                                if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
-                                {
-                                    processor = new StandardDTRProcessor(DTR, leaves, holidays);
-                                    processor.ComputeHolidayAndRestDay();
-                                    DTR = processor.DTR;
-                                }
-                                else
-                                {
-                                    processor = new StandardDTRProcessor(DTR, leaves);
-                                    processor.ComputeRegular();
-                                    DTR = processor.DTR;
-                                }
+                                //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                //{
+                                //    processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                //    processor.ComputeHolidayAndRestDay();
+                                //    DTR = processor.DTR;
+                                //}
+                                //else
+                                //{
+                                //    processor = new StandardDTRProcessor(DTR, leaves);
+                                //    processor.ComputeRegular();
+                                //    DTR = processor.DTR;
+                                //}
+
+                                processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                ((StandardDTRProcessor)processor).Compute();
+
+                                DTR = processor.DTR;
+                                DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                             }
                             else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex)
                             {
