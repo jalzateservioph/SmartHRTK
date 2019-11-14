@@ -303,12 +303,12 @@ namespace TKProcessor.Services
                     DailyTransactionRecord hangingDTR = new DailyTransactionRecord();
 
                     bool firstIteration = true;
-                    start = start.AddDays(-1); //start from day before to compute hanging DTR
-                    while (start <= end)
+                    DateTime dateIterator = start.AddDays(-1); //start from day before to compute hanging DTR
+                    while (dateIterator <= end)
                     {
                         if (!firstIteration)
                         {
-                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == start);
+                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == dateIterator);
 
                             foreach (var item in existing)
                             {
@@ -316,7 +316,7 @@ namespace TKProcessor.Services
                             }
                         }
 
-                        IEnumerable<Holiday> holidays = holidayService.GetHolidays(start);
+                        IEnumerable<Holiday> holidays = holidayService.GetHolidays(dateIterator);
 
                         var isLegalHoliday = false;
                         var isSpecialHoliday = false;
@@ -338,16 +338,16 @@ namespace TKProcessor.Services
 
                         DailyTransactionRecord currentDayDTR = hangingDTR; //consider holidays
                         currentDayDTR.Employee = employee;
-                        currentDayDTR.TransactionDate = start;
+                        currentDayDTR.TransactionDate = dateIterator;
                         //currentDayDTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
 
 
                         hangingDTR = new DailyTransactionRecord(); //Reset hanging DTR
 
-                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
-                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == start && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
 
-                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == start).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
+                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == dateIterator).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
 
                         foreach (var workSchedule in workSchedules)
                         {
@@ -355,11 +355,11 @@ namespace TKProcessor.Services
 
                             DTR.Employee = employee;
                             DTR.Shift = workSchedule.Shift;
-                            DTR.TransactionDate = start;
+                            DTR.TransactionDate = dateIterator;
 
                             //standard
-                            var _schedIn = start.Add(workSchedule.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
-                            var _schedOut = start.Add(workSchedule.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
+                            var _schedIn = dateIterator.Add(workSchedule.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
+                            var _schedOut = dateIterator.Add(workSchedule.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
 
                             if (_schedOut < _schedIn)
                             {
@@ -439,7 +439,7 @@ namespace TKProcessor.Services
                         currentDayDTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                         Save(currentDayDTR);
 
-                        start = start.AddDays(1);
+                        dateIterator = dateIterator.AddDays(1);
                     }
                 }
 
