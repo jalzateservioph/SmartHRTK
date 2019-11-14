@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
+using TKProcessor.WPF.Events;
 using TKProcessor.WPF.Models;
 
 namespace TKProcessor.WPF.ViewModels
@@ -19,6 +20,7 @@ namespace TKProcessor.WPF.ViewModels
 
         private string _filterString;
         private bool _isEnabled;
+        private bool _isCheckedAll;
 
         public ViewModelBase()
         {
@@ -64,7 +66,13 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
+        public virtual void HandleError(Exception ex)
+        {
+            eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+        }
+
         public ICollectionView View { get; }
+
         public string FilterString
         {
             get => _filterString;
@@ -79,13 +87,25 @@ namespace TKProcessor.WPF.ViewModels
                 }
             }
         }
+
         public bool AutoFilter { get; set; }
+
         public bool IsEnabled
         {
             get => _isEnabled;
             set
             {
                 _isEnabled = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public bool IsCheckedAll
+        {
+            get => _isCheckedAll;
+            set
+            {
+                _isCheckedAll = value;
                 NotifyOfPropertyChange();
             }
         }

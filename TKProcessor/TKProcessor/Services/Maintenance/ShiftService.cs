@@ -22,14 +22,14 @@ namespace TKProcessor.Services.Maintenance
             var shift = typeof(Shift).GetProperties().Select(i => i.Name);
             var include = shift.Where(s => !exclude1.Any(e => e == s) && !exclude2.Any(e => e == s));
 
-           columns = include.ToArray(); 
+            columns = include.ToArray();
         }
 
         public override void Save(Shift entity)
         {
             try
             {
-                var existing = Context.Shift.FirstOrDefault(i => i.Id == entity.Id || i.ShiftCode == entity.ShiftCode);
+                var existing = Context.Shift.FirstOrDefault(i => i.IsActive && (i.Id == entity.Id || i.ShiftCode == entity.ShiftCode));
 
                 if (existing != default(Shift))
                     entity.Id = existing.Id;
@@ -86,9 +86,13 @@ namespace TKProcessor.Services.Maintenance
                         else if ((prop.PropertyType == typeof(DateTime)) || (prop.PropertyType == typeof(DateTime?)))
                         {
                             if (DateTime.TryParse(value.ToString(), out DateTime result))
+                            {
                                 prop.SetValue(tempShift, result);
+                            }
                             else
+                            {
                                 prop.SetValue(tempShift, DateTime.FromOADate(Convert.ToDouble(value.ToString())));
+                            }
                         }
                         else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                         {

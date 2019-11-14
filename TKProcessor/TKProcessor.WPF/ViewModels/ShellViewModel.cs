@@ -15,7 +15,7 @@ using TKProcessor.WPF.Models;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class ShellViewModel : Conductor<Screen>, IHandle<NewMessageEvent>, IHandle<LoginEvent>
+    public class ShellViewModel : Conductor<Screen>, IDisposable, IHandle<NewMessageEvent>, IHandle<LoginEvent>
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IWindowManager windowManager;
@@ -204,6 +204,12 @@ namespace TKProcessor.WPF.ViewModels
 
                 ShowDashboard();
             }
+        }
+
+        public void Dispose()
+        {
+            if (ActiveItem is IDisposable)
+                (ActiveItem as IDisposable).Dispose();
         }
 
         public bool HasMessage

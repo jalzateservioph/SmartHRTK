@@ -61,9 +61,23 @@ namespace TKProcessor.Services
 
         public virtual void Delete(T entity)
         {
-            entity.IsActive = false;
+            var existing = Context.Set<T>().Find(entity.Id);
 
-            Save(entity);
+            if (existing != default(T))
+            {
+                entity.IsActive = false;
+
+                entity.Id = existing.Id;
+                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedOn = DateTime.Now;
+
+                CreateAuditLog(entity, existing);
+
+                Context.Entry(existing).CurrentValues.SetValues(entity);
+            }
+
+            if (AutoSaveChanges)
+                SaveChanges();
         }
 
         public virtual void DeleteHard(T entity)

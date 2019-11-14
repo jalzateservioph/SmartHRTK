@@ -67,20 +67,6 @@ namespace TKProcessor.WPF.Models
                 return;
 
             IsDirty = true;
-
-            IsValid = true;
-
-            if (IsValid && (e.PropertyName == nameof(AmBreakIn) || e.PropertyName == nameof(AmBreakOut)))
-                IsValid = AmBreakOut <= AmBreakIn;
-
-            if (IsValid && (e.PropertyName == nameof(PmBreakIn) || e.PropertyName == nameof(PmBreakOut)))
-                IsValid = PmBreakOut <= PmBreakIn;
-
-            if (IsValid && (e.PropertyName == nameof(LunchIn) || e.PropertyName == nameof(LunchOut)))
-                IsValid = LunchOut <= LunchIn;
-
-            if (IsValid && (e.PropertyName == nameof(DinnerIn) || e.PropertyName == nameof(DinnerOut)))
-                IsValid = DinnerOut <= DinnerIn;
         }
 
         public string ShiftCode
@@ -140,10 +126,10 @@ namespace TKProcessor.WPF.Models
         }
         public decimal RequiredWorkHours
         {
-            get => _requiredWorkHours;
+            get => _requiredWorkHours + 0.00m;
             set
             {
-                _requiredWorkHours = value;
+                _requiredWorkHours = value + 0.00m;
                 NotifyOfPropertyChange();
             }
         }
@@ -523,16 +509,6 @@ namespace TKProcessor.WPF.Models
             set
             {
                 _latestTimeOut = value.HasValue ? value.Value.AddSeconds(-value.Value.Second).AddMilliseconds(-value.Value.Millisecond) : value;
-                NotifyOfPropertyChange();
-            }
-        }
-
-        public override bool IsValid
-        {
-            get => _isValid;
-            set
-            {
-                _isValid = value;
                 NotifyOfPropertyChange();
             }
         }

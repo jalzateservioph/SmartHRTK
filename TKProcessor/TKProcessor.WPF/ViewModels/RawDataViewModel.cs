@@ -22,7 +22,6 @@ namespace TKProcessor.WPF.ViewModels
         readonly OpenFileDialog openFileDialog;
         readonly SaveFileDialog saveFileDialog;
         readonly RawDataService service;
-        private bool _isCheckedAll;
 
         public RawDataViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -182,16 +181,6 @@ namespace TKProcessor.WPF.ViewModels
         public void Dispose()
         {
             service.Dispose();
-        }
-
-        public bool IsCheckedAll
-        {
-            get => _isCheckedAll;
-            set
-            {
-                _isCheckedAll = value;
-                NotifyOfPropertyChange();
-            }
         }
     }
 }

@@ -20,11 +20,12 @@ namespace TKProcessor.WPF.ViewModels
     public class EmployeeViewModel : ViewModelBase<Employee>
     {
         readonly IMapper mapper;
-        readonly EmployeeService service;
+        readonly EmployeeService employeeService;
 
         public EmployeeViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
-            service = new EmployeeService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
+            employeeService = new EmployeeService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
+
             mapper = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Employee, TKModels.Employee>();
@@ -50,8 +51,12 @@ namespace TKProcessor.WPF.ViewModels
 
                     Items.Clear();
 
-                    foreach (var item in service.List())
+                    foreach (var item in employeeService.List())
+                    {
                         Items.Add(mapper.Map<Employee>(item));
+
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing {item.ToString()}..."));
+                    }
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} employees."));
                 }
@@ -74,11 +79,23 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent("Employee sync started..."));
 
-                    service.Sync(Session.Default.CurrentUser.Id);
+                    employeeService.Sync(Session.Default.CurrentUser.Id, emp =>
+                    {
+                        var employee = mapper.Map<Employee>(emp);
+
+                        var existing = Items.FirstOrDefault(i => i.Id == employee.Id ||
+                                                                 i.EmployeeCode == employee.EmployeeCode ||
+                                                                 i.FullName == employee.FullName);
+
+                        if (existing != default(Employee))
+                            Items.Remove(existing);
+
+                        Items.Add(employee);
+
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing {employee.ToString()}..."));
+                    });
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent("Employee Sync Complete!"));
-
-                    Populate();
                 }
                 catch (Exception ex)
                 {
@@ -95,11 +112,14 @@ namespace TKProcessor.WPF.ViewModels
             {
                 StartProcessing();
 
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving employees..."));
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving edited employees..."));
 
                 foreach (var employee in Items.Where(i => i.IsDirty))
                 {
-                    service.Save(mapper.Map<TKModels.Employee>(employee));
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {employee}..."));
+
+                    employeeService.Save(mapper.Map<TKModels.Employee>(employee));
+
                     employee.IsDirty = false;
                 }
 
@@ -115,25 +135,48 @@ namespace TKProcessor.WPF.ViewModels
 
         public override bool Filter(object o)
         {
-            if (FilterString == "")
+            if (string.IsNullOrEmpty(FilterString))
                 return true;
 
-            var filters = FilterString.Split(',');
-            var entity = (Employee)o;
+            string[] filterGroups = FilterString.Split(';')
+                                                .Where(i => !string.IsNullOrEmpty(i))
+                                                .ToArray();
 
-            if (filters.Any(i => entity.EmployeeCode.ToLower().Contains(i.Trim().ToLower())))
-                return true;
+            Employee entity = (Employee)o;
 
-            if (filters.Any(i => entity.FullName.ToLower().Contains(i.Trim().ToLower())))
-                return true;
+            bool[] result = new bool[filterGroups.Length];
 
-            return false;
+            string[] filterColumns = new string[]
+            {
+                entity.EmployeeCode.ToLower(),
+                entity.FullName.ToLower()
+            };
+
+            for (int a = 0; a < filterGroups.Length; a++)
+            {
+                var filters = filterGroups[a].Split(',')
+                                             .Where(i => !string.IsNullOrEmpty(i))
+                                             .ToArray();
+
+                result[a] = (filters.Length > 1);
+
+                int counter = 0;
+
+                foreach (var col in filterColumns)
+                {
+                    if (filters.Any(i => col.Contains(i.Trim().ToLower())))
+                        counter++;
+                }
+
+                result[a] = (counter >= filters.Length);
+            }
+
+            return result.Any(i => i);
         }
 
         public override void Sort()
         {
-            View.SortDescriptions.Add(new SortDescription("Employee.EmployeeCode", ListSortDirection.Ascending));
-            View.SortDescriptions.Add(new SortDescription("Employee.BiometricsId", ListSortDirection.Ascending));
+            View.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
         }
     }
 }

@@ -16,6 +16,9 @@ namespace TKProcessor.WPF.Models
         public BaseModel()
         {
             Id = Guid.NewGuid();
+            IsDirty = false;
+            IsActive = true;
+            IsSelected = false;
         }
         
         public Guid Id { get; set; }

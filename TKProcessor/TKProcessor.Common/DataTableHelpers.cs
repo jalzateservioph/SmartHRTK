@@ -21,6 +21,18 @@ namespace TKProcessor.Common
             return table;
         }
 
+        public static DataTable CreateTable(IEnumerable<string> columns)
+        {
+            DataTable table = new DataTable();
+
+            foreach (var col in columns)
+            {
+                table.Columns.Add(col);
+            }
+
+            return table;
+        }
+
         public static DataTable ToDataTable<T>(this IEnumerable<T> data)
             where T : class, new()
         {

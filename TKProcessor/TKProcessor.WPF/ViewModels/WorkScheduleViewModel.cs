@@ -26,10 +26,11 @@ namespace TKProcessor.WPF.ViewModels
         readonly IMapper mapper;
         readonly WorkScheduleService service;
         readonly OpenFileDialog openFileDialog;
+        readonly SaveFileDialog saveFileDialog;
         private ObservableCollection<Shift> _shiftList;
         private ObservableCollection<Employee> _employeeList;
         private WorkSchedule _currentItem;
-        private bool _isCheckedAll;
+        private bool isNewRecordState;
 
         public WorkScheduleViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -65,7 +66,15 @@ namespace TKProcessor.WPF.ViewModels
 
             }).CreateMapper();
 
-            openFileDialog = new OpenFileDialog();
+            openFileDialog = new OpenFileDialog()
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx"
+            };
+
+            saveFileDialog = new SaveFileDialog()
+            {
+                Filter = "Excel file (*.xlsx)|*.xlsx"
+            };
 
             Populate();
         }
@@ -170,6 +179,41 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
+        public void DownloadTemplate()
+        {
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                try
+                {
+                    foreach (var item in service.HeaderDef)
+                    {
+                        var suffix = "";
+
+                        if (item.Any(i => i == "{datetime}"))
+                        {
+                            suffix = "_plot";
+                            item[1] = DateTime.Today.ToShortDateString();
+                        }
+                        else if (item.Any(i => i == "To" || i == "From"))
+                            suffix = "_summary";
+
+                        ExcelFileHandler.Export($"{Path.GetDirectoryName(saveFileDialog.FileName)}" +
+                                                $"\\{Path.GetFileNameWithoutExtension(saveFileDialog.FileName)}{suffix}.xlsx", item);
+                    }
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Successfully downloaded template files", MessageType.Success));
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex);
+                }
+
+                EndProcessing();
+            }
+        }
+
         public void New()
         {
             CurrentItem = new WorkSchedule()
@@ -179,6 +223,8 @@ namespace TKProcessor.WPF.ViewModels
                 EndDate = DateTime.Today
             };
 
+            IsNewRecordState = true;
+
             StartEditing();
         }
 
@@ -187,7 +233,10 @@ namespace TKProcessor.WPF.ViewModels
             CurrentItem = mapper.Map<WorkSchedule>(ActiveItem);
 
             CurrentItem.Employee = EmployeeList.FirstOrDefault(i => i.Id == ActiveItem.Employee.Id);
+
             CurrentItem.Shift = ShiftList.FirstOrDefault(i => i.Id == ActiveItem.Shift.Id);
+
+            IsNewRecordState = false;
 
             StartEditing();
         }
@@ -217,21 +266,6 @@ namespace TKProcessor.WPF.ViewModels
                             wsObject.Saturday
                         };
 
-                        var errMsg = "";
-
-                        //if ((wsObject.EndDate - wsObject.StartDate).Days > 7)
-                        //{
-                        //    for (int i = 0; i < shifts.Length; i++)
-                        //    {
-                        //        var item = shifts[i];
-
-                        //        if (string.IsNullOrEmpty(errMsg))
-                        //            errMsg = "Please fill selet shift for ";
-
-                        //        errMsg += ((DayOfWeek)i).ToString() + " ";
-                        //    }   
-                        //}
-
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving work schedules for {wsObject.Employee} ", MessageType.Information));
 
                         var start = wsObject.StartDate;
@@ -249,6 +283,7 @@ namespace TKProcessor.WPF.ViewModels
                                         $"has no shift setup", MessageType.Information));
 
                                     start = start.AddDays(1);
+
                                     continue;
                                 }
 
@@ -277,7 +312,6 @@ namespace TKProcessor.WPF.ViewModels
                                         Items.Remove(existing);
 
                                     Items.Add(forSave);
-
                                 });
                             }
                             catch (Exception ex)
@@ -374,24 +408,49 @@ namespace TKProcessor.WPF.ViewModels
 
         public override bool Filter(object o)
         {
-            var entity = o as WorkSchedule;
-            var splitValue = FilterString.Split(',');
-
-            if (splitValue.Any(str => entity.Employee.EmployeeCode.ToLower().Contains(str.ToLower())))
+            if (string.IsNullOrEmpty(FilterString))
                 return true;
 
-            if (splitValue.Any(str => entity.Employee.FullName.ToLower().Contains(str.ToLower())))
-                return true;
+            string[] filterGroups = FilterString.Split(';')
+                                                .Where(i => !string.IsNullOrEmpty(i))
+                                                .ToArray();
 
-            if (splitValue.Any(str => entity.ScheduleDate.ToShortDateString().ToLower().Contains(str.ToLower())))
-                return true;
+            WorkSchedule entity = (WorkSchedule)o;
 
-            if (splitValue.Any(str => entity.ScheduleDate.ToLongDateString().ToLower().Contains(str.ToLower())))
-                return true;
+            bool[] result = new bool[filterGroups.Length];
 
-            return false;
+            string[] filterColumns = new string[]
+            {
+                entity.Employee.EmployeeCode.ToLower(),
+                entity.Employee.FullName.ToLower(),
+                entity.Shift.ShiftCode.ToLower(),
+                entity.ScheduleDate.ToLongDateString(),
+                entity.ScheduleDate.ToString("MM/dd/yyyy"),
+                entity.ScheduleDate.ToString("MM-dd-yyyy"),
+                entity.ScheduleDate.ToString("hh:mm")
+            };
+
+            for (int a = 0; a < filterGroups.Length; a++)
+            {
+                var filters = filterGroups[a].Split(',')
+                                             .Where(i => !string.IsNullOrEmpty(i))
+                                             .ToArray();
+
+                result[a] = (filters.Length > 1);
+
+                int counter = 0;
+
+                foreach (var col in filterColumns)
+                {
+                    if (filters.Any(i => col.Contains(i.Trim().ToLower())))
+                        counter++;
+                }
+
+                result[a] = (counter >= filters.Length);
+            }
+
+            return result.Any(i => i);
         }
-
 
         public ObservableCollection<Shift> ShiftList
         {
@@ -402,6 +461,7 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
         public ObservableCollection<Employee> EmployeeList
         {
             get => _employeeList;
@@ -411,16 +471,19 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
         public bool IsAdvancedMode { get; set; }
-        public bool IsCheckedAll
+
+        public bool IsNewRecordState
         {
-            get => _isCheckedAll;
+            get => isNewRecordState;
             set
             {
-                _isCheckedAll = value;
+                isNewRecordState = value;
                 NotifyOfPropertyChange();
             }
         }
+
         public WorkSchedule CurrentItem
         {
             get => _currentItem ?? (_currentItem = new WorkSchedule());
