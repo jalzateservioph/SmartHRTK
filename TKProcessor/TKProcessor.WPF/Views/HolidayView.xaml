@@ -19,9 +19,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Holiday Setup" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
+        <Label Content="Holiday Setup" FontSize="20" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}"/>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,5,0,0">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <!--<Button x:Name="SaveRecords" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>-->
@@ -67,7 +67,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="1" Background="#BF000000" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
+        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
             <Border Width="500" Height="250" BorderBrush="#FF767676" BorderThickness="1" VerticalAlignment="Center">
 
                 <Grid Background="White">

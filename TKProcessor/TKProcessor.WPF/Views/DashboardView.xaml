@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:converters="clr-namespace:TKProcessor.WPF.Converter"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="TKProcessor.WPF.Views.DashboardView"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800" Background="White">
+    <UserControl.Resources>
+        <converters:NumberAbbrevConverter x:Key="NumberAbbrevConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -14,14 +19,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Timekeeping Dashboard" Margin="0" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}"/>
+        <Label Content="Dashboard" Margin="0" FontSize="20" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}"/>
+        <Button x:Name="Populate" Content="Button" Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -42,7 +48,7 @@
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding EmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
@@ -57,7 +63,7 @@
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding ActiveEmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
@@ -72,7 +78,7 @@
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding HoursWorked, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">

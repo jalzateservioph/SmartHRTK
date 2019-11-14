@@ -9,8 +9,8 @@
              d:DesignHeight="450" d:DesignWidth="800" Background="White"
              FontSize="14">
     <Grid>
-        <Border HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" BorderThickness="1" BorderBrush="#FFBFBFBF">
-            <Grid Background="White">
+        <Border HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" BorderThickness="1" BorderBrush="#FFBFBFBF" Background="#FFFDFDFD" Padding="10,5">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="91*"/>
@@ -23,7 +23,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Content="SmartHR Timekeeping System" Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="0,5,0,0"/>
+                <Label Content="SmartHR Timekeeping System" Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0"/>
 
                 <Label Content="Username" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Grid.Row="1" Foreground="#FF4B4B4B"/>
                 <TextBox Grid.Column="1" Height="23" Margin="0,0,10,0" TextWrapping="Wrap" Text="{Binding ActiveItem.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" Grid.Row="1" VerticalContentAlignment="Center"
@@ -36,7 +36,7 @@
                 <TextBlock Text="{Binding Messsage}" HorizontalAlignment="Center" Margin="0,2" VerticalAlignment="Center" Grid.Row="3" Grid.ColumnSpan="2" Foreground="#FFE02525" Background="White" FontSize="12"
                            Visibility="{Binding IsInvalid, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                <Button x:Name="Login" Content="Login" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,5,0,10" Grid.Row="4" VerticalAlignment="Center" Width="75" Background="#FFEEEEEE" Foreground="Black"/>
+                <Button x:Name="Login" Content="Login" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,3,0,0" Grid.Row="4" VerticalAlignment="Center" Background="#FF3E974E" Foreground="White" FontWeight="Bold" Padding="15,3"/>
             </Grid>
         </Border>
     </Grid>

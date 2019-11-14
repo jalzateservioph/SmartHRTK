@@ -19,7 +19,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Biometrics Raw Data" FontSize="14" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
+        <Label Content="Biometrics Raw Data" FontSize="20" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
         
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>

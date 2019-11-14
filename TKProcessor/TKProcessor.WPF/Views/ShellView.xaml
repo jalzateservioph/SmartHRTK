@@ -21,7 +21,6 @@
 
         <Menu Grid.Row="0" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
             <MenuItem Header="TK Processor">
-                <!--<MenuItem Header="Users"/>-->
                 <MenuItem x:Name="ShowDashboard" Header="Dashboard"/>
                 <Separator/>
                 <MenuItem x:Name="ShowGlobalSettings" Header="Global Settings"/>
@@ -41,9 +40,6 @@
                 <MenuItem x:Name="ShowRawData" Header="Biometrics Raw Data"/>
             </MenuItem>
             <MenuItem Header="Transactions">
-                <!--<MenuItem Header="Work Schedule Adjustment"/>
-                <MenuItem Header="Time In/Out Adjustment"/>
-                <Separator/>-->
                 <MenuItem x:Name="ShowDailyTransactionRecords" Header="Daily Transaction Records"/>
             </MenuItem>
 
@@ -69,7 +65,7 @@
 
         <ContentControl x:Name="ActiveItem" Margin="10,5,10,10" Grid.Row="1"/>
 
-        <Grid Visibility="{Binding HasStartupMessage, Converter={StaticResource BooleanToVisibilityConverter}}" Background="#BF000000" Grid.RowSpan="3">
+        <Grid Visibility="{Binding HasStartupMessage, Converter={StaticResource BooleanToVisibilityConverter}}" Background="{DynamicResource OverlayBackground1}" Grid.RowSpan="3">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="200,0">
                 <TextBlock Text="{Binding StartupMessage}" FontFamily="Segoe UI Semibold" FontSize="20" Foreground="White" TextWrapping="WrapWithOverflow"/>
             </StackPanel>
