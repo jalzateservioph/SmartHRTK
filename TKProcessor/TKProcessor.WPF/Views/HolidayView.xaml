@@ -23,7 +23,7 @@
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
-            <!--<Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>-->
+            <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="SaveRecords" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
             <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363"/>
@@ -78,7 +78,7 @@
                     </Grid.RowDefinitions>
 
                     <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
-                        <Label Content="Holiday" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
+                        <Label Content="Add/update Holiday" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
                     </Border>
 
                     <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
@@ -108,23 +108,18 @@
                         <TextBox Margin="0" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Height="23" 
                                  Text="{Binding HolidaySummary.Name}"/>
 
-                        <CheckBox Content="Use Range Entry Mode" Margin="0,0,15,0" Grid.Row="1" Grid.ColumnSpan="2" IsChecked="{Binding HolidaySummary.IsRegularHoliday}" VerticalAlignment="Center"/>
-
-
-
-                        <!--Range Entry Mode-->
-                        <Label Content="Type:" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top"/>
+                        <Label Content="Type:" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top"/>
                         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
                             <CheckBox Content="Regular Holiday" Margin="0,0,15,0" IsChecked="{Binding HolidaySummary.IsRegularHoliday}"/>
                             <CheckBox Content="Special Holiday" IsChecked="{Binding HolidaySummary.IsSpecialHoliday}"/>
                         </StackPanel>
 
-                        <Label Content="Date:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top"/>
-                        <DatePicker Grid.Column="1" Margin="0" Grid.Row="3" VerticalAlignment="Top" 
+                        <Label Content="Date:" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top"/>
+                        <DatePicker Grid.Column="1" Margin="0" Grid.Row="2" VerticalAlignment="Top" 
                                     SelectedDate="{Binding HolidaySummary.Date}"/>
 
-                        <Label Content="Up To Year:" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Top"/>
-                        <xctk:IntegerUpDown Grid.Column="1" Margin="0" Grid.Row="4" VerticalAlignment="Center" Height="23"
+                        <Label Content="Up To Year:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top"/>
+                        <xctk:IntegerUpDown Grid.Column="1" Margin="0" Grid.Row="3" VerticalAlignment="Center" Height="23"
                                             Value="{Binding HolidaySummary.YearTo}" Minimum="{Binding HolidaySummary.YearTo}"/>
                         <!--Range Entry Mode-->
                     </Grid>

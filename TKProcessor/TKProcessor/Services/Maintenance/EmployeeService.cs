@@ -41,7 +41,7 @@ namespace TKProcessor.Services.Maintenance
             }
         }
 
-        public void Sync(Guid userId)
+        public void Sync(Guid userId, Action<Employee> iterationCallback = null)
         {
             try
             {
@@ -67,6 +67,8 @@ namespace TKProcessor.Services.Maintenance
                         try
                         {
                             Save(emp);
+
+                            iterationCallback?.Invoke(emp);
 
                             successCount++;
                         }

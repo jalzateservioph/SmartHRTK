@@ -14,6 +14,13 @@ namespace TKProcessor.WPF.Events
             MessageType = MessageType.Information;
         }
 
+        public NewMessageEvent(string message, int duration)
+        {
+            Message = message;
+            MessageType = MessageType.Information;
+            Duration = duration * 1000;
+        }
+
         public NewMessageEvent(string message, MessageType messageType)
         {
             Message = message;
@@ -30,7 +37,7 @@ namespace TKProcessor.WPF.Events
 
         public string Message { get; set; }
         public MessageType MessageType { get; set; }
-        public int Duration { get;set; }
+        public int Duration { get; set; }
     }
 
     public enum MessageType

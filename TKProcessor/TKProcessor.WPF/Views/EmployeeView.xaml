@@ -33,7 +33,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding FullName}" Header="Full Name" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Biometrics Id" Width="auto">
+                <DataGridTemplateColumn Header="Biometrics Id" Width="auto" CanUserSort="True" SortMemberPath="BiometricsId">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding BiometricsId}">

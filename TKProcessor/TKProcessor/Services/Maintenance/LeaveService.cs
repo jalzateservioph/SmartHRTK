@@ -13,13 +13,20 @@ namespace TKProcessor.Services.Maintenance
     {
         readonly SHRContext sHRContext;
         readonly TKContext tKContext;
+
         public LeaveService() : base()
         {
             sHRContext = new SHRContext();
             tKContext = new TKContext();
         }
 
-        public void Sync()
+        public LeaveService(Guid userId) : base(userId)
+        {
+            sHRContext = new SHRContext();
+            tKContext = new TKContext();
+        }
+
+        public void Sync(Action<TK.Leave> iterationCallback = null)
         {
             foreach (TK.Leave leave in Context.Leave.ToList())
                 Delete(leave);
@@ -37,6 +44,8 @@ namespace TKProcessor.Services.Maintenance
                 };
 
                 Save(tkLeave);
+
+                iterationCallback?.Invoke(tkLeave);
             }
         }
 

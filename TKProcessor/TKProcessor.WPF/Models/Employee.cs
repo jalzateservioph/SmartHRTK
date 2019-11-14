@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TKProcessor.WPF.Models
 {
-    public class Employee : BaseModel, IComparable<Employee>
+    public class Employee : BaseModel
     {
         private string _biometricsId;
         private string _employeeCode;
@@ -76,11 +76,6 @@ namespace TKProcessor.WPF.Models
                 _jobGradeBand = value;
                 NotifyOfPropertyChange();
             }
-        }
-
-        public int CompareTo(Employee other)
-        {
-            return BiometricsId.CompareTo(other.BiometricsId);
         }
 
         public override string ToString()

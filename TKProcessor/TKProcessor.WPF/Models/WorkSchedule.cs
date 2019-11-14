@@ -13,11 +13,6 @@ namespace TKProcessor.WPF.Models
         private DateTime _scheduleDate;
         private Shift _shift;
 
-        public WorkSchedule()
-        {
-            Id = Guid.NewGuid();
-        }
-
         public Employee Employee
         {
             get => _employee;

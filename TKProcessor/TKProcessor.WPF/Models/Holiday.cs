@@ -49,9 +49,9 @@ namespace TKProcessor.WPF.Models
         }
     }
 
-    public class HolidaySummary : BaseModel
+    public class HolidayModel : BaseModel
     {
-        public HolidaySummary()
+        public HolidayModel()
         {
             Date = DateTime.Today;
             YearTo = DateTime.Today.Year;

@@ -24,8 +24,7 @@ namespace TKProcessor.WPF.ViewModels
         private readonly HolidayService service;
         private readonly OpenFileDialog openFileDialog;
         readonly SaveFileDialog saveFileDialog;
-        private HolidaySummary holidaySummary;
-        private bool _isCheckedAll;
+        private HolidayModel holidaySummary;
 
         public HolidayViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -65,7 +64,7 @@ namespace TKProcessor.WPF.ViewModels
 
         public void New()
         {
-            holidaySummary = new HolidaySummary();
+            holidaySummary = new HolidayModel();
 
             StartEditing();
         }
@@ -190,22 +189,43 @@ namespace TKProcessor.WPF.ViewModels
             if (string.IsNullOrEmpty(FilterString))
                 return true;
 
-            var entity = (Holiday)o;
-            var splitValue = FilterString.Split(',');
+            string[] filterGroups = FilterString.Split(';')
+                                                .Where(i => !string.IsNullOrEmpty(i))
+                                                .ToArray();
 
-            if (splitValue.Any(str => entity.Name.ToLower().Contains(str.ToLower())))
-                return true;
+            Holiday entity = (Holiday)o;
 
-            if (splitValue.Any(str => ((TK.HolidayType)entity.Type).ToString().ToLower().Contains(str.ToLower())))
-                return true;
+            bool[] result = new bool[filterGroups.Length];
 
-            if (splitValue.Any(str => entity.Date.ToShortDateString().ToLower().Contains(str.ToLower())))
-                return true;
+            string[] filterColumns = new string[]
+            {
+                entity.Name.ToLower(),
+                ((TK.HolidayType)entity.Type).ToString().ToLower(),
+                entity.Date.ToLongDateString(),
+                entity.Date.ToString("MM/dd/yyyy"),
+                entity.Date.ToString("MM-dd-yyyy"),
+            };
 
-            if (splitValue.Any(str => entity.Date.ToLongDateString().ToLower().Contains(str.ToLower())))
-                return true;
+            for (int a = 0; a < filterGroups.Length; a++)
+            {
+                var filters = filterGroups[a].Split(',')
+                                             .Where(i => !string.IsNullOrEmpty(i))
+                                             .ToArray();
 
-            return false;
+                result[a] = (filters.Length > 1);
+
+                int counter = 0;
+
+                foreach (var col in filterColumns)
+                {
+                    if (filters.Any(i => col.Contains(i.Trim().ToLower())))
+                        counter++;
+                }
+
+                result[a] = (counter >= filters.Length);
+            }
+
+            return result.Any(i => i);
         }
 
         public override void Sort()
@@ -219,22 +239,12 @@ namespace TKProcessor.WPF.ViewModels
             service.Dispose();
         }
 
-        public HolidaySummary HolidaySummary
+        public HolidayModel HolidaySummary
         {
             get => holidaySummary;
             set
             {
                 holidaySummary = value;
-                NotifyOfPropertyChange();
-            }
-        }
-
-        public bool IsCheckedAll
-        {
-            get => _isCheckedAll;
-            set
-            {
-                _isCheckedAll = value;
                 NotifyOfPropertyChange();
             }
         }

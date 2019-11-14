@@ -3,6 +3,7 @@ using Caliburn.Micro;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,17 +18,15 @@ using TKModels = TKProcessor.Models.TK;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class ShiftViewModel : ViewModelBase<Shift>
+    public class ShiftViewModel : EditableViewModelBase<Shift>
     {
-        readonly IEventAggregator eventAggregator;
-        readonly IWindowManager windowManager;
         readonly IMapper mapper;
         readonly OpenFileDialog openFileDialog;
         readonly SaveFileDialog saveFileDialog;
         readonly ShiftService service;
         private Shift _currentItem;
 
-        public ShiftViewModel()
+        public ShiftViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
             service = new ShiftService(Session.Default.CurrentUser?.Id ?? Guid.Empty) { AutoSaveChanges = true };
 
@@ -35,14 +34,12 @@ namespace TKProcessor.WPF.ViewModels
             {
                 cfg.CreateMap<Shift, TKModels.Shift>();
                 cfg.CreateMap<TKModels.Shift, Shift>()
-                    .AfterMap((model, appmodel) => { appmodel.IsDirty = false; });
+                   .AfterMap((model, appmodel) => { appmodel.IsDirty = false; });
 
                 cfg.CreateMap<User, TKModels.User>();
                 cfg.CreateMap<TKModels.User, User>();
 
                 cfg.CreateMap<Shift, Shift>();
-                cfg.CreateMap<Shift, Shift>();
-
             }).CreateMapper();
 
             openFileDialog = new OpenFileDialog()
@@ -78,10 +75,6 @@ namespace TKProcessor.WPF.ViewModels
                 FlexiIncrements.Add(item.ToString(), i);
             }
 
-            // change this in the future 
-
-            New();
-
             Populate();
         }
 
@@ -89,12 +82,8 @@ namespace TKProcessor.WPF.ViewModels
         {
             if (e.PropertyName == nameof(ActiveItem))
                 CurrentItem = mapper.Map<Shift>(ActiveItem);
-        }
-
-        public ShiftViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : this()
-        {
-            this.eventAggregator = eventAggregator;
-            this.windowManager = windowManager;
+            if (e.PropertyName == nameof(IsCheckedAll))
+                View.Cast<Shift>().ToList().ForEach(i => i.IsSelected = IsCheckedAll);
         }
 
         public void Populate()
@@ -105,14 +94,16 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
+                    IsCheckedAll = false;
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieving shifts from the database...", 0));
+
                     Items.Clear();
 
                     foreach (var item in service.List().Where(i => i.IsActive).Select(i => mapper.Map<Shift>(i)))
                     {
                         Items.Add(item);
                     }
-
-                    New();
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} shifts ", MessageType.Success));
                 }
@@ -125,26 +116,29 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
-        //public bool CanSave { get => CurrentItem?.IsValid ?? false; }
-
         public void Save()
         {
             StartProcessing();
 
             try
             {
-
                 if (string.IsNullOrEmpty(CurrentItem.ShiftCode))
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without shift code", MessageType.Success));
+                    throw new Exception($"Cannot save shift without shift code");
 
                 if (CurrentItem.ScheduleIn == null)
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without schedule in", MessageType.Success));
+                    throw new Exception($"Cannot save shift without schedule in");
 
                 if (CurrentItem.ScheduleOut == null)
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without schedule out", MessageType.Success));
+                    throw new Exception($"Cannot save shift without schedule out");
 
                 if (CurrentItem.RequiredWorkHours == 0)
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Cannot save shift without required work hours", MessageType.Success));
+                    throw new Exception($"Cannot save shift without required work hours");
+
+                if (CurrentItem.NightDiffStart == null)
+                    throw new Exception($"Cannot save shift without night differential start");
+
+                if (CurrentItem.NightDiffEnd == null)
+                    throw new Exception($"Cannot save shift without night differential end");
 
                 service.Save(mapper.Map<TKModels.Shift>(CurrentItem));
 
@@ -179,13 +173,50 @@ namespace TKProcessor.WPF.ViewModels
 
                 if (a != null)
                 {
-                    CurrentItem.IsDirty = false;
                     CurrentItem.NightDiffStart = a.DefaultNDStart;
                     CurrentItem.NightDiffEnd = a.DefaultNDEnd;
+                    CurrentItem.IsDirty = false;
                 }
             }
 
             EndProcessing();
+
+            StartEditing();
+        }
+
+        public void Edit()
+        {
+            StartEditing();
+        }
+
+        public void Delete()
+        {
+            Task.Run(() =>
+            {
+                StartProcessing();
+
+                try
+                {
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting shifts...", MessageType.Information));
+
+                    foreach (var item in Items.Where(i => i.IsSelected).ToList())
+                    {
+                        service.Delete(mapper.Map<TKModels.Shift>(item));
+
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting {item.ShiftCode}...", MessageType.Information));
+
+                        Items.Remove(item);
+                    }
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleted selected shifts.", MessageType.Information));
+
+                }
+                catch (Exception ex)
+                {
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                }
+                EndProcessing();
+            });
         }
 
         public void Import()
@@ -229,6 +260,61 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
+        public override bool Filter(object o)
+        {
+            if (string.IsNullOrEmpty(FilterString))
+                return true;
+
+            string[] filterGroups = FilterString.Split(';')
+                                                .Where(i => !string.IsNullOrEmpty(i))
+                                                .ToArray();
+
+            Shift entity = (Shift)o;
+
+            bool[] result = new bool[filterGroups.Length];
+
+            string[] filterColumns = new string[]
+            {
+                entity.ShiftCode.ToLower(),
+                entity.Description.ToLower(),
+                entity.ScheduleIn?.ToString("hh:mm"),
+                entity.IsLateIn == true ? "late" : "nolate",
+                entity.IsEarlyOut == true ? "early out" : "",
+                entity.IsEarlyOut == true ? "undertime" : "",
+                entity.IsRestDay == true ? "restday" : "",
+                entity.IsPreShiftOt == true ? "preshiftot" : "",
+                entity.IsPostShiftOt == true ? "postshiftot" : "",
+                entity.IsHolidayRestDayOt == true ? "holidayrestdayoy" : ""
+            };
+
+            for (int a = 0; a < filterGroups.Length; a++)
+            {
+                var filters = filterGroups[a].Split(',')
+                                             .Where(i => !string.IsNullOrEmpty(i))
+                                             .ToArray();
+
+                result[a] = (filters.Length > 1);
+
+                int counter = 0;
+
+                foreach (var col in filterColumns)
+                {
+                    if (filters.Any(i => col.Contains(i.Trim().ToLower())))
+                        counter++;
+                }
+
+                result[a] = (counter >= filters.Length);
+            }
+
+            return result.Any(i => i);
+        }
+
+        public override void Sort()
+        {
+            View.SortDescriptions.Add(new SortDescription("ShiftCode", ListSortDirection.Ascending));
+            View.SortDescriptions.Add(new SortDescription("ScheduleIn", ListSortDirection.Ascending));
+        }
+
         public Shift CurrentItem
         {
             get => _currentItem;
@@ -240,6 +326,7 @@ namespace TKProcessor.WPF.ViewModels
         }
 
         public Dictionary<string, int> FlexiTypes { get; }
+
         public Dictionary<string, int> FlexiIncrements { get; }
     }
 }

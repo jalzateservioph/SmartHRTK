@@ -365,5 +365,7 @@ namespace TKProcessor.Services.Maintenance
         {
             //ExcelFileHander.Export(filename, headerDef[templateType]);
         }
+
+        public List<List<string>> HeaderDef => headerDef;
     }
 }
