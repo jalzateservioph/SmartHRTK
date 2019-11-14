@@ -71,6 +71,11 @@ namespace TKProcessor.WPF.ViewModels
             eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
         }
 
+        public virtual void RaiseMessage(string message, MessageType messageType = MessageType.Information, int duration = 3)
+        {
+            eventAggregator.PublishOnUIThread(new NewMessageEvent(message, messageType, duration));
+        }
+
         public ICollectionView View { get; }
 
         public string FilterString

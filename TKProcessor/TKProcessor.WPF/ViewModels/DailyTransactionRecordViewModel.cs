@@ -23,19 +23,25 @@ namespace TKProcessor.WPF.ViewModels
     public class DailyTransactionRecordViewModel : ViewModelBase<DailyTransactionRecord>
     {
         readonly IMapper mapper;
-        readonly DailyTransactionRecordService service;
+        readonly DailyTransactionRecordService dtrService;
+        readonly EmployeeService employeeService;
         readonly JobGradeBandService payCodeService;
         readonly SaveFileDialog saveDiag;
 
-        private ObservableCollection<string> _payrollCodeList;
         private DateTime _startDate;
         private DateTime _endDate;
         private DateTime _payOutDate;
-        private string _payrollCode;
+
+        private IList<string> _selectedPayrollCodes;
+        private IList<string> _payrollCodeList;
+        private IList<Employee> employeesList;
+        private IList<Employee> selectedEmployees;
 
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
-            service = new DailyTransactionRecordService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
+            dtrService = new DailyTransactionRecordService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
+
+            employeeService = new EmployeeService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
             payCodeService = new JobGradeBandService();
 
@@ -60,26 +66,36 @@ namespace TKProcessor.WPF.ViewModels
                 Filter = "Excel File (*.xlsx)|*.xlsx"
             };
 
+            PropertyChanged += DailyTransactionRecordViewModel_PropertyChanged;
+
+            InitializeFilters();
+
+            AutoFilter = false;
+        }
+
+        private void InitializeFilters()
+        {
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
             PayOutDate = DateTime.Now;
 
-            PropertyChanged += DailyTransactionRecordViewModel_PropertyChanged;
-
             Task.Run(() =>
             {
+                StartProcessing();
+
+                RaiseMessage("Loading filters...");
+
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    PayrollCodeList = new ObservableCollection<string>(payCodeService.List());
-                    PayrollCode = PayrollCodeList[0];
+                    PayrollCodeList = payCodeService.List();
+
+                    EmployeeList = employeeService.List().Select(i => mapper.Map<Employee>(i)).ToList();
                 });
+
+                RaiseMessage("Filters loaded");
+
+                EndProcessing();
             });
-
-            PayrollCodeList = new ObservableCollection<string>(payCodeService.List());
-
-            PayrollCode = PayrollCodeList[0];
-
-            AutoFilter = false;
         }
 
         private void DailyTransactionRecordViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -109,7 +125,9 @@ namespace TKProcessor.WPF.ViewModels
             {
                 Items.Clear();
 
-                foreach (TK.DailyTransactionRecord item in service.List(StartDate, EndDate, PayrollCode))
+                var retrievedItems = dtrService.List(StartDate, EndDate, SelectedPayrollCodes, SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList());
+
+                foreach (TK.DailyTransactionRecord item in retrievedItems)
                 {
                     Items.Add(mapper.Map<DailyTransactionRecord>(item));
                 }
@@ -128,11 +146,11 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updating DTR records...", MessageType.Information,0));
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updating DTR records...", MessageType.Information, 0));
 
                     foreach (var item in View.Cast<DailyTransactionRecord>().Where(i => i.IsDirty))
                     {
-                        service.Save(mapper.Map<TK.DailyTransactionRecord>(item));
+                        dtrService.Save(mapper.Map<TK.DailyTransactionRecord>(item));
                     }
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updated DTR records", MessageType.Information));
@@ -156,10 +174,13 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information, 0));
 
-                    service.Process(StartDate, EndDate, PayrollCode, message =>
-                    {
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent(message, MessageType.Information));
-                    });
+                    dtrService.Process(
+                        StartDate, 
+                        EndDate, 
+                        SelectedPayrollCodes, 
+                        SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList(), 
+                        message => RaiseMessage(message)
+                    );
 
                     Populate();
 
@@ -186,7 +207,14 @@ namespace TKProcessor.WPF.ViewModels
 
                     Populate();
 
-                    service.ExportToDP(StartDate, EndDate, PayOutDate, PayrollCode); // add callback for message handling
+                    dtrService.ExportToDP(
+                        StartDate, 
+                        EndDate, 
+                        PayOutDate, 
+                        SelectedPayrollCodes, 
+                        SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList(), 
+                        message => RaiseMessage(message)
+                    );
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));
 
@@ -212,23 +240,26 @@ namespace TKProcessor.WPF.ViewModels
                     {
                         Populate();
 
-                        var data = service.GetExportExcelData(StartDate, EndDate, PayrollCode);
-
+                        var data = dtrService.GetExportExcelData(StartDate, EndDate, SelectedPayrollCodes, SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)));
+                      
                         ExcelFileHandler.Export(saveDiag.FileName, data);
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Exported to {saveDiag.FileName}", MessageType.Success));
-
                     }
                     catch (Exception ex)
                     {
                         eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
                     }
 
-                    Populate();
-
                     EndProcessing();
                 });
             }
+        }
+
+        public override void Sort()
+        {
+            View.SortDescriptions.Add(new SortDescription(nameof(Employee.EmployeeCode), ListSortDirection.Ascending));
+            View.SortDescriptions.Add(new SortDescription(nameof(DailyTransactionRecord.TransactionDate), ListSortDirection.Descending));
         }
 
         public override bool Filter(object o)
@@ -248,12 +279,6 @@ namespace TKProcessor.WPF.ViewModels
             return false;
         }
 
-        public override void Sort()
-        {
-            View.SortDescriptions.Add(new SortDescription(nameof(Employee.EmployeeCode), ListSortDirection.Ascending));
-            View.SortDescriptions.Add(new SortDescription(nameof(DailyTransactionRecord.TransactionDate), ListSortDirection.Descending));
-        }
-
         public DateTime StartDate
         {
             get => _startDate;
@@ -263,6 +288,7 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
         public DateTime EndDate
         {
             get => _endDate;
@@ -272,6 +298,7 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
         public DateTime PayOutDate
         {
             get => _payOutDate;
@@ -281,21 +308,43 @@ namespace TKProcessor.WPF.ViewModels
                 NotifyOfPropertyChange();
             }
         }
-        public string PayrollCode
+
+        public IList<string> PayrollCodeList
         {
-            get => _payrollCode;
-            set
-            {
-                _payrollCode = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        public ObservableCollection<string> PayrollCodeList
-        {
-            get => _payrollCodeList;
+            get => _payrollCodeList ?? (_payrollCodeList = new List<string>());
             set
             {
                 _payrollCodeList = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public IList<string> SelectedPayrollCodes
+        {
+            get => _selectedPayrollCodes ?? (_selectedPayrollCodes = new List<string>());
+            set
+            {
+                _selectedPayrollCodes = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public IList<Employee> EmployeeList
+        {
+            get => employeesList ?? (employeesList = new List<Employee>());
+            set
+            {
+                employeesList = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public IList<Employee> SelectedEmployees
+        {
+            get => selectedEmployees ?? (SelectedEmployees = new List<Employee>());
+            set
+            {
+                selectedEmployees = value;
                 NotifyOfPropertyChange();
             }
         }

@@ -27,7 +27,7 @@ namespace TKProcessor.Services
             leaveService = new LeaveService();
         }
 
-        public IEnumerable<DailyTransactionRecord> List(DateTime start, DateTime end, string jobGradeBand)
+        public IEnumerable<DailyTransactionRecord> List(DateTime start, DateTime end, IEnumerable<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace TKProcessor.Services
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                if (string.IsNullOrEmpty(jobGradeBand))
+                if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
 
@@ -48,15 +48,26 @@ namespace TKProcessor.Services
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == jobGradeBand).ToList();
+                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
 
                 if (employees.Count == 0)
-                    throw new Exception($"No employees found with Job Grade Band {jobGradeBand}");
+                    throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
 
-                return Context.DailyTransactionRecord.Include(i => i.Employee).Include(i => i.Shift)
+                if (employeesFilter != null && employeesFilter.Count() > 0)
+                {
+                    employees = employees.Where(emp => employeesFilter.Any(empF => empF.Id == emp.Id)).ToList();
+
+                    if (employees.Count == 0)
+                        throw new Exception($"Filtered employees have no records to process");
+                }
+
+                return Context.DailyTransactionRecord.Include(i => i.Employee)
+                                                     .Include(i => i.Shift)
                                                      .Where(i => i.TransactionDate.Value.Date >= start &&
                                                                  i.TransactionDate.Value.Date <= end &&
-                                                                 employees.Any(emp => emp == i.Employee));
+                                                                 employees.Any(emp => emp == i.Employee))
+                                                     .OrderBy(i => i.Employee.EmployeeCode)
+                                                     .OrderBy(i => i.TransactionDate);
             }
             catch (Exception ex)
             {
@@ -66,7 +77,8 @@ namespace TKProcessor.Services
             }
         }
 
-        public void Process(DateTime start, DateTime end, string jobGradeBand, Action<string> iterationCallback = null)
+        public void Process(DateTime start, DateTime end, IEnumerable<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null,
+                            Action<string> iterationCallback = null)
         {
             try
             {
@@ -76,9 +88,8 @@ namespace TKProcessor.Services
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                if (string.IsNullOrEmpty(jobGradeBand))
+                if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
-
 
                 var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
                                             .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end).ToList();
@@ -86,10 +97,18 @@ namespace TKProcessor.Services
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == jobGradeBand).Distinct().ToList();
+                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
 
                 if (employees.Count == 0)
-                    throw new Exception($"No employees found with payroll code {jobGradeBand}");
+                    throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
+
+                if (employeesFilter != null && employeesFilter.Count() > 0)
+                {
+                    employees = employees.Where(emp => employeesFilter.Any(empF => empF.Id == emp.Id)).ToList();
+
+                    if (employees.Count == 0)
+                        throw new Exception($"Filtered employees have no records to process");
+                }
 
                 var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
@@ -263,7 +282,8 @@ namespace TKProcessor.Services
             }
         }
 
-        public void ProcessSplit(DateTime start, DateTime end, string jobGradeBand, Action<string> iterationCallback = null)
+        public void ProcessSplit(DateTime start, DateTime end, IList<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null,
+                                 Action<string> iterationCallback = null)
         {
             try
             {
@@ -273,21 +293,27 @@ namespace TKProcessor.Services
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                if (string.IsNullOrEmpty(jobGradeBand))
+                if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
-
                 var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
-                                            .Where(i => i.ScheduleDate.Date >= start.AddDays(-1) && i.ScheduleDate.Date <= end).ToList(); //Include work schedule of day before start day... Filter split shifts
-
+                                           .Where(i => i.ScheduleDate.Date >= start.AddDays(-1) && i.ScheduleDate.Date <= end).ToList(); //Include work schedule of day before start day... Filter split shifts
 
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Select(i => i.Employee).Where(i => i.JobGradeBand == jobGradeBand).Distinct().ToList();
+                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
 
                 if (employees.Count == 0)
-                    throw new Exception($"No employees found with payroll code {jobGradeBand}");
+                    throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
+
+                if (employeesFilter != null && employeesFilter.Count() > 0)
+                {
+                    employees = employees.Where(emp => employeesFilter.Any(empF => empF.Id == emp.Id)).ToList();
+
+                    if (employees.Count == 0)
+                        throw new Exception($"Filtered employees have no records to process");
+                }
 
                 var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Value.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
@@ -327,7 +353,7 @@ namespace TKProcessor.Services
                                 isLegalHoliday = true;
                             }
                             else if (holiday.Type == (int)HolidayType.Special)
-                            { 
+                            {
                                 isSpecialHoliday = true;
                             }
                         }
@@ -454,7 +480,8 @@ namespace TKProcessor.Services
             }
         }
 
-        public void ExportToDP(DateTime start, DateTime end, DateTime payOutDate, string jobGradeBand)
+        public void ExportToDP(DateTime start, DateTime end, DateTime payOutDate, IEnumerable<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null,
+                               Action<string> iterationCallback = null)
         {
             try
             {
@@ -468,7 +495,7 @@ namespace TKProcessor.Services
                 if (end < payOutDate)
                     throw new Exception("Payout date cannot be less than the set end date");
 
-                if (string.IsNullOrEmpty(jobGradeBand))
+                if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
                 GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.PayPackageMappings)
@@ -483,85 +510,91 @@ namespace TKProcessor.Services
                     throw new Exception("Please setup mappings in Global Settings first");
                 }
 
-                var dtrGroups = List(start, end, jobGradeBand).Where(i => i.Employee.JobGradeBand == jobGradeBand)
-                                                                .Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
-                                                                .ToList().GroupBy(i => i.Employee);
-
-                if (dtrGroups.Count() == 0)
-                    throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
-                                        $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
-
-                var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
-
-                if (payPackage == null)
-                    throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
-
-                var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
-                                               .Include(i => i.PayPackageSeq)
-                                               .Include(i => i.PayFreqCalendarSeq)
-                                               .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
-
-                if (payFreqCalendar == null)
-                    throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
-
-                var maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
-
-                PayrollTrx trx = new PayrollTrx()
+                foreach (var jobGradeBand in jobGradeBandFilter)
                 {
-                    CountryId = dPContext.Country.FirstOrDefault()?.CountryId,
-                    Type = 1,
-                    TrxNo = maxTrxNo,
-                    Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
-                    Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
-                    RefDate = DateTime.Now,
-                    CreatedOn = DateTime.Now,
-                    CreatedBy = Guid.Empty,
-                    ModifiedOn = DateTime.Now,
-                    ModifiedBy = Guid.Empty
-                };
+                    iterationCallback?.Invoke($"Exporting employees with job grade band {jobGradeBand}...");
 
+                    var dtrGroups = List(start, end, jobGradeBandFilter, employeesFilter).Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
+                                                                                         .ToList().GroupBy(i => i.Employee);
 
-                foreach (var group in dtrGroups)
-                {
-                    short displayOrder = 1;
+                    if (dtrGroups.Count() == 0)
+                        throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
+                                            $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
 
-                    foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
+                    var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
+
+                    if (payPackage == null)
+                        throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
+
+                    var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
+                                                   .Include(i => i.PayPackageSeq)
+                                                   .Include(i => i.PayFreqCalendarSeq)
+                                                   .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
+
+                    if (payFreqCalendar == null)
+                        throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
+
+                    var maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
+
+                    PayrollTrx trx = new PayrollTrx()
                     {
-                        decimal fieldValue = 0;
+                        CountryId = dPContext.Country.FirstOrDefault()?.CountryId,
+                        Type = 1,
+                        TrxNo = maxTrxNo,
+                        Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
+                        Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
+                        RefDate = DateTime.Now,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = Guid.Empty,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = Guid.Empty
+                    };
 
-                        foreach (var groupItem in group)
+
+                    foreach (var group in dtrGroups)
+                    {
+                        iterationCallback?.Invoke($"Exporting {group.Key}...");
+
+                        short displayOrder = 1;
+
+                        foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
                         {
-                            fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
+                            decimal fieldValue = 0;
+
+                            foreach (var groupItem in group)
+                            {
+                                fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
+                            }
+
+                            if (fieldValue == 0)
+                                continue;
+
+                            var line = new PayrollTrxLines()
+                            {
+                                DisplayOrder = displayOrder++,
+                                EmployeeCode = group.Key.EmployeeCode,
+                                LineDate = payOutDate,
+                                PayPackageCode = payPackage.Code,
+                                PayFreqCalendarCode = payFreqCalendar.Code,
+                                PayrollCodeCode = mapping.Source,
+                                AttributeCode = "PHNumHours",
+                                InputValue = fieldValue.ToString(),
+                                PostingAction = 0,
+                                InstanceCount = 0,
+                                CreatedOn = DateTime.Now,
+                                CreatedBy = CurrentUser.DPUserId ?? Guid.Empty,
+                                ModifiedOn = DateTime.Now,
+                                ModifiedBy = CurrentUser.DPUserId ?? Guid.Empty
+                            };
+
+                            trx.PayrollTrxLines.Add(line);
                         }
-
-                        if (fieldValue == 0)
-                            continue;
-
-                        var line = new PayrollTrxLines()
-                        {
-                            DisplayOrder = displayOrder++,
-                            EmployeeCode = group.Key.EmployeeCode,
-                            LineDate = payOutDate,
-                            PayPackageCode = payPackage.Code,
-                            PayFreqCalendarCode = payFreqCalendar.Code,
-                            PayrollCodeCode = mapping.Source,
-                            AttributeCode = "PHNumHours",
-                            InputValue = fieldValue.ToString(),
-                            PostingAction = 0,
-                            InstanceCount = 0,
-                            CreatedOn = DateTime.Now,
-                            CreatedBy = CurrentUser.DPUserId ?? Guid.Empty,
-                            ModifiedOn = DateTime.Now,
-                            ModifiedBy = CurrentUser.DPUserId ?? Guid.Empty
-                        };
-
-                        trx.PayrollTrxLines.Add(line);
                     }
+
+                    dPContext.PayrollTrx.Add(trx);
+
+                    dPContext.SaveChanges();
                 }
-
-                dPContext.PayrollTrx.Add(trx);
-
-                dPContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -571,11 +604,11 @@ namespace TKProcessor.Services
             }
         }
 
-        public DataTable GetExportExcelData(DateTime start, DateTime end, string jobGradeBand)
+        public DataTable GetExportExcelData(DateTime start, DateTime end, IEnumerable<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null)
         {
             try
             {
-                var data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBand));
+                var data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBandFilter, employeesFilter));
 
                 foreach (var propInfo in typeof(IEntity).GetProperties())
                 {
@@ -593,7 +626,7 @@ namespace TKProcessor.Services
             {
                 CreateErrorLog(ex);
 
-                throw ex; ;
+                throw ex;
             }
         }
     }
