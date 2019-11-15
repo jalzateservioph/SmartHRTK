@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IntegrationClient.Models
+namespace IntegrationClient.DAL.Models
 {
     public class Employee
     {
-        public Guid Id { get; set; }
+        public string EmployeeCode { get; set; }
         public string BiometricsId { get; set; }
         public string EmployeeName { get; set; }
-        public string EmployeeCode { get; set; }
     }
 }

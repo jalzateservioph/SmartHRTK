@@ -15,9 +15,11 @@ Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "TKProcessor.Reports", "TKPr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Biometrics Integration", "Biometrics Integration", "{D7B7C841-922B-4CE8-B416-448F3A079289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiometricsIntegrationWebAPI", "BiometricsIntegrationWebAPI\BiometricsIntegrationWebAPI.csproj", "{3E24914F-6AE4-453E-B399-F92849712377}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiometricsIntegrationWebAPI", "BiometricsIntegrationWebAPI\BiometricsIntegrationWebAPI.csproj", "{3E24914F-6AE4-453E-B399-F92849712377}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationClient", "IntegrationClient\IntegrationClient.csproj", "{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient", "IntegrationClient\IntegrationClient.csproj", "{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationClient.DAL", "IntegrationClient.DAL\IntegrationClient.DAL.csproj", "{46662883-F791-42D8-97ED-90BB98371753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,12 @@ Global
 		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46662883-F791-42D8-97ED-90BB98371753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +85,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3E24914F-6AE4-453E-B399-F92849712377} = {D7B7C841-922B-4CE8-B416-448F3A079289}
 		{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2} = {D7B7C841-922B-4CE8-B416-448F3A079289}
+		{46662883-F791-42D8-97ED-90BB98371753} = {D7B7C841-922B-4CE8-B416-448F3A079289}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4E935FC4-E0D2-4F36-86CF-8F54EF89FAE2}
