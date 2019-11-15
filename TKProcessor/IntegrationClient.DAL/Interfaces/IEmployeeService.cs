@@ -4,7 +4,7 @@ using System.Text;
 using IntegrationClient.DAL.Models;
 namespace IntegrationClient.DAL.Interfaces
 {
-    interface IEmployeeService
+    public interface IEmployeeService
     {
         IEnumerable<Employee> GetEmployees();
     }

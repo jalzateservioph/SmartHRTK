@@ -16,6 +16,9 @@ namespace IntegrationClient
             BuildConfiguration();
             RegisterServices();
 
+            ILoggingService loggingService = _serviceProvider.GetService<ILoggingService>();
+            //Test connection to both TK and Device
+            
 
 
             if (args.Length == 0) //Invoked by user
@@ -86,6 +89,7 @@ namespace IntegrationClient
 
             collection.AddScoped<IConfiguration>(_ => _configuration);
             collection.AddSingleton<ILoggingService,NLogService>();
+            collection.AddSingleton<IEmployeeService, WebAPIEmployeeService>();
 
             //add services here
 
