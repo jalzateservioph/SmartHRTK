@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +27,10 @@ namespace BiometricsIntegrationWebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddMvc();
+
+            services.AddDbContext<ApplicationContext>(item => item.UseSqlServer(Configuration.GetConnectionString("con")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +51,19 @@ namespace BiometricsIntegrationWebAPI
             {
                 endpoints.MapControllers();
             });
+
+            UpdateDatabase<ApplicationContext>(app);
+        }
+        
+        private static void UpdateDatabase<T>(IApplicationBuilder app)
+           where T : DbContext
+        {
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                                                            .CreateScope();
+
+            using var context = serviceScope.ServiceProvider.GetService<T>();
+
+            context.Database.Migrate();
         }
     }
 }
