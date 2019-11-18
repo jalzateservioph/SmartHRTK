@@ -86,7 +86,7 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
@@ -101,7 +101,7 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
@@ -116,7 +116,7 @@
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
