@@ -351,7 +351,7 @@ namespace TKProcessor.Services
             { 
                 DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
                 DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
-                //DTR.ApprovedOvertime
+                DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
                 DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
                 DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
             }

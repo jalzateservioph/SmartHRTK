@@ -655,13 +655,13 @@ namespace TKProcessor.Services
                         {
                             if (nightDifferentialPeriodEnd.Value < postShiftOvertimePeriodEnd.Value)
                             {
-                                nightDifferential += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(nightDifferentialPeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
                                 nightDifferentialPostShiftOvertimePeriodStart = nightDifferentialPeriodStart;
                                 nightDifferentialPostShiftOvertimePeriodEnd = nightDifferentialPeriodEnd;
                             }
                             else if (postShiftOvertimePeriodEnd.Value > nightDifferentialPeriodStart.Value)
                             {
-                                nightDifferential += (decimal)(postShiftOvertimePeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
+                                nightDifferentialOvertime += (decimal)(postShiftOvertimePeriodEnd.Value - nightDifferentialPeriodStart.Value).TotalMinutes;
                                 nightDifferentialPostShiftOvertimePeriodStart = nightDifferentialPeriodStart;
                                 nightDifferentialPostShiftOvertimePeriodEnd = postShiftOvertimePeriodEnd;
                             }
