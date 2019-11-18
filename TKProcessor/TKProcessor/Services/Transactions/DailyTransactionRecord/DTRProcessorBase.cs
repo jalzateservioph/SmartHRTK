@@ -222,10 +222,10 @@ namespace TKProcessor.Services
                 {
                     adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.AmbreakIn.Value.RemoveSeconds() - DTR.Shift.AmbreakOut.Value.RemoveSeconds()).TotalMinutes);
                 }
-                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
-                {
-                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                }
+                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                //{
+                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                //}
                 else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
                 {
                     adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay)).TotalMinutes);
@@ -237,10 +237,10 @@ namespace TKProcessor.Services
                 {
                     adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.PmbreakIn.Value.RemoveSeconds() - DTR.Shift.PmbreakOut.Value.RemoveSeconds()).TotalMinutes);
                 }
-                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
-                {
-                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                }
+                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                //{
+                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                //}
                 else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
                 {
                     adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay)).TotalMinutes);
@@ -252,10 +252,10 @@ namespace TKProcessor.Services
                 {
                     adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.LunchIn.Value.RemoveSeconds() - DTR.Shift.LunchOut.Value.RemoveSeconds()).TotalMinutes);
                 }
-                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
-                {
-                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                }
+                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+                //{
+                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                //}
                 else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
                 {
                     adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay)).TotalMinutes);
@@ -267,10 +267,10 @@ namespace TKProcessor.Services
                 {
                     adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
                 }
-                else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
-                {
-                    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                }
+                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                //{
+                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay) - timeIn).TotalMinutes);
+                //}
                 else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
                 {
                     adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay)).TotalMinutes);

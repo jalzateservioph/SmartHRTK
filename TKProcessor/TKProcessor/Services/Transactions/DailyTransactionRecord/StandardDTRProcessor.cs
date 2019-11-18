@@ -470,7 +470,7 @@ namespace TKProcessor.Services
                     nightDifferentialPeriodEnd = actualTimeOut;
                 }
                 else if (actualTimeIn >= expectedNightDifferentialStart && actualTimeOut <= expectedNightDifferentialEnd)
-                {
+                {     
                     nightDifferential = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                     nightDifferential = AdjustWorkHours(actualTimeIn, actualTimeOut, nightDifferential);
                     nightDifferentialPeriodStart = actualTimeIn;
