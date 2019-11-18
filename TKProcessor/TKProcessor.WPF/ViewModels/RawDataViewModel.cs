@@ -183,4 +183,9 @@ namespace TKProcessor.WPF.ViewModels
             service.Dispose();
         }
     }
+
+    public interface IBiometricsIntegrationAPI
+    {
+        
+    }
 }

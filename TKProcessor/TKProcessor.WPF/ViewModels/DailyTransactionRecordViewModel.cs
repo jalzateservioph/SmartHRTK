@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
@@ -20,7 +21,7 @@ using TK = TKProcessor.Models.TK;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class DailyTransactionRecordViewModel : ViewModelBase<DailyTransactionRecord>
+    public class DailyTransactionRecordViewModel : EditableViewModelBase<DailyTransactionRecord>
     {
         readonly IMapper mapper;
         readonly DailyTransactionRecordService dtrService;
@@ -32,10 +33,15 @@ namespace TKProcessor.WPF.ViewModels
         private DateTime _endDate;
         private DateTime _payOutDate;
 
-        private IList<string> _selectedPayrollCodes;
-        private IList<string> _payrollCodeList;
-        private IList<Employee> employeesList;
-        private IList<Employee> selectedEmployees;
+        private ObservableCollection<string> _selectedPayrollCodes;
+        private ObservableCollection<string> _payrollCodeList;
+
+        private ICollectionView employeeListView;
+        private ObservableCollection<Employee> employeesList;
+        private ICollectionView selectedEmployeesView;
+        private ObservableCollection<Employee> selectedEmployees;
+
+        private bool isAllEmployeesSelected;
 
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -87,9 +93,31 @@ namespace TKProcessor.WPF.ViewModels
 
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    PayrollCodeList = payCodeService.List();
+                    PayrollCodeList = new ObservableCollection<string>(employeeService.List().Select(i => i.JobGradeBand).Distinct().OrderBy(i => i));
 
-                    EmployeeList = employeeService.List().Select(i => mapper.Map<Employee>(i)).ToList();
+                    SelectedPayrollCodes = new ObservableCollection<string>();
+
+                    SelectedPayrollCodes.CollectionChanged += (o, e) =>
+                    {
+                        NotifyOfPropertyChange(() => SelectedPayrollCodes);
+                    };
+
+                    EmployeeList = new ObservableCollection<Employee>(employeeService.List().Select(i => mapper.Map<Employee>(i)).OrderBy(i => i.EmployeeCode));
+
+                    EmployeeListView = CollectionViewSource.GetDefaultView(EmployeeList);
+
+                    EmployeeListView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
+
+                    SelectedEmployees = new ObservableCollection<Employee>();
+
+                    SelectedEmployees.CollectionChanged += (o, e) =>
+                    {
+                        NotifyOfPropertyChange(() => SelectedEmployees);
+                    };
+
+                    SelectedEmployeesView = CollectionViewSource.GetDefaultView(SelectedEmployees);
+
+                    SelectedEmployeesView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
                 });
 
                 RaiseMessage("Filters loaded");
@@ -125,7 +153,10 @@ namespace TKProcessor.WPF.ViewModels
             {
                 Items.Clear();
 
-                var retrievedItems = dtrService.List(StartDate, EndDate, SelectedPayrollCodes, SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList());
+                var retrievedItems = dtrService.List(
+                    StartDate, EndDate, (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
+                    (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i)).ToList()
+                );
 
                 foreach (TK.DailyTransactionRecord item in retrievedItems)
                 {
@@ -175,10 +206,10 @@ namespace TKProcessor.WPF.ViewModels
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information, 0));
 
                     dtrService.Process(
-                        StartDate, 
-                        EndDate, 
-                        SelectedPayrollCodes, 
-                        SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList(), 
+                        StartDate,
+                        EndDate,
+                        (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
+                        (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i)).ToList(),
                         message => RaiseMessage(message)
                     );
 
@@ -208,11 +239,11 @@ namespace TKProcessor.WPF.ViewModels
                     Populate();
 
                     dtrService.ExportToDP(
-                        StartDate, 
-                        EndDate, 
-                        PayOutDate, 
-                        SelectedPayrollCodes, 
-                        SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)).ToList(), 
+                        StartDate,
+                        EndDate,
+                        PayOutDate,
+                        (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
+                        (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i)).ToList(),
                         message => RaiseMessage(message)
                     );
 
@@ -240,8 +271,11 @@ namespace TKProcessor.WPF.ViewModels
                     {
                         Populate();
 
-                        var data = dtrService.GetExportExcelData(StartDate, EndDate, SelectedPayrollCodes, SelectedEmployees.Select(i => mapper.Map<TK.Employee>(i)));
-                      
+                        var data = dtrService.GetExportExcelData(
+                            StartDate, EndDate, (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes), 
+                            (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i))
+                        );
+
                         ExcelFileHandler.Export(saveDiag.FileName, data);
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Exported to {saveDiag.FileName}", MessageType.Success));
@@ -254,6 +288,66 @@ namespace TKProcessor.WPF.ViewModels
                     EndProcessing();
                 });
             }
+        }
+
+        public void OpenEmployeeSelector()
+        {
+            StartEditing();
+        }
+
+        public void AddSelectedEmployees(Employee source)
+        {
+            SelectedEmployees.Add(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void RemoveSelectedEmployees(Employee source)
+        {
+            SelectedEmployees.Remove(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void FilterEmployeeFilter()
+        {
+            EmployeeListView.Filter += (o) =>
+            {
+                Employee emp = (Employee)o;
+
+                if (SelectedEmployees.Cast<Employee>().Any(i => i.Id == emp.Id))
+                    return false;
+
+                if (string.IsNullOrEmpty(EmployeeListViewSearch))
+                    return true;
+
+                return (emp.ToString().ToLower().Contains(EmployeeListViewSearch.ToLower()));
+            };
+
+            EmployeeListView.Refresh();
+
+            SelectedEmployeesView.Filter += (o) =>
+            {
+                Employee emp = (Employee)o;
+
+                if (EmployeeListView.Cast<Employee>().Any(i => i.Id == emp.Id))
+                    return false;
+
+                if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
+                    return true;
+
+                return (emp.ToString().ToLower().Contains(SelectedEmployeesViewSearch.ToLower()));
+            };
+
+            SelectedEmployeesView.Refresh();
+        }
+
+        public void InvokeEmployeeFilter(KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter)
+                return;
+
+            FilterEmployeeFilter();
         }
 
         public override void Sort()
@@ -309,9 +403,9 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public IList<string> PayrollCodeList
+        public ObservableCollection<string> PayrollCodeList
         {
-            get => _payrollCodeList ?? (_payrollCodeList = new List<string>());
+            get => _payrollCodeList;
             set
             {
                 _payrollCodeList = value;
@@ -319,9 +413,9 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public IList<string> SelectedPayrollCodes
+        public ObservableCollection<string> SelectedPayrollCodes
         {
-            get => _selectedPayrollCodes ?? (_selectedPayrollCodes = new List<string>());
+            get => _selectedPayrollCodes;
             set
             {
                 _selectedPayrollCodes = value;
@@ -329,9 +423,9 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public IList<Employee> EmployeeList
+        public ObservableCollection<Employee> EmployeeList
         {
-            get => employeesList ?? (employeesList = new List<Employee>());
+            get => employeesList;
             set
             {
                 employeesList = value;
@@ -339,12 +433,44 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public IList<Employee> SelectedEmployees
+        public string EmployeeListViewSearch
         {
-            get => selectedEmployees ?? (SelectedEmployees = new List<Employee>());
+            get;
+            set;
+        }
+
+        public ICollectionView EmployeeListView
+        {
+            get => employeeListView;
+            set
+            {
+                employeeListView = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public ObservableCollection<Employee> SelectedEmployees
+        {
+            get => selectedEmployees;
             set
             {
                 selectedEmployees = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public string SelectedEmployeesViewSearch
+        {
+            get;
+            set;
+        }
+
+        public ICollectionView SelectedEmployeesView
+        {
+            get => selectedEmployeesView;
+            set
+            {
+                selectedEmployeesView = value;
                 NotifyOfPropertyChange();
             }
         }

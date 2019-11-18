@@ -159,8 +159,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\Session.cs" />
+    <Compile Include="Converter\CollectionToCommaSeparatedConverter.cs" />
     <Compile Include="Converter\DataConverter\HolidayTypeConverter.cs" />
     <Compile Include="Converter\DataConverter\RawDataTransactionTypeConverter.cs" />
+    <Compile Include="Converter\DecimalToTimeConverter.cs" />
     <Compile Include="Converter\NumberAbbrevConverter.cs" />
     <Compile Include="Converter\ReverseBoolVisibilityConverter.cs" />
     <Compile Include="Converter\TextValueConverterValidator.cs" />

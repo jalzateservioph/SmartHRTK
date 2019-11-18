@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:converters="clr-namespace:TKProcessor.WPF.Converter"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="TKProcessor.WPF.Views.DailyTransactionRecordView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <UserControl.Resources>
+        <converters:DecimalToTimeConverter x:Key="DecimalToTimeConverter"/>
+        <converters:CollectionToCommaSeparatedConverter x:Key="CollectionToCommaSeparatedConverter"/>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -21,13 +27,13 @@
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="20" Grid.Row="1" IsEnabled="{Binding IsEnabled}" Margin="0,5,0,0">
             <Button x:Name="PopulateAsync" Content="View Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
-            <Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <!--<Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>-->
             <Button x:Name="Process" Content="Process" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="ExportToDP" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
-        <Grid HorizontalAlignment="Left" Margin="0,5,0,0" Grid.Row="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled}">
+        <Grid Margin="0,5,0,0" Grid.Row="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -37,6 +43,7 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -53,15 +60,41 @@
 
             <Label Grid.Column="4" Content="Pay Frequency:" Margin="10,0,0,0"/>
             <xctk:CheckComboBox Grid.Column="5" Width="102" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" 
-                                ItemsSource="{Binding PayrollCodeList}" SelectedItemsOverride="{Binding SelectedPayrollCodes}" />
+                                ItemsSource="{Binding PayrollCodeList}" SelectedItemsOverride="{Binding SelectedPayrollCodes}" >
+                <xctk:CheckComboBox.Style>
+                    <Style>
+                        <Setter Property="xctk:CheckComboBox.Text" Value="{Binding SelectedPayrollCodes, Converter={StaticResource CollectionToCommaSeparatedConverter}}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedPayrollCodes, Converter={StaticResource CollectionToCommaSeparatedConverter}}" Value="">
+                                <Setter Property="xctk:CheckComboBox.Text" Value="All"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </xctk:CheckComboBox.Style>
+            </xctk:CheckComboBox>
 
             <Label Grid.Column="6" Content="Pay Out Date:" Margin="10,0,0,0"/>
             <DatePicker Grid.Column="7" SelectedDate="{Binding PayOutDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!--row 3-->
-            <Label Grid.Column="0" Grid.Row="2" Content="Employee:" Margin="0,0,0,0"/>
-            <xctk:CheckComboBox Grid.Column="1" Grid.Row="2" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" 
-                                ItemsSource="{Binding EmployeeList}" SelectedItemsOverride="{Binding SelectedEmployees}" />
+            <Label Grid.Column="0" Grid.Row="2" Content="Employees:" Margin="0,0,0,0"/>
+            <Button x:Name="StartEditing" Grid.Column="1" Grid.Row="2" Foreground="Black" Grid.ColumnSpan="7"
+                    Background="{x:Null}" BorderBrush="#FFB6B6B6" HorizontalContentAlignment="Left" Padding="5,1">
+                <Border>
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style>
+                                <Setter Property="TextBlock.Text" Value="{Binding SelectedEmployees, Converter={StaticResource CollectionToCommaSeparatedConverter}}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedEmployees, Converter={StaticResource CollectionToCommaSeparatedConverter}}" Value="">
+                                        <Setter Property="TextBlock.Text" Value="All Employees"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
+            </Button>
         </Grid>
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,3,0,0" Grid.Row="3" VerticalAlignment="Top" Height="26" Width="48" IsEnabled="{Binding IsEnabled}"/>
@@ -78,7 +111,7 @@
                 <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=d}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding WorkHours}" Header="Total Work Hours" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding WorkHours}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding RegularWorkHours}" Header="Regular Work Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding AbsentHours}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualLate}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
@@ -714,5 +747,81 @@
                 <DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!--<Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="Hidden"  Margin="0,0,0,0">-->
+        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0">
+            <Border BorderBrush="#FF767676" BorderThickness="1" Margin="100" Padding="0">
+
+                <Grid Background="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
+                        <Label Content="Select Employees" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
+                    </Border>
+
+                    <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
+                            Background="#FFC94D4D" Foreground="White"/>
+
+                    <Grid Margin="5" Grid.Row="1" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Content="Employees" Grid.Row="0" Grid.Column="0"/>
+
+                        <TextBox Height="23" Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Text="{Binding EmployeeListViewSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                 Margin="0,0,5,0" VerticalContentAlignment="Center" cal:Message.Attach="[Event PreviewKeyDown] = [Action InvokeEmployeeFilter($eventArgs)]"/>
+
+                        <DataGrid Grid.Row="2" Grid.Column="0" Margin="0,5,5,0" AutoGenerateColumns="False" 
+                                  ItemsSource="{Binding EmployeeListView}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action AddSelectedEmployees($dataContext)]" >
+                                                <TextBlock Text="{Binding}"/>
+                                            </ContentControl>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <Label Content="Selected Employees" Grid.Row="0" Grid.Column="1"/>
+
+                        <TextBox Height="23" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Text="{Binding SelectedEmployeesViewSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  
+                                 Margin="5,0,0,0" VerticalContentAlignment="Center" cal:Message.Attach="[Event PreviewKeyDown] = [Action InvokeEmployeeFilter($eventArgs)]"/>
+
+                        <DataGrid Grid.Row="2" Grid.Column="1" Margin="5,5,0,0" AutoGenerateColumns="False" 
+                                  ItemsSource="{Binding SelectedEmployeesView}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action RemoveSelectedEmployees($dataContext)]" >
+                                                <TextBlock Text="{Binding}"/>
+                                            </ContentControl>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </Grid>
+
+            </Border>
+        </Grid>
+
     </Grid>
 </UserControl>
