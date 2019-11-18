@@ -30,4 +30,54 @@ namespace TKProcessor.WPF.Converter
             throw new NotImplementedException();
         }
     }
+
+    public class DecimalToHourPartConverter : IValueConverter
+    {
+        decimal originalHourValue = 0;
+        decimal originalMinValue = 0;
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            decimal timeValue = (decimal)value;
+
+            TimeSpan timespan = TimeSpan.FromHours(System.Convert.ToDouble(timeValue));
+
+            originalHourValue = System.Convert.ToDecimal(timespan.ToString("hh"));
+            originalMinValue = System.Convert.ToDecimal(timespan.ToString("mm"));
+
+            return originalHourValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            decimal hourValue = System.Convert.ToDecimal(string.IsNullOrEmpty(value.ToString()) ? 0 : value);
+
+            return hourValue + (originalMinValue / 60);
+        }
+    }
+
+    public class DecimalToMinutePartConverter : IValueConverter
+    {
+        decimal originalHourValue = 0;
+        decimal originalMinValue = 0;
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            decimal timeValue = (decimal)value;
+
+            TimeSpan timespan = TimeSpan.FromHours(System.Convert.ToDouble(timeValue));
+
+            originalHourValue = System.Convert.ToDecimal(timespan.ToString("hh"));
+            originalMinValue = System.Convert.ToDecimal(timespan.ToString("mm"));
+
+            return originalMinValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            decimal minPartValue = System.Convert.ToDecimal(string.IsNullOrEmpty(value.ToString()) ? 0 : value);
+
+            return originalHourValue + (minPartValue/60);
+        }
+    }   
 }
