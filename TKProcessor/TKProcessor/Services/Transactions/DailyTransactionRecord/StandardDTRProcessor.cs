@@ -212,7 +212,6 @@ namespace TKProcessor.Services
 
         private void ComputeLate()
         {
-
             if (DTR.Shift.IsLateIn == true)
             {
                 int gracePeriodMinutes = 0;
@@ -228,6 +227,10 @@ namespace TKProcessor.Services
                     if (actualTimeIn > expectedTimeIn.AddMinutes(gracePeriodMinutes))
                     {
                         approvedLate = late;
+                    }
+                    else
+                    {
+                        regularWorkHours += late;
                     }
 
                     latePeriodStart = expectedTimeIn;
@@ -291,6 +294,10 @@ namespace TKProcessor.Services
                     if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
+                    }
+                    else
+                    {
+                        regularWorkHours += undertime;
                     }
 
                     undertimePeriodStart = actualTimeOut;

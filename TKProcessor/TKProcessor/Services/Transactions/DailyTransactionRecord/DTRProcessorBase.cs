@@ -227,7 +227,7 @@ namespace TKProcessor.Services
                     adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
                 }
                 else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
-                { 
+                {
                     adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay)).TotalMinutes);
                 }
             }
@@ -348,10 +348,18 @@ namespace TKProcessor.Services
                 //DTR.ApprovedNDRDot
             }
             else
-            { 
+            {
                 DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+
+                DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
+                DTR.ApprovedLate = Math.Round(approvedLate / 60, 2) + 0.00m;
+
+                DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
+                DTR.ApprovedUndertime = Math.Round(approvedUndertime / 60, 2) + 0.00m;
+
                 DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
                 DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
                 DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
                 DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
             }
@@ -364,7 +372,7 @@ namespace TKProcessor.Services
                 leaveDuration = Leaves.OrderByDescending(e => e.LeaveHours).FirstOrDefault().LeaveHours;
             }
         }
- 
+
         public Tuple<DailyTransactionRecord, DailyTransactionRecord> Split(DailyTransactionRecord DTR)
         {
 
@@ -374,8 +382,8 @@ namespace TKProcessor.Services
                 ActualLate = Math.Round(splitHeadLate / 60, 2),
                 ActualUndertime = Math.Round(splitHeadUndertime / 60, 2),
                 AbsentHours = Math.Round(splitHeadAbsentHours / 60, 2),
-                ActualPreOvertime = Math.Round(splitHeadPreShiftOvertime / 60,2),
-                ActualPostOvertime = Math.Round(splitHeadPostShiftOvertime / 60 ,2)
+                ActualPreOvertime = Math.Round(splitHeadPreShiftOvertime / 60, 2),
+                ActualPostOvertime = Math.Round(splitHeadPostShiftOvertime / 60, 2)
             };
 
             DailyTransactionRecord tail = new DailyTransactionRecord()
@@ -400,7 +408,7 @@ namespace TKProcessor.Services
                 tail.ActualNDRD = Math.Round(splitTailNightDifferential / 60, 2);
                 tail.ActualNDRDot = Math.Round((splitTailNightDifferentialPreShiftOvertime + splitTailNightDifferentialPostShiftOvertime) / 60, 2);
             }
-            else 
+            else
             {
                 head.RegularWorkHours = Math.Round(splitHeadRegularWorkHours / 60, 2);
                 head.ActualOvertime = Math.Round(splitHeadTotalOvertime / 60, 2);
