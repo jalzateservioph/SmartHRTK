@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 
 namespace TKProcessor.Common
 {
@@ -59,7 +60,10 @@ namespace TKProcessor.Common
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message + " at  ExcelReader.ImportExceltoDatatable(..)");
+                if (Debugger.IsAttached)
+                    throw new Exception(ex.Message + " at  ExcelReader.ImportExceltoDatatable(..)");
+                else
+                    throw new Exception("There was a problem importing the file. Please verify the file's data and try again.");
             }
         }
         public static void Export(string filename, DataTable table)
