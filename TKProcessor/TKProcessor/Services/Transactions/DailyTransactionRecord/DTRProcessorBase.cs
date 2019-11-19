@@ -295,7 +295,7 @@ namespace TKProcessor.Services
                     {
                         adjustedWorkHours -= Convert.ToDecimal((lunchIn - timeIn).TotalMinutes);
                     }
-                    else 
+                    else
                     {
                         adjustedWorkHours -= Convert.ToDecimal((timeOut - timeIn).TotalMinutes);
                     }
@@ -337,14 +337,20 @@ namespace TKProcessor.Services
         {
             DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
             DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
+
             DTR.ApprovedLate = DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
-            DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
-            DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
             DTR.AbsentHours = Math.Round(absentHours / 60, 2) + 0.00m;
 
             DTR.ApprovedUndertime = DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
-            DTR.ApprovedPreOvertime = DTR.ActualPreOvertime = Math.Round(preShiftOvertime / 60, 2) + 0.00m;
-            DTR.ApprovedPostOvertime = DTR.ActualPostOvertime = Math.Round(postShiftOvertime / 60, 2) + 0.00m;
+
+            DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
+            DTR.ActualPreOvertime = Math.Round(preShiftOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedPreOvertime = Math.Round(approvedPreShiftOvertime / 60, 2) + 0.00m;
+            DTR.ActualPostOvertime = Math.Round(postShiftOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedPostOvertime = Math.Round(approvedPostShiftOvertime / 60, 2) + 0.00m;
 
             DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
             DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
@@ -360,7 +366,8 @@ namespace TKProcessor.Services
             DTR.ApprovedNDSpeHolOt = DTR.ActualNDSpeHolOt = Math.Round(specialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedRestDay = DTR.ActualRestDay = Math.Round(restDay / 60, 2) + 0.00m;
-            DTR.ApprovedRestDayOt = DTR.ActualRestDayOt = Math.Round(restDayOvertime / 60, 2) + 0.00m;
+            DTR.ActualRestDayOt = Math.Round(restDayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedRestDayOt = Math.Round(approvedRestDayOvertime / 60, 2) + 0.00m;
             DTR.ApprovedNDRD = DTR.ActualNDRD = Math.Round(restDayNightDifferential / 60, 2) + 0.00m;
             DTR.ApprovedNDRDot = DTR.ActualNDRDot = Math.Round(restDayNightDifferentialOvertime / 60, 2) + 0.00m;
 

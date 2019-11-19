@@ -143,12 +143,6 @@ namespace TKProcessor.Services
                                                                         (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
 
-                            if (globalSettings != null && !globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
-                            {
-                                iterationCallback?.Invoke($"Skipping {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()} due to No Work, No DTR Setup");
-                                continue;
-                            }
-
                             var ambreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
                                                                         (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
                                                                         i.TransactionType == (int)TransactionType.AMBreakIn);
@@ -186,10 +180,10 @@ namespace TKProcessor.Services
                             };
 
                             if (DTR.Shift == null)
-                                DTR.AddRemarks($"Employee has no work schdedule setup for this day");
+                                DTR.AddRemarks($"Employee has no work schdedule setup for this day, ");
 
                             if (DTR.TimeIn == null && DTR.TimeOut == null)
-                                DTR.AddRemarks($"There is no time in and time out data for this day");
+                                DTR.AddRemarks($"There is no time in and time out data for this day, ");
 
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
@@ -215,50 +209,70 @@ namespace TKProcessor.Services
                                     if (holiday.Type == (int)HolidayType.Legal)
                                     {
                                         isLegalHoliday = true;
+
+                                        DTR.Remarks = "Legal Holiday, ";
                                     }
                                     else if (holiday.Type == (int)HolidayType.Special)
                                     {
                                         isSpecialHoliday = true;
+
+                                        DTR.Remarks = "Special Holiday, ";
                                     }
                                 }
                             }
 
-                            if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
-                            {
-                                //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
-                                //{
-                                //    processor = new StandardDTRProcessor(DTR, leaves, holidays);
-                                //    processor.ComputeHolidayAndRestDay();
-                                //    DTR = processor.DTR;
-                                //}
-                                //else
-                                //{
-                                //    processor = new StandardDTRProcessor(DTR, leaves);
-                                //    processor.ComputeRegular();
-                                //    DTR = processor.DTR;
-                                //}
 
-                                processor = new StandardDTRProcessor(DTR, leaves, holidays);
-                                ((StandardDTRProcessor)processor).Compute();
-
-                                DTR = processor.DTR;
-                                DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
-                            }
-                            else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex)
+                            if (timein == null && timeout == null && holidays != null)
                             {
-                                if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                DTR.RegularWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
+                            }
+                            else
+                            {
+                                if (globalSettings != null && !globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
                                 {
-                                    processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
-                                    processor.ComputeHolidayAndRestDay();
-                                    DTR = processor.DTR;
+                                    iterationCallback?.Invoke($"Skipping {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()} due to No Work, No DTR Setup");
+                                    continue;
                                 }
-                                else
+
+                                if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                                 {
-                                    processor = new FlextimeDTRProcessor(DTR, leaves);
-                                    processor.ComputeRegular();
+                                    //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                    //{
+                                    //    processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                    //    processor.ComputeHolidayAndRestDay();
+                                    //    DTR = processor.DTR;
+                                    //}
+                                    //else
+                                    //{
+                                    //    processor = new StandardDTRProcessor(DTR, leaves);
+                                    //    processor.ComputeRegular();
+                                    //    DTR = processor.DTR;
+                                    //}
+
+                                    processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                    ((StandardDTRProcessor)processor).Compute();
+
                                     DTR = processor.DTR;
+                                    DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
+                                }
+                                else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex)
+                                {
+                                    if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                    {
+                                        processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
+                                        processor.ComputeHolidayAndRestDay();
+                                        DTR = processor.DTR;
+                                    }
+                                    else
+                                    {
+                                        processor = new FlextimeDTRProcessor(DTR, leaves);
+                                        processor.ComputeRegular();
+                                        DTR = processor.DTR;
+                                    }
                                 }
                             }
+
+                            DTR.Remarks = DTR.Remarks != "" && DTR.Remarks != "" ? DTR.Remarks.Remove(DTR.Remarks.Length - 2) : "";
 
                             Save(DTR);
                         }
