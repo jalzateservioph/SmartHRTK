@@ -12,12 +12,12 @@ namespace TKProcessor.WPF.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            decimal hourValue = (decimal)value;
+            decimal hourValue = value == null ? 0 : (decimal)value;
 
             TimeSpan timespan = TimeSpan.FromHours(System.Convert.ToDouble(hourValue));
 
-            int hours = System.Convert.ToInt16(timespan.ToString("hh")),
-                mins = System.Convert.ToInt16(timespan.ToString("mm"));
+            int hours = timespan.Hours,
+                mins = timespan.Minutes + (timespan.Seconds > 30 ? 1 : 0);
 
             string output = $"{hours} hr{(hours > 1 ? "s" : "")}  " +
                             $"{mins} min{(mins > 1 ? "s" : "")}";
@@ -38,12 +38,12 @@ namespace TKProcessor.WPF.Converter
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            decimal timeValue = (decimal)value;
+            decimal timeValue = value == null ? 0 : (decimal)value;
 
             TimeSpan timespan = TimeSpan.FromHours(System.Convert.ToDouble(timeValue));
 
-            originalHourValue = System.Convert.ToDecimal(timespan.ToString("hh"));
-            originalMinValue = System.Convert.ToDecimal(timespan.ToString("mm"));
+            originalHourValue = timespan.Hours;
+            originalMinValue = timespan.Minutes + (timespan.Seconds > 30 ? 1 : 0);
 
             return originalHourValue;
         }
@@ -66,12 +66,12 @@ namespace TKProcessor.WPF.Converter
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            decimal timeValue = (decimal)value;
+            decimal timeValue = value == null ? 0 : (decimal)value;
 
             TimeSpan timespan = TimeSpan.FromHours(System.Convert.ToDouble(timeValue));
 
-            originalHourValue = System.Convert.ToDecimal(timespan.ToString("hh"));
-            originalMinValue = System.Convert.ToDecimal(timespan.ToString("mm"));
+            originalHourValue = timespan.Hours;
+            originalMinValue = timespan.Minutes + (timespan.Seconds > 30 ? 1 : 0);
 
             return originalMinValue;
         }

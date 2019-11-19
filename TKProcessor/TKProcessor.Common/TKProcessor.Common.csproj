@@ -67,6 +67,7 @@
     <Compile Include="ObjectHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringHelpers.cs" />
+    <Compile Include="TimeClasses.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

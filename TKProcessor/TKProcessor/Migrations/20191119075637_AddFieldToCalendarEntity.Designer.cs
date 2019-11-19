@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TKProcessor.Contexts;
 
 namespace TKProcessor.Migrations
 {
     [DbContext(typeof(TKContext))]
-    partial class TKContextModelSnapshot : ModelSnapshot
+    [Migration("20191119075637_AddFieldToCalendarEntity")]
+    partial class AddFieldToCalendarEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -699,34 +701,6 @@ namespace TKProcessor.Migrations
                     b.ToTable("WorkSchedule");
                 });
 
-            modelBuilder.Entity("TKProcessor.Models.TK.WorkSite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid?>("CreatedById");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<bool>("IsActive");
-
-                    b.Property<Guid?>("LastModifiedById");
-
-                    b.Property<DateTime?>("LastModifiedOn");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("SiteId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LastModifiedById");
-
-                    b.ToTable("WorkSite");
-                });
-
             modelBuilder.Entity("TKProcessor.Models.TK.AuditLog", b =>
                 {
                     b.HasOne("TKProcessor.Models.TK.User", "CreatedBy")
@@ -891,17 +865,6 @@ namespace TKProcessor.Migrations
                     b.HasOne("TKProcessor.Models.TK.Shift", "Shift")
                         .WithMany()
                         .HasForeignKey("ShiftId");
-                });
-
-            modelBuilder.Entity("TKProcessor.Models.TK.WorkSite", b =>
-                {
-                    b.HasOne("TKProcessor.Models.TK.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("TKProcessor.Models.TK.User", "LastModifiedBy")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedById");
                 });
 #pragma warning restore 612, 618
         }

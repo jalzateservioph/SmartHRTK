@@ -20,9 +20,12 @@ namespace TKProcessor.Contexts
         public virtual DbSet<AuditLog> AuditLog { get; set; }
         public virtual DbSet<DailyTransactionRecord> DailyTransactionRecord { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
+        public virtual DbSet<WorkSite> WorkSite { get; set; }
         public virtual DbSet<ErrorLog> ErrorLog { get; set; }
         public virtual DbSet<GlobalSetting> GlobalSetting { get; set; }
         public virtual DbSet<Mapping> Mapping { get; set; }
+        public virtual DbSet<Calendar> Calendars { get; set; }
+        public virtual DbSet<CalendarDay> CalendarDays { get;set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<Leave> Leave { get; set; }
         public virtual DbSet<RawData> RawData { get; set; }

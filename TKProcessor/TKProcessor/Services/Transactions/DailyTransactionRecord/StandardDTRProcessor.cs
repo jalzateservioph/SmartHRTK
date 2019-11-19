@@ -171,8 +171,8 @@ namespace TKProcessor.Services
             }
 
 
-            //MapFieldsToDTR();
-            MapFields();
+            MapFieldsToDTR();
+            //MapFields();
         }
 
         public void ComputeRegular()
@@ -274,7 +274,6 @@ namespace TKProcessor.Services
                 }
                 #endregion
             }
-
         }
 
         private void ComputeUndertime()

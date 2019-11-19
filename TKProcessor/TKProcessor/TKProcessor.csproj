@@ -262,6 +262,22 @@
     <Compile Include="Migrations\20191108075106_UpdateGlobalSettingsAddFieldDTRColumnsToMinutes.designer.cs">
       <DependentUpon>20191108075106_UpdateGlobalSettingsAddFieldDTRColumnsToMinutes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191119075518_AddCalendarEntities.cs" />
+    <Compile Include="Migrations\20191119075518_AddCalendarEntities.designer.cs">
+      <DependentUpon>20191119075518_AddCalendarEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191119075637_AddFieldToCalendarEntity.cs" />
+    <Compile Include="Migrations\20191119075637_AddFieldToCalendarEntity.designer.cs">
+      <DependentUpon>20191119075637_AddFieldToCalendarEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191119234051_AddWorksiteEntity.cs" />
+    <Compile Include="Migrations\20191119234051_AddWorksiteEntity.designer.cs">
+      <DependentUpon>20191119234051_AddWorksiteEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191119234215_AddWorkSiteEntityToEmployee.cs" />
+    <Compile Include="Migrations\20191119234215_AddWorkSiteEntityToEmployee.designer.cs">
+      <DependentUpon>20191119234215_AddWorkSiteEntityToEmployee.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
@@ -293,6 +309,7 @@
     <Compile Include="Models\TK\User.cs" />
     <Compile Include="Models\TK\WorkSchedule.cs" />
     <Compile Include="Models\TK\WorkScheduleAdjustment.cs" />
+    <Compile Include="Models\TK\WorkSite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Reports\AbsenceReportService.cs" />
     <Compile Include="Services\Reports\AbsenceReportSummaryService.cs" />
