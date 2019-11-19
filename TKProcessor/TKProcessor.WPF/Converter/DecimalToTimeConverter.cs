@@ -19,8 +19,8 @@ namespace TKProcessor.WPF.Converter
             int hours = System.Convert.ToInt16(timespan.ToString("hh")),
                 mins = System.Convert.ToInt16(timespan.ToString("mm"));
 
-            string output = $"{hours} hr{(hours > 0 ? "s" : "")}  " +
-                            $"{mins} min{(mins > 0 ? "s" : "")}";
+            string output = $"{hours} hr{(hours > 1 ? "s" : "")}  " +
+                            $"{mins} min{(mins > 1 ? "s" : "")}";
 
             return output;
         }
@@ -52,6 +52,9 @@ namespace TKProcessor.WPF.Converter
         {
             decimal hourValue = System.Convert.ToDecimal(string.IsNullOrEmpty(value.ToString()) ? 0 : value);
 
+            if (hourValue > 23)
+                hourValue = 23;
+
             return hourValue + (originalMinValue / 60);
         }
     }
@@ -77,7 +80,10 @@ namespace TKProcessor.WPF.Converter
         {
             decimal minPartValue = System.Convert.ToDecimal(string.IsNullOrEmpty(value.ToString()) ? 0 : value);
 
-            return originalHourValue + (minPartValue/60);
+            if (minPartValue > 59)
+                minPartValue = 59;
+
+            return originalHourValue + (minPartValue / 60);
         }
-    }   
+    }
 }
