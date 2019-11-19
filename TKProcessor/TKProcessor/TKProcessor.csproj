@@ -270,6 +270,14 @@
     <Compile Include="Migrations\20191119075637_AddFieldToCalendarEntity.designer.cs">
       <DependentUpon>20191119075637_AddFieldToCalendarEntity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191119234051_AddWorksiteEntity.cs" />
+    <Compile Include="Migrations\20191119234051_AddWorksiteEntity.designer.cs">
+      <DependentUpon>20191119234051_AddWorksiteEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191119234215_AddWorkSiteEntityToEmployee.cs" />
+    <Compile Include="Migrations\20191119234215_AddWorkSiteEntityToEmployee.designer.cs">
+      <DependentUpon>20191119234215_AddWorkSiteEntityToEmployee.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
