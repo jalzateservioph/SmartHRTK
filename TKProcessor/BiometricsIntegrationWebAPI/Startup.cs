@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using BiometricsIntegrationWebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace BiometricsIntegrationWebAPI
 {
@@ -30,7 +26,10 @@ namespace BiometricsIntegrationWebAPI
 
             services.AddMvc();
 
-            services.AddDbContext<ApplicationContext>(item => item.UseSqlServer(Configuration.GetConnectionString("con")));
+            //services.AddDbContext<ApplicationContext>(item => item.UseSqlServer(Configuration.GetConnectionString("con")));
+            services.AddDbContext<TKProcessor.Contexts.TKContext>(item => item.UseSqlServer(Configuration.GetConnectionString("tk")));
+            services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
+            services.AddScoped<EmployeeService, EmployeeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +51,7 @@ namespace BiometricsIntegrationWebAPI
                 endpoints.MapControllers();
             });
 
-            UpdateDatabase<ApplicationContext>(app);
+            //UpdateDatabase<ApplicationContext>(app);
         }
         
         private static void UpdateDatabase<T>(IApplicationBuilder app)

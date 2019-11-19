@@ -37,5 +37,10 @@ namespace TKProcessor.Contexts
                 optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
             }
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<User>().HasOne(a => a.CreatedBy).WithOne(a => a.LastModifiedBy).HasForeignKey<User>(c => c.Id);
+        }
     }
 }
