@@ -213,67 +213,120 @@ namespace TKProcessor.Services
             }
         }
 
-        protected decimal AdjustWorkHours(DateTime timeIn, DateTime timeOut, decimal workHours) //for removing break hours of split DTRs
+        protected decimal AdjustWorkHours(DateTime timeIn, DateTime timeOut, decimal workHours) //for removing break hours
         {
             decimal adjustedWorkHours = workHours;
             if (DTR.Shift.AmbreakIn.HasValue && DTR.Shift.AmbreakOut.HasValue)
             {
-                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                DateTime amBreakOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay);
+                DateTime amBreakIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay);
+
+                if (timeIn <= amBreakOut)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.AmbreakIn.Value.RemoveSeconds() - DTR.Shift.AmbreakOut.Value.RemoveSeconds()).TotalMinutes);
+                    if (timeOut >= amBreakIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((amBreakIn - amBreakOut).TotalMinutes);
+                    }
+                    else //out is less than break
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - amBreakOut).TotalMinutes);
+                    }
                 }
-                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
-                //{
-                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                //}
-                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakIn.Value.TimeOfDay))
+                else if (timeIn < amBreakIn)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.AmbreakOut.Value.TimeOfDay)).TotalMinutes);
+                    if (timeOut >= amBreakIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((amBreakIn - timeIn).TotalMinutes);
+                    }
+                    else
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - timeIn).TotalMinutes);
+                    }
                 }
+
             }
             if (DTR.Shift.PmbreakIn.HasValue && DTR.Shift.PmbreakOut.HasValue)
             {
-                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                DateTime pmBreakOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay);
+                DateTime pmBreakIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay);
+                if (timeIn <= pmBreakOut)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.PmbreakIn.Value.RemoveSeconds() - DTR.Shift.PmbreakOut.Value.RemoveSeconds()).TotalMinutes);
+                    if (timeOut >= pmBreakIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((pmBreakIn - pmBreakOut).TotalMinutes);
+                    }
+                    else //out is less than break
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - pmBreakOut).TotalMinutes);
+                    }
                 }
-                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
-                //{
-                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                //}
-                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakIn.Value.TimeOfDay))
+                else if (timeIn < pmBreakIn)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.PmbreakOut.Value.TimeOfDay)).TotalMinutes);
+                    if (timeOut >= pmBreakIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((pmBreakIn - timeIn).TotalMinutes);
+                    }
+                    else
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - timeIn).TotalMinutes);
+                    }
                 }
             }
             if (DTR.Shift.LunchIn.HasValue && DTR.Shift.LunchOut.HasValue)
             {
-                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+
+                DateTime lunchOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay);
+                DateTime lunchIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay);
+
+                if (timeIn <= lunchOut)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.LunchIn.Value.RemoveSeconds() - DTR.Shift.LunchOut.Value.RemoveSeconds()).TotalMinutes);
+                    if (timeOut >= lunchIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((lunchIn - lunchOut).TotalMinutes);
+                    }
+                    else //out is less than break
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - lunchOut).TotalMinutes);
+                    }
                 }
-                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
-                //{
-                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                //}
-                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchIn.Value.TimeOfDay))
+                else if (timeIn < lunchIn)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.LunchOut.Value.TimeOfDay)).TotalMinutes);
+                    if (timeOut >= lunchIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((lunchIn - timeIn).TotalMinutes);
+                    }
+                    else 
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - timeIn).TotalMinutes);
+                    }
                 }
             }
             if (DTR.Shift.DinnerIn.HasValue && DTR.Shift.DinnerOut.HasValue)
             {
-                if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                DateTime dinnerOut = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay);
+                DateTime dinnerIn = new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay);
+
+                if (timeIn <= dinnerOut)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((DTR.Shift.DinnerIn.Value.RemoveSeconds() - DTR.Shift.DinnerOut.Value.RemoveSeconds()).TotalMinutes);
+                    if (timeOut >= dinnerIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((dinnerIn - dinnerOut).TotalMinutes);
+                    }
+                    else //out is less than break
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - dinnerOut).TotalMinutes);
+                    }
                 }
-                //else if (timeIn > new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut >= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
-                //{
-                //    adjustedWorkHours -= Convert.ToDecimal((new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay) - timeIn).TotalMinutes);
-                //}
-                else if (timeIn <= new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay) && timeOut < new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerIn.Value.TimeOfDay))
+                else if (timeIn < dinnerIn)
                 {
-                    adjustedWorkHours -= Convert.ToDecimal((timeOut - new DateTime(DTR.TransactionDate.Value.Year, DTR.TransactionDate.Value.Month, DTR.TransactionDate.Value.Day).Add(DTR.Shift.DinnerOut.Value.TimeOfDay)).TotalMinutes);
+                    if (timeOut >= dinnerIn)
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((dinnerIn - timeIn).TotalMinutes);
+                    }
+                    else
+                    {
+                        adjustedWorkHours -= Convert.ToDecimal((timeOut - timeIn).TotalMinutes);
+                    }
                 }
             }
 

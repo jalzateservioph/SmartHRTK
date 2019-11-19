@@ -118,7 +118,7 @@ namespace IntegrationClient
                  * 
                  * 
                  * push-rawdata:
-                 *      need to provide additional arguments for date filters
+                 *      optional arguments for date filters
                  *      invoke Biometrics service, get rawdata qualified by said filters
                  *      invoke API service, push rawdata, include any additional data for client identification
                  *      
@@ -210,7 +210,7 @@ namespace IntegrationClient
 
             collection.AddSingleton<IConfiguration>(_ => _configuration);
             collection.AddSingleton<ILoggingService,NLogService>();
-            collection.AddSingleton<IEmployeeService, WebAPIEmployeeService>();
+            collection.AddSingleton<ITimekeepingService, WebAPIService>();
             collection.AddSingleton<IDeviceService, ZKTEcoDeviceService>(); //Change this depending on the device
 
             //add services here
