@@ -14,7 +14,7 @@
 
         <converters:DecimalToHourPartConverter x:Key="DecimalToHourPartConverter"/>
         <converters:DecimalToMinutePartConverter x:Key="DecimalToMinutePartConverter"/>
-        
+
         <converters:CollectionToCommaSeparatedConverter x:Key="CollectionToCommaSeparatedConverter"/>
     </UserControl.Resources>
 
@@ -123,9 +123,9 @@
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBox Text="{Binding ApprovedLate, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black"/>
+                                <TextBox Text="{Binding ApprovedLate, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
                                 <TextBlock Text=" hrs" Margin="0,0,5,0"/>
-                                <TextBox Text="{Binding ApprovedLate, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black"/>
+                                <TextBox Text="{Binding ApprovedLate, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
                                 <TextBlock Text=" mins"/>
                             </StackPanel>
                         </DataTemplate>
@@ -146,7 +146,12 @@
                 <DataGridTemplateColumn Header="Approved Undertime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedUndertime}" Foreground="Black" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedUndertime, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedUndertime, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                     <DataGridTemplateColumn.CellTemplate>
@@ -165,7 +170,7 @@
                 <DataGridTemplateColumn Header="Approved Overtime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedOvertime}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -176,15 +181,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedOvertime}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedOvertime, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedOvertime, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualPreOvertime}" Header="Actual Pre Overtime" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualPreOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Pre Overtime" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Pre Overtime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedPreOvertime}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedPreOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -195,15 +205,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedPreOvertime}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedPreOvertime, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedPreOvertime, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualPostOvertime}" Header="Actual Post Overtime" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualPostOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Post Overtime" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Post Overtime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedPostOvertime}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedPostOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -214,17 +229,22 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedPostOvertime}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedPostOvertime, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedPostOvertime, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding NightDifferential}" Header="ND" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding NightDifferentialOt}" Header="NDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding ActualRestDay}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding NightDifferential, Converter={StaticResource DecimalToTimeConverter}}" Header="ND" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding NightDifferentialOt, Converter={StaticResource DecimalToTimeConverter}}" Header="NDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualRestDay, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Rest Day" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDay}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDay, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -235,15 +255,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedRestDay}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedRestDay, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedRestDay, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualRestDayOt}" Header="Actual Rest Day OT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualRestDayOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Rest Day OT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Rest Day OT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDayOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedRestDayOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -254,15 +279,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedRestDayOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedRestDayOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedRestDayOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDRD}" Header="Actual NDRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -273,15 +303,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDRDot}" Header="Actual NDRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -292,15 +327,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegHol}" Header="Actual LegHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -311,15 +351,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegHolOt}" Header="Actual LegHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -330,15 +375,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualSpeHol}" Header="Actual SpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved SpeHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -349,15 +399,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedSpeHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedSpeHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedSpeHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualSpeHolOt}" Header="Actual SpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved SpeHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -368,15 +423,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedSpeHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedSpeHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedSpeHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegSpeHol}" Header="Actual LegSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegSpeHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -387,15 +447,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegSpeHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegSpeHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegSpeHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegSpeHolOt}" Header="Actual LegSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegSpeHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -406,15 +471,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegSpeHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegSpeHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegSpeHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegHolRD}" Header="Actual LegHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -425,15 +495,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegHolRDot}" Header="Actual LegHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -444,15 +519,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualSpeHolRD}" Header="Actual SpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved SpeHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -463,15 +543,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedSpeHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedSpeHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedSpeHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualSpeHolRDot}" Header="Actual SpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved SpeHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -482,15 +567,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedSpeHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedSpeHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedSpeHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRD}" Header="Actual LegSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegSpeHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -501,15 +591,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegSpeHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegSpeHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegSpeHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRDot}" Header="Actual LegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved LegSpeHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -520,15 +615,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedLegSpeHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedLegSpeHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedLegSpeHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegHol}" Header="Actual NDLegHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -539,15 +639,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegHolOt}" Header="Actual NDLegHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -558,15 +663,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDSpeHol}" Header="Actual NDSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDSpeHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -577,15 +687,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDSpeHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDSpeHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDSpeHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDSpeHolOt}" Header="Actual NDSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDSpeHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -596,15 +711,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDSpeHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDSpeHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDSpeHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHol}" Header="Actual NDLegSpeHol" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHol" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegSpeHol" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHol}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -615,15 +735,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegSpeHol}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegSpeHol, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegSpeHol, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolOt}" Header="Actual NDLegSpeHolOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegSpeHolOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolOt}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -634,15 +759,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegSpeHolOt}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolOt, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolOt, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegHolRD}" Header="Actual NDLegHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -653,15 +783,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegHolRDot}" Header="Actual NDLegHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -672,15 +807,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRD}" Header="Actual NDSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDSpeHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -691,15 +831,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDSpeHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDSpeHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDSpeHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRDot}" Header="Actual NDSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDSpeHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -710,15 +855,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDSpeHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDSpeHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDSpeHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRD}" Header="Actual NDLegSpeHolRD" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolRD" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegSpeHolRD" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRD}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -729,15 +879,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegSpeHolRD}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolRD, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolRD, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRDot}" Header="Actual NDLegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved NDLegSpeHolRDOT" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRDot}" >
+                            <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
                                 <TextBlock.Style>
                                     <Style>
                                         <Setter Value="Black" Property="TextBlock.Foreground"/>
@@ -748,7 +903,12 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding ApprovedNDLegSpeHolRDot}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolRDot, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding ApprovedNDLegSpeHolRDot, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
