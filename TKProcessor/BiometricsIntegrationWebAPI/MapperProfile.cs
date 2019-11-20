@@ -8,6 +8,11 @@ namespace BiometricsIntegrationWebAPI
         public MapperProfile()
         {
             CreateMap<TK.Employee, Integration.Employee>().ForMember(dest => dest.EmployeeName, act => act.MapFrom(src => src.FullName)).ReverseMap();
+            CreateMap<Integration.RawData, TK.RawData>()
+                .ForMember(dest => dest.BiometricsId, act => act.MapFrom(src => src.EmployeeBiometricsID))
+                .ForMember(dest => dest.TransactionType, act => act.MapFrom(src => src.TransactionType))
+                .ForMember(dest => dest.TransactionDateTime, act => act.MapFrom(src => src.TransactionDateTime))
+                .ReverseMap();
         }
     }
 }

@@ -19,26 +19,12 @@ namespace BiometricsIntegrationWebAPI.Controllers
     {
         private readonly EmployeeService service;
         private readonly IMapper mapper;
-        private readonly WorkSiteService workSiteService;
 
-        public EmployeesController(EmployeeService service, IMapper mapper, WorkSiteService workSiteService)
+        public EmployeesController(EmployeeService service, IMapper mapper)
         {
             this.service = service;
             this.mapper = mapper;
-            this.workSiteService = workSiteService;
         }
-        [AllowAnonymous]
-        [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
-        {
-            var workSite = await workSiteService.Authenticate(model.Username, model.Password);
-
-            if (workSite == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            return Ok();
-        }
-
 
         // GET: api/Employees
         [HttpGet]

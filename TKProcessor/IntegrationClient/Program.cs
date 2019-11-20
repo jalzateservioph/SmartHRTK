@@ -36,9 +36,16 @@ namespace IntegrationClient
                     if (parsedInput == 1) //Pull employee data
                     {
                         //Connect to WebAPI
-                        var employees = tkService.GetEmployees();
-                        //deviceService.EnrollUsers(null);
+                        try 
+                        {
+                            var employees = tkService.GetEmployees();
+                            deviceService.EnrollUsers(employees);
+                        }
+                        catch (Exception e)
+                        {
 
+                        }   
+                        
                     }
                     else if (parsedInput == 2) //Push raw data
                     {
@@ -68,8 +75,7 @@ namespace IntegrationClient
                             try
                             {
                                 IEnumerable<RawData> rawData = deviceService.GetRawData(from, to);
-
-                                //push data to WebAPI
+                                tkService.PushRawData(rawData);
                             }
                             catch (Exception ex)
                             {
@@ -81,7 +87,7 @@ namespace IntegrationClient
                             try
                             {
                                 IEnumerable<RawData> rawData = deviceService.GetRawData(null, null);
-                                //push data to WebAPI
+                                tkService.PushRawData(rawData);
                             }
                             catch (Exception ex)
                             {
@@ -131,8 +137,8 @@ namespace IntegrationClient
                  */
                 if (args[0].ToLower().Equals("pull-employeedata"))
                 {
-                    //Connect to WebAPI
-                    deviceService.EnrollUsers(null);
+                    var employees = tkService.GetEmployees();
+                    deviceService.EnrollUsers(employees);
                 }
                 else if (args[0].ToLower().Equals("push-rawdata"))
                 {
@@ -175,7 +181,7 @@ namespace IntegrationClient
                                 try
                                 {
                                     IEnumerable<RawData> rawData = deviceService.GetRawData(from, to);
-
+                                    tkService.PushRawData(rawData);
                                     //push data to WebAPI
                                 }
                                 catch (Exception ex)

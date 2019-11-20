@@ -35,6 +35,7 @@ namespace BiometricsIntegrationWebAPI
             services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
             services.AddScoped<EmployeeService, EmployeeService>();
             services.AddScoped<WorkSiteService, WorkSiteService>();
+            services.AddScoped<RawDataService, RawDataService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
