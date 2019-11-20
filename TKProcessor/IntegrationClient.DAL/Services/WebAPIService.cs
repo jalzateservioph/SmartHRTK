@@ -29,6 +29,13 @@ namespace IntegrationClient.DAL.Services
             httpClient.BaseAddress = new Uri(_configuration.GetSection("TK_WebAPI")["BaseURL"]);
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            //add auth
+            string username = _configuration.GetSection("TK_WebAPI")["AuthUsername"];
+            string password = _configuration.GetSection("TK_WebAPI")["AuthPassword"];
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+
+            httpClient.DefaultRequestHeaders.Authorization = auth;
         }
 
         public IEnumerable<Employee> GetEmployees()

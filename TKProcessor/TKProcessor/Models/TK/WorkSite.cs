@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TKProcessor.Models.TK
 {
@@ -18,5 +19,13 @@ namespace TKProcessor.Models.TK
 
         public string SiteId { get; set; }
         public string Name { get; set; }
+
+        public string IntegrationAuthUsername { get; set; }
+        public string IntegrationAuthPassword { get; set; }
+
+
+        //public ICollection<Employee> AssignedEmployees { get; set; }
+
+        public IList<EmployeeWorkSite> WorkSiteEmployees { get; set; }
     }
 }

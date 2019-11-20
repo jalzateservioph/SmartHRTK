@@ -1,5 +1,7 @@
 using AutoMapper;
+using BiometricsIntegrationWebAPI.Helpers;
 using BiometricsIntegrationWebAPI.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +28,13 @@ namespace BiometricsIntegrationWebAPI
 
             services.AddMvc();
 
+            services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
             //services.AddDbContext<ApplicationContext>(item => item.UseSqlServer(Configuration.GetConnectionString("con")));
             services.AddDbContext<TKProcessor.Contexts.TKContext>(item => item.UseSqlServer(Configuration.GetConnectionString("tk")));
             services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
             services.AddScoped<EmployeeService, EmployeeService>();
+            services.AddScoped<WorkSiteService, WorkSiteService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,8 +47,13 @@ namespace BiometricsIntegrationWebAPI
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -15,9 +15,10 @@ namespace BiometricsIntegrationWebAPI.Services
             this.context = context;
         }
 
-        public IEnumerable<Employee> GetEmployees()
+        public IEnumerable<Employee> GetEmployees(Guid siteId)
         {
-            return context.Employee.ToList();
+            return context.Employee.Where(e => e.EmployeeWorkSites.Any( s => s.WorkSiteId == siteId));
+            //return context.Employee.ToList();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace IntegrationClient
 
             ILoggingService loggingService = _serviceProvider.GetService<ILoggingService>();
             IDeviceService deviceService = _serviceProvider.GetRequiredService<IDeviceService>();
+            ITimekeepingService tkService = _serviceProvider.GetRequiredService<ITimekeepingService>();
 
             if (args.Length == 0) //Invoked by user
             {
@@ -35,7 +36,8 @@ namespace IntegrationClient
                     if (parsedInput == 1) //Pull employee data
                     {
                         //Connect to WebAPI
-                        deviceService.EnrollUsers(null);
+                        var employees = tkService.GetEmployees();
+                        //deviceService.EnrollUsers(null);
 
                     }
                     else if (parsedInput == 2) //Push raw data

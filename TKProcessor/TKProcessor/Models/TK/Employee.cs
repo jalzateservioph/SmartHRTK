@@ -34,6 +34,8 @@ namespace TKProcessor.Models.TK
         public string JobGradeBand { get; set; }
         public DateTime? TerminationDate { get; set; }
 
-        ICollection<WorkSite> AssignedWorkSites { get; set; }
+        //ICollection<WorkSite> AssignedWorkSites { get; set; }
+
+        public IList<EmployeeWorkSite> EmployeeWorkSites { get; set; }
     }
 }

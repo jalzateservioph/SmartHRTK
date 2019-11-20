@@ -278,6 +278,14 @@
     <Compile Include="Migrations\20191119234215_AddWorkSiteEntityToEmployee.designer.cs">
       <DependentUpon>20191119234215_AddWorkSiteEntityToEmployee.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191120004250_AddEmployeeWorkSiteEntity.cs" />
+    <Compile Include="Migrations\20191120004250_AddEmployeeWorkSiteEntity.designer.cs">
+      <DependentUpon>20191120004250_AddEmployeeWorkSiteEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191120005750_AddWorkSiteAuthColumns.cs" />
+    <Compile Include="Migrations\20191120005750_AddWorkSiteAuthColumns.designer.cs">
+      <DependentUpon>20191120005750_AddWorkSiteAuthColumns.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
@@ -298,6 +306,7 @@
     <Compile Include="Models\TK\AuditLog.cs" />
     <Compile Include="Models\TK\DailyTransactionRecord.cs" />
     <Compile Include="Models\TK\Employee.cs" />
+    <Compile Include="Models\TK\EmployeeWorkSite.cs" />
     <Compile Include="Models\TK\ErrorLog.cs" />
     <Compile Include="Models\TK\GlobalSetting.cs" />
     <Compile Include="Models\TK\Holiday.cs" />
