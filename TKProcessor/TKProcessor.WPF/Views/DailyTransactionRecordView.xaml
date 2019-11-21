@@ -191,7 +191,8 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualPreOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Pre Overtime" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Pre Overtime" Width="auto" IsReadOnly="False">
+                <DataGridTextColumn Binding="{Binding ApprovedPreOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Approved Pre Overtime" Width="auto" IsReadOnly="True"/>
+                <!--<DataGridTemplateColumn Header="Approved Pre Overtime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedPreOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -213,9 +214,10 @@
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
                 <DataGridTextColumn Binding="{Binding ActualPostOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Post Overtime" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Post Overtime" Width="auto" IsReadOnly="False">
+                <DataGridTextColumn Binding="{Binding ApprovedPostOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Approved Post Overtime" Width="auto" IsReadOnly="True"/>
+                <!--<DataGridTemplateColumn Header="Approved Post Overtime" Width="auto" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedPostOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -237,7 +239,7 @@
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
                 <DataGridTextColumn Binding="{Binding NightDifferential, Converter={StaticResource DecimalToTimeConverter}}" Header="ND" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding NightDifferentialOt, Converter={StaticResource DecimalToTimeConverter}}" Header="NDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualRestDay, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>

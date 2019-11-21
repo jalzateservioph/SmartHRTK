@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:dataconv="clr-namespace:TKProcessor.WPF.Converter.DataConverter"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:validators="clr-namespace:TKProcessor.WPF.Validators"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <UserControl.Resources>
+        <dataconv:EmployeeStringConverter x:Key="EmployeeStringConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -31,38 +36,47 @@
         <DataGrid Margin="0,41,0,0" Grid.Row="2" CanUserAddRows="False" CanUserDeleteRows="False" IsEnabled="{Binding IsEnabled}"
                   ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding FullName}" Header="Full Name" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Biometrics Id" Width="auto" CanUserSort="True" SortMemberPath="BiometricsId">
+
+                <DataGridTemplateColumn Header="Employee" Width="auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Background="Yellow" Text="{Binding BiometricsId}">
-                                <TextBlock.Style>
-                                    <Style>
-                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding}" />
+                            </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <TextBox Validation.ErrorTemplate="{StaticResource TextBoxErrorTemplate}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="100">
-                                    <TextBox.Text>
-                                        <Binding Path="BiometricsId" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
-                                            <Binding.ValidationRules>
-                                                <validators:StringIntegerValidationRule ErrorMessage="Biometrics Id is not a valid number"/>
-                                            </Binding.ValidationRules>
-                                        </Binding>
-                                    </TextBox.Text>
-                                </TextBox>
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding JobGradeBand}" Header="Job Grade Band"  Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TerminationDate}" Header="Termination Date"  Width="auto" IsReadOnly="True"/>
+
+                <DataGridTemplateColumn Header="Biometrics Id" Width="auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding BiometricsId}" />
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Job Grade Band" Width="auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding JobGradeBand}" />
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Termination Date" Width="auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding TerminationDate}" />
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
 
@@ -109,20 +123,20 @@
                         </Grid.RowDefinitions>
 
                         <Label Content="Employee:" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="6" Height="23" Margin="0,0,0,0" IsReadOnly="True"/>
+                        <TextBox Text="{Binding CurrentItem, Converter={StaticResource EmployeeStringConverter}}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="6" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center"/>
 
                         <Label Content="Biometrics Id:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.BiometricsId}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23" Margin="0,0,2,0"/>
+                        <TextBox Text="{Binding CurrentItem.BiometricsId}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23" Margin="0,0,2,0" VerticalContentAlignment="Center"/>
 
                         <Label Content="Job Grade Band:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.JobGradeBand}" Grid.Row="1" Grid.Column="3" Height="23" Margin="0,0,2,0" IsReadOnly="True"/>
+                        <TextBox Text="{Binding CurrentItem.JobGradeBand}" Grid.Row="1" Grid.Column="3" Height="23" Margin="0,0,2,0" IsReadOnly="True" VerticalContentAlignment="Center"/>
 
                         <Label Content="Termination Date:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="4" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.TerminationDate, StringFormat=d}" Grid.Row="1" Grid.Column="5" Height="23" Margin="0,0,0,0" IsReadOnly="True"/>
+                        <TextBox Text="{Binding CurrentItem.TerminationDate, StringFormat=d}" Grid.Row="1" Grid.Column="5" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center"/>
 
                         <Label Content="Assigned Worksites:" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="6" VerticalAlignment="Center"/>
 
-                        <DataGrid Grid.Row="4" Grid.ColumnSpan="6">
+                        <DataGrid Grid.Row="4" Grid.ColumnSpan="6" Background="#FFF3F3F3" ItemsSource="{Binding EmployeeWorkSites}" CanUserAddRows="True" CanUserDeleteRows="True">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
@@ -141,7 +155,7 @@
 
                     </Grid>
 
-                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="0,5,0,5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+                    <Button x:Name="Save" Content="Save" Grid.Row="2" Margin="5" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
                 </Grid>
 
             </Border>

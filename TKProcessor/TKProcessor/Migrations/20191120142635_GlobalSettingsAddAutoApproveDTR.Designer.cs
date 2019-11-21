@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TKProcessor.Contexts;
 
 namespace TKProcessor.Migrations
 {
     [DbContext(typeof(TKContext))]
-    partial class TKContextModelSnapshot : ModelSnapshot
+    [Migration("20191120142635_GlobalSettingsAddAutoApproveDTR")]
+    partial class GlobalSettingsAddAutoApproveDTR
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,6 +388,10 @@ namespace TKProcessor.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<bool>("AutoApproveDTRFields");
+
+                    b.Property<bool>("CreateDTRForNoWorkDays");
+
                     b.Property<Guid?>("CreatedById");
 
                     b.Property<DateTime?>("CreatedOn");
@@ -393,6 +399,8 @@ namespace TKProcessor.Migrations
                     b.Property<DateTime>("DefaultNDEnd");
 
                     b.Property<DateTime>("DefaultNDStart");
+
+                    b.Property<bool>("DisplayDTRColumnsAsMinutes");
 
                     b.Property<bool>("IsActive");
 
@@ -525,26 +533,6 @@ namespace TKProcessor.Migrations
                     b.HasIndex("LastModifiedById");
 
                     b.ToTable("RawData");
-                });
-
-            modelBuilder.Entity("TKProcessor.Models.TK.SelectionSetting", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DisplayOrder");
-
-                    b.Property<Guid?>("GlobalSettingId");
-
-                    b.Property<bool>("IsSelected");
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GlobalSettingId");
-
-                    b.ToTable("SelectionSetting");
                 });
 
             modelBuilder.Entity("TKProcessor.Models.TK.Shift", b =>
@@ -898,13 +886,6 @@ namespace TKProcessor.Migrations
                     b.HasOne("TKProcessor.Models.TK.User", "LastModifiedBy")
                         .WithMany()
                         .HasForeignKey("LastModifiedById");
-                });
-
-            modelBuilder.Entity("TKProcessor.Models.TK.SelectionSetting", b =>
-                {
-                    b.HasOne("TKProcessor.Models.TK.GlobalSetting")
-                        .WithMany("AutoApproveDTRFieldsList")
-                        .HasForeignKey("GlobalSettingId");
                 });
 
             modelBuilder.Entity("TKProcessor.Models.TK.Shift", b =>

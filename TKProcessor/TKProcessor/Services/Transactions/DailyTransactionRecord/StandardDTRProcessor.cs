@@ -70,13 +70,14 @@ namespace TKProcessor.Services
             else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
+
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
 
-                if (IsSplittable) 
+                if (IsSplittable)
                 {
                     //Split
 
-                    if (actualTimeIn.Date == expectedTimeIn.Date) 
+                    if (actualTimeIn.Date == expectedTimeIn.Date)
                     {
                         if (actualTimeOut >= expectedTimeOut.Date) //If actual time out crosses to next day
                         {
@@ -86,11 +87,11 @@ namespace TKProcessor.Services
                                 splitHeadRegularWorkHours = (decimal)(expectedTimeOut.Date - expectedTimeIn).TotalMinutes;
                             }
                             else
-                            { 
+                            {
                                 splitHeadRegularWorkHours = (decimal)(expectedTimeOut.Date - actualTimeIn).TotalMinutes;
                             }
                         }
-                        else 
+                        else
                         {
                             splitHeadWorkHours = workHours;
                             if (actualTimeIn < expectedTimeIn)
@@ -114,11 +115,11 @@ namespace TKProcessor.Services
                                 splitTailRegularWorkHours = (decimal)(expectedTimeOut - expectedTimeOut.Date).TotalMinutes;
                             }
                             else
-                            { 
+                            {
                                 splitTailRegularWorkHours = (decimal)(actualTimeOut - expectedTimeOut.Date).TotalMinutes;
                             }
                         }
-                        else 
+                        else
                         {
                             splitTailWorkHours = workHours;
                             if (actualTimeOut < expectedTimeOut)
@@ -154,7 +155,7 @@ namespace TKProcessor.Services
                 ComputeUndertime();
                 ComputeOvertime();
                 ComputeNightDifferential();
-  
+
             }
             else
             {
@@ -164,7 +165,7 @@ namespace TKProcessor.Services
 
                     if (IsSplittable)
                     {
-                        splitHeadAbsentHours = AdjustWorkHours(expectedTimeIn, expectedTimeOut.Date,(decimal)(expectedTimeOut.Date - expectedTimeIn).TotalMinutes);
+                        splitHeadAbsentHours = AdjustWorkHours(expectedTimeIn, expectedTimeOut.Date, (decimal)(expectedTimeOut.Date - expectedTimeIn).TotalMinutes);
                         splitTailAbsentHours = AdjustWorkHours(expectedTimeOut.Date, expectedTimeOut, (decimal)(expectedTimeOut - expectedTimeOut.Date).TotalMinutes);
                     }
                 }
@@ -212,6 +213,9 @@ namespace TKProcessor.Services
 
         private void ComputeLate()
         {
+            if (actualTimeIn > expectedTimeIn)
+                late = (decimal)(actualTimeIn - expectedTimeIn).TotalMinutes;
+
             if (DTR.Shift.IsLateIn == true)
             {
                 int gracePeriodMinutes = 0;
@@ -222,8 +226,6 @@ namespace TKProcessor.Services
                 }
                 if (actualTimeIn > expectedTimeIn)
                 {
-                    late = (decimal)(actualTimeIn - expectedTimeIn).TotalMinutes;
-
                     if (actualTimeIn > expectedTimeIn.AddMinutes(gracePeriodMinutes))
                     {
                         approvedLate = late;
@@ -243,7 +245,7 @@ namespace TKProcessor.Services
                             splitTailLate += (decimal)(latePeriodEnd.Value.RemoveSeconds() - latePeriodEnd.Value.Date).TotalMinutes;
                             splitHeadLate += (decimal)(latePeriodStart.Value.Date.AddDays(1) - latePeriodStart.Value.RemoveSeconds()).TotalMinutes;
                         }
-                        else 
+                        else
                         {
                             splitHeadLate += (decimal)(latePeriodEnd.Value.RemoveSeconds() - latePeriodStart.Value.RemoveSeconds()).TotalMinutes;
                         }
@@ -264,11 +266,12 @@ namespace TKProcessor.Services
                                 splitHeadAbsentHours += AdjustWorkHours(expectedTimeIn, HalfDayPoint.Value.Date, absentHours); //assuming that shift is split exactly in half.
                                 splitTailAbsentHours += AdjustWorkHours(HalfDayPoint.Value.Date, HalfDayPoint.Value, absentHours);
                             }
-                            else 
+                            else
                             {
                                 splitHeadAbsentHours += AdjustWorkHours(expectedTimeIn, HalfDayPoint.Value, absentHours); //assuming that shift is split exactly in half.
                             }
                         }
+
                         approvedLate = 0;
                     }
                 }
@@ -278,6 +281,9 @@ namespace TKProcessor.Services
 
         private void ComputeUndertime()
         {
+            if (actualTimeOut < expectedTimeOut)
+                undertime = (decimal)((expectedTimeOut - actualTimeOut).TotalMinutes);
+
             if (DTR.Shift.IsEarlyOut == true)
             {
                 int gracePeriodMinutes = 0;
@@ -288,8 +294,6 @@ namespace TKProcessor.Services
                 }
                 if (actualTimeOut < expectedTimeOut)
                 {
-                    undertime = (decimal)((expectedTimeOut - actualTimeOut).TotalMinutes);
-
                     if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
@@ -309,7 +313,7 @@ namespace TKProcessor.Services
                             splitTailUndertime += (decimal)(undertimePeriodEnd.Value - undertimePeriodEnd.Value.Date).TotalMinutes;
                             splitHeadUndertime += (decimal)(undertimePeriodStart.Value.Date.AddDays(1) - undertimePeriodStart.Value).TotalMinutes;
                         }
-                        else 
+                        else
                         {
                             splitTailUndertime += (decimal)(undertimePeriodEnd.Value.RemoveSeconds() - undertimePeriodStart.Value.RemoveSeconds()).TotalMinutes;
                         }
@@ -326,7 +330,7 @@ namespace TKProcessor.Services
                         {
                             if (HalfDayPoint.Value.Date < expectedTimeOut.Date)
                             {
-                                splitHeadAbsentHours += AdjustWorkHours(HalfDayPoint.Value, expectedTimeOut.Date, absentHours); 
+                                splitHeadAbsentHours += AdjustWorkHours(HalfDayPoint.Value, expectedTimeOut.Date, absentHours);
                                 splitTailAbsentHours += AdjustWorkHours(expectedTimeOut.Date, expectedTimeOut, absentHours);
                             }
                             else
@@ -344,6 +348,9 @@ namespace TKProcessor.Services
         private void ComputeOvertime()
         {
             #region Pre-Overtime
+            if (actualTimeIn < expectedTimeIn)
+                preShiftOvertime = (decimal)(expectedTimeIn - actualTimeIn).TotalMinutes;
+
             if (DTR.Shift.IsPreShiftOt == true)
             {
                 if (actualTimeIn < expectedTimeIn)
@@ -363,7 +370,7 @@ namespace TKProcessor.Services
                             splitTailTotalOvertime += splitTailPreShiftOvertime;
                             splitHeadTotalOvertime += splitHeadPreShiftOvertime;
                         }
-                        else 
+                        else
                         {
                             splitHeadPreShiftOvertime += (decimal)(preShiftOvertimePeriodEnd.Value - preShiftOvertimePeriodStart.Value).TotalMinutes;
                             splitHeadTotalOvertime += splitHeadPreShiftOvertime;
@@ -383,9 +390,14 @@ namespace TKProcessor.Services
                 totalOvertime += preShiftOvertime;
                 approvedOvertime += approvedPreShiftOvertime;
             }
+
+            totalOvertime += preShiftOvertime;
             #endregion
 
             #region Post-Overtime
+            if (actualTimeOut > expectedTimeOut)
+                postShiftOvertime = (decimal)(actualTimeOut - expectedTimeOut).TotalMinutes;
+
             if (DTR.Shift.IsPostShiftOt == true)
             {
                 if (actualTimeOut > expectedTimeOut)
@@ -424,9 +436,10 @@ namespace TKProcessor.Services
                     approvedPostShiftOvertime = DTR.Shift.MaximumPostShiftOt.Value;
                 }
 
-                totalOvertime += postShiftOvertime;
                 approvedOvertime += approvedPostShiftOvertime;
             }
+
+            totalOvertime += postShiftOvertime;
             #endregion
         }
 
@@ -469,7 +482,7 @@ namespace TKProcessor.Services
                     nightDifferentialPeriodEnd = actualTimeOut;
                 }
                 else if (actualTimeIn >= expectedNightDifferentialStart && actualTimeOut <= expectedNightDifferentialEnd)
-                {     
+                {
                     nightDifferential = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
                     nightDifferential = AdjustWorkHours(actualTimeIn, actualTimeOut, nightDifferential);
                     nightDifferentialPeriodStart = actualTimeIn;
@@ -761,7 +774,7 @@ namespace TKProcessor.Services
                     approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
                     legalSpecialHolidayRestDayNightDifferential = nightDifferential;
                     legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
+                    approvedLegalSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 

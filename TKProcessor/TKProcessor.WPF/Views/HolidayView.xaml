@@ -50,19 +50,35 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Holiday" Width="auto" />
-                <DataGridTextColumn Binding="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HolidayTypeConverter}}" Header="Type"  Width="auto" />
-                <DataGridTemplateColumn Header="Date"  Width="auto" >
+                
+                <DataGridTemplateColumn Header="Holiday Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Date, StringFormat=d}"/>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding Name}"/>
+                            </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Type">
+                    <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <DatePicker SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding Type, Converter={StaticResource HolidayTypeConverter}}"/>
+                            </ContentControl>
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Date">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding Date, StringFormat=d}"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>

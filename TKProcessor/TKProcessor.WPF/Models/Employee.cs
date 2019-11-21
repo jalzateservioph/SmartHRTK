@@ -1,6 +1,6 @@
 ﻿using Caliburn.Micro;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +15,7 @@ namespace TKProcessor.WPF.Models
         private string _fullName;
         private DateTime? _terminationDate;
         private string _jobGradeBand;
+        private ObservableCollection<EmployeeWorkSite> employeeWorkSites;
 
         public string EmployeeCode
         {
@@ -57,6 +58,8 @@ namespace TKProcessor.WPF.Models
                     _biometricsId = value;
                     IsDirty = true;
                 }
+
+                NotifyOfPropertyChange();
             }
         }
         public DateTime? TerminationDate
@@ -77,6 +80,17 @@ namespace TKProcessor.WPF.Models
                 NotifyOfPropertyChange();
             }
         }
+
+        public ObservableCollection<EmployeeWorkSite> EmployeeWorkSites
+        {
+            get => employeeWorkSites;
+            set
+            {
+                employeeWorkSites = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
 
         public override string ToString()
         {

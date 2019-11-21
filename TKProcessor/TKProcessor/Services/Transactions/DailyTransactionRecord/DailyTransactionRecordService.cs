@@ -82,6 +82,8 @@ namespace TKProcessor.Services
         {
             try
             {
+                iterationCallback?.Invoke($"Initializing...");
+
                 start = start.Date;
                 end = end.Date;
 
@@ -91,99 +93,111 @@ namespace TKProcessor.Services
                 if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
-                var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
-                                            .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end).ToList();
+                var workschedules = Context.WorkSchedule.Include(i => i.Employee)
+                                                        .Include(i => i.Shift)
+                                                        .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end && i.IsActive)
+                                                        .ToArray();
 
-                if (workschedules.Count == 0)
-                    throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
+                if (workschedules.Length == 0)
+                    throw new Exception($"No work schedules were found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
+                var employees = workschedules.Select(i => i.Employee)
+                                             .Where(emp => jobGradeBandFilter.Any(jgb => jgb == emp.JobGradeBand))
+                                             .Distinct()
+                                             .ToArray();
 
-                if (employees.Count == 0)
-                    throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
+                if (employees.Length == 0)
+                    throw new Exception($"No employees were found with Job Grade Band {jobGradeBandFilter}");
 
                 if (employeesFilter != null && employeesFilter.Count() > 0)
                 {
-                    employees = employees.Where(emp => employeesFilter.Any(empF => empF.Id == emp.Id)).ToList();
+                    employees = employees.Where(emp => employeesFilter.Any(empF => empF.Id == emp.Id)).ToArray();
 
-                    if (employees.Count == 0)
+                    if (employees.Length == 0)
                         throw new Exception($"Filtered employees have no records to process");
                 }
 
-                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start && i.ScheduleDate.Value.Date <= end &&
-                                                            employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
+                var globalSettings = Context.GlobalSetting.Include(i => i.AutoApproveDTRFieldsList).FirstOrDefault();
 
-                if (workschedules.Count == 0)
-                    throw new Exception($"No Raw Data was found");
+                var rawDataList = Context.RawData.ToArray();
 
-                var globalSettings = Context.GlobalSetting.FirstOrDefault();
+                var dtrRecords = Context.DailyTransactionRecord.Where(i => i.TransactionDate.Value.Date >= start && i.TransactionDate.Value.Date <= end);
 
-                while (start <= end)
+                foreach (var employee in employees)
                 {
-                    foreach (var employee in employees)
+                    var rawdata = rawDataList.Where(i => i.ScheduleDate >= start &&
+                                                        i.ScheduleDate.Value.Date <= end &&
+                                                        string.Compare(i.BiometricsId ,employee.BiometricsId) == 0).ToList();
+
+                    var existing = dtrRecords.Where(i => i.Employee == employee);
+
+                    if (existing.Count() > 0)
+                    {
+                        Context.DailyTransactionRecord.RemoveRange(existing);
+
+                        SaveChanges();
+                    }
+
+                    var scheduleDate = start;
+
+                    while (scheduleDate <= end)
                     {
                         try
                         {
-                            iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()}...");
+                            iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
 
-                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == start);
+                            var shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
 
-                            foreach (var item in existing)
-                            {
-                                Context.DailyTransactionRecord.Remove(item);
-                            }
-
-                            var shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == start);
-
-                            var timein = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
+                            var timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeIn);
 
-                            var timeout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == start.Date) &&
+                            var timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
 
-                            var ambreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                                        (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var ambreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                                        (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.AMBreakIn);
 
-                            var ambreakout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var ambreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.AMBreakOut);
 
-                            var lunchin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var lunchin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchIn);
-                            var lunchout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var lunchout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchOut);
-                            var pmbreakin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var pmbreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakIn);
-                            var pmbreakout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var pmbreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakOut);
-                            var dinnerin = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var dinnerin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerIn);
-                            var dinnerout = rawdata.FirstOrDefault(i => i.BiometricsId == employee.BiometricsId &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == start.Date) &&
+                            var dinnerout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
+                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerOut);
 
                             DailyTransactionRecord DTR = new DailyTransactionRecord()
                             {
                                 Employee = employee,
-                                TransactionDate = start,
-                                Shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == start)?.Shift,
+                                TransactionDate = scheduleDate,
+                                Shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate)?.Shift,
                                 TimeIn = timein?.TransactionDateTime?.RemoveSeconds(),
                                 TimeOut = timeout?.TransactionDateTime?.RemoveSeconds(),
                             };
 
                             if (DTR.Shift == null)
-                                DTR.AddRemarks($"Employee has no work schdedule setup for this day, ");
-
-                            if (DTR.TimeIn == null && DTR.TimeOut == null)
-                                DTR.AddRemarks($"There is no time in and time out data for this day, ");
+                            {
+                                iterationCallback?.Invoke($"Skipping {employee} - {scheduleDate.ToLongDateString()}");
+                                scheduleDate = scheduleDate.AddDays(1);
+                                continue;
+                            }
 
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
@@ -210,69 +224,88 @@ namespace TKProcessor.Services
                                     {
                                         isLegalHoliday = true;
 
-                                        DTR.Remarks = "Legal Holiday, ";
+                                        DTR.AddRemarks("Legal Holiday");
                                     }
                                     else if (holiday.Type == (int)HolidayType.Special)
                                     {
                                         isSpecialHoliday = true;
 
-                                        DTR.Remarks = "Special Holiday, ";
+                                        DTR.AddRemarks("Special Holiday, ");
                                     }
                                 }
                             }
 
+                            var requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
-                            if (timein == null && timeout == null && holidays != null)
+                            if (timein == null && timeout == null)
                             {
-                                DTR.RegularWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
+
+                                if (holidays != null && holidays.Count() > 0)
+                                    DTR.RegularWorkHours = requiredWorkHours;
+                                else
+                                    DTR.AbsentHours = requiredWorkHours;
                             }
                             else
                             {
-                                if (globalSettings != null && !globalSettings.CreateDTRForNoWorkDays && timein == null && timeout == null)
+                                if (timein != null && timeout != null && timein.TransactionDateTime == timeout.TransactionDateTime)
                                 {
-                                    iterationCallback?.Invoke($"Skipping {employee.EmployeeCode} - {employee.FullName} - {start.ToLongDateString()} due to No Work, No DTR Setup");
-                                    continue;
-                                }
-
-                                if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
-                                {
-                                    //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
-                                    //{
-                                    //    processor = new StandardDTRProcessor(DTR, leaves, holidays);
-                                    //    processor.ComputeHolidayAndRestDay();
-                                    //    DTR = processor.DTR;
-                                    //}
-                                    //else
-                                    //{
-                                    //    processor = new StandardDTRProcessor(DTR, leaves);
-                                    //    processor.ComputeRegular();
-                                    //    DTR = processor.DTR;
-                                    //}
-
-                                    processor = new StandardDTRProcessor(DTR, leaves, holidays);
-                                    ((StandardDTRProcessor)processor).Compute();
-
-                                    DTR = processor.DTR;
+                                    DTR.RegularWorkHours = requiredWorkHours;
                                     DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                 }
-                                else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex)
+                                else if (timein != null && timeout != null &&
+                                        (timein.TransactionDateTime < DTR.Shift.ScheduleIn && timeout.TransactionDateTime < DTR.Shift.ScheduleIn) ||
+                                        (timein.TransactionDateTime > DTR.Shift.ScheduleOut && timeout.TransactionDateTime > DTR.Shift.ScheduleOut))
                                 {
-                                    if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                    DTR.AbsentHours = requiredWorkHours;
+                                }
+                                else
+                                {
+                                    if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                                     {
-                                        processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
-                                        processor.ComputeHolidayAndRestDay();
+                                        //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                        //{
+                                        //    processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                        //    processor.ComputeHolidayAndRestDay();
+                                        //    DTR = processor.DTR;
+                                        //}
+                                        //else
+                                        //{
+                                        //    processor = new StandardDTRProcessor(DTR, leaves);
+                                        //    processor.ComputeRegular();
+                                        //    DTR = processor.DTR;
+                                        //}
+
+                                        processor = new StandardDTRProcessor(DTR, leaves, holidays);
+                                        ((StandardDTRProcessor)processor).Compute();
+
                                         DTR = processor.DTR;
+                                        DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                     }
-                                    else
+                                    else if (DTR.Shift?.ShiftType == (int)ShiftType.Flex)
                                     {
-                                        processor = new FlextimeDTRProcessor(DTR, leaves);
-                                        processor.ComputeRegular();
-                                        DTR = processor.DTR;
+                                        if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
+                                        {
+                                            processor = new FlextimeDTRProcessor(DTR, leaves, holidays);
+                                            processor.ComputeHolidayAndRestDay();
+                                            DTR = processor.DTR;
+                                        }
+                                        else
+                                        {
+                                            processor = new FlextimeDTRProcessor(DTR, leaves);
+                                            processor.ComputeRegular();
+                                            DTR = processor.DTR;
+                                        }
+                                    }
+
+                                    foreach (var notAutoApprove in globalSettings.AutoApproveDTRFieldsList.Where(i => !i.IsSelected))
+                                    {
+                                        typeof(DailyTransactionRecord).GetProperty("Approved" + notAutoApprove.Name).SetValue(DTR, 0m);
                                     }
                                 }
                             }
 
-                            DTR.Remarks = DTR.Remarks != "" && DTR.Remarks != "" ? DTR.Remarks.Remove(DTR.Remarks.Length - 2) : "";
+                            if (!string.IsNullOrEmpty(DTR.Remarks))
+                                DTR.Remarks = DTR.Remarks.Trim().Trim(';').Trim(',');
 
                             Save(DTR);
                         }
@@ -283,9 +316,9 @@ namespace TKProcessor.Services
 
                             throw ex;
                         }
-                    }
 
-                    start = start.AddDays(1);
+                        scheduleDate = scheduleDate.AddDays(1);
+                    }
                 }
             }
             catch (Exception ex)

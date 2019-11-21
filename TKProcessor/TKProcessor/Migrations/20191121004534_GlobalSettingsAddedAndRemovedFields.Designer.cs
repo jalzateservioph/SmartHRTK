@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TKProcessor.Contexts;
 
 namespace TKProcessor.Migrations
 {
     [DbContext(typeof(TKContext))]
-    partial class TKContextModelSnapshot : ModelSnapshot
+    [Migration("20191121004534_GlobalSettingsAddedAndRemovedFields")]
+    partial class GlobalSettingsAddedAndRemovedFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -538,7 +540,7 @@ namespace TKProcessor.Migrations
 
                     b.Property<bool>("IsSelected");
 
-                    b.Property<string>("Name");
+                    b.Property<int>("Name");
 
                     b.HasKey("Id");
 

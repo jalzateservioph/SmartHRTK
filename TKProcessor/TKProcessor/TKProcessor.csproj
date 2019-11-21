@@ -286,6 +286,18 @@
     <Compile Include="Migrations\20191120005750_AddWorkSiteAuthColumns.designer.cs">
       <DependentUpon>20191120005750_AddWorkSiteAuthColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191120142635_GlobalSettingsAddAutoApproveDTR.cs" />
+    <Compile Include="Migrations\20191120142635_GlobalSettingsAddAutoApproveDTR.designer.cs">
+      <DependentUpon>20191120142635_GlobalSettingsAddAutoApproveDTR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191121004534_GlobalSettingsAddedAndRemovedFields.cs" />
+    <Compile Include="Migrations\20191121004534_GlobalSettingsAddedAndRemovedFields.designer.cs">
+      <DependentUpon>20191121004534_GlobalSettingsAddedAndRemovedFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20191121012622_GlobalSettingsAddedAndRemovedFields1.cs" />
+    <Compile Include="Migrations\20191121012622_GlobalSettingsAddedAndRemovedFields1.designer.cs">
+      <DependentUpon>20191121012622_GlobalSettingsAddedAndRemovedFields1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
@@ -314,6 +326,7 @@
     <Compile Include="Models\TK\Leave.cs" />
     <Compile Include="Models\TK\Mapping.cs" />
     <Compile Include="Models\TK\RawData.cs" />
+    <Compile Include="Models\TK\SelectionSetting.cs" />
     <Compile Include="Models\TK\Shift.cs" />
     <Compile Include="Models\TK\User.cs" />
     <Compile Include="Models\TK\WorkSchedule.cs" />

@@ -41,8 +41,6 @@ namespace TKProcessor.WPF.ViewModels
         private ICollectionView selectedEmployeesView;
         private ObservableCollection<Employee> selectedEmployees;
 
-        private bool isAllEmployeesSelected;
-
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
             dtrService = new DailyTransactionRecordService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
@@ -59,6 +57,12 @@ namespace TKProcessor.WPF.ViewModels
 
                 cfg.CreateMap<Employee, TK.Employee>();
                 cfg.CreateMap<TK.Employee, Employee>();
+
+                cfg.CreateMap<TK.EmployeeWorkSite, EmployeeWorkSite>();
+                cfg.CreateMap<EmployeeWorkSite, TK.EmployeeWorkSite>();
+
+                cfg.CreateMap<WorkSite, TK.WorkSite>();
+                cfg.CreateMap<TK.WorkSite, WorkSite>();
 
                 cfg.CreateMap<Shift, TK.Shift>();
                 cfg.CreateMap<TK.Shift, Shift>();
@@ -151,6 +155,8 @@ namespace TKProcessor.WPF.ViewModels
         {
             try
             {
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Loading DTR records...", MessageType.Information, 0));
+
                 Items.Clear();
 
                 var retrievedItems = dtrService.List(
@@ -321,7 +327,13 @@ namespace TKProcessor.WPF.ViewModels
                 if (string.IsNullOrEmpty(EmployeeListViewSearch))
                     return true;
 
-                return (emp.ToString().ToLower().Contains(EmployeeListViewSearch.ToLower()));
+                if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                    return true;
+
+                if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                    return true;
+
+                return false;
             };
 
             EmployeeListView.Refresh();
@@ -336,7 +348,13 @@ namespace TKProcessor.WPF.ViewModels
                 if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
                     return true;
 
-                return (emp.ToString().ToLower().Contains(SelectedEmployeesViewSearch.ToLower()));
+                if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                    return true;
+
+                if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                    return true;
+
+                return false;
             };
 
             SelectedEmployeesView.Refresh();
@@ -352,8 +370,8 @@ namespace TKProcessor.WPF.ViewModels
 
         public override void Sort()
         {
-            View.SortDescriptions.Add(new SortDescription(nameof(Employee.EmployeeCode), ListSortDirection.Ascending));
-            View.SortDescriptions.Add(new SortDescription(nameof(DailyTransactionRecord.TransactionDate), ListSortDirection.Descending));
+            View.SortDescriptions.Add(new SortDescription("Employee.EmployeeCode", ListSortDirection.Ascending));
+            View.SortDescriptions.Add(new SortDescription("TransactionDate", ListSortDirection.Descending));
         }
 
         public override bool Filter(object o)

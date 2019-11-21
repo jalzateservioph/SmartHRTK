@@ -160,10 +160,12 @@
     </ApplicationDefinition>
     <Compile Include="Common\Session.cs" />
     <Compile Include="Converter\CollectionToCommaSeparatedConverter.cs" />
+    <Compile Include="Converter\DataConverter\EmployeeConverters.cs" />
     <Compile Include="Converter\DataConverter\HolidayTypeConverter.cs" />
     <Compile Include="Converter\DataConverter\RawDataTransactionTypeConverter.cs" />
     <Compile Include="Converter\DecimalToTimeConverter.cs" />
     <Compile Include="Converter\NumberAbbrevConverter.cs" />
+    <Compile Include="Converter\ObjectConverters.cs" />
     <Compile Include="Converter\ReverseBoolVisibilityConverter.cs" />
     <Compile Include="Converter\TextValueConverterValidator.cs" />
     <Compile Include="Events\LoginEvent.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Models\Calendar.cs" />
     <Compile Include="Models\DailyTransactionRecord.cs" />
     <Compile Include="Models\Dashboard.cs" />
+    <Compile Include="Models\EmployeeWorkSite.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\ExcelFileMap.cs" />
     <Compile Include="Models\GlobalSettings.cs" />
@@ -182,10 +185,12 @@
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Holiday.cs" />
     <Compile Include="Models\Report.cs" />
+    <Compile Include="Models\SelectionSetting.cs" />
     <Compile Include="Models\Shift.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\WorkSchedule.cs" />
     <Compile Include="Models\WorkScheduleAdjustmentModel.cs" />
+    <Compile Include="Models\WorkSite.cs" />
     <Compile Include="Validators\StringIntegerValidationRule.cs" />
     <Compile Include="Validators\StringRangeValidationRule.cs" />
     <Compile Include="ViewModels\AuditLogsViewModel.cs" />
@@ -209,6 +214,9 @@
       <DependentUpon>AuditLogsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\BaseViewClasses.cs" />
+    <Compile Include="Views\CalendarView.xaml.cs">
+      <DependentUpon>CalendarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DailyTransactionRecordView.xaml.cs">
       <DependentUpon>DailyTransactionRecordView.xaml</DependentUpon>
     </Compile>
@@ -251,6 +259,9 @@
     <Compile Include="Views\WorkScheduleView.xaml.cs">
       <DependentUpon>WorkScheduleView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WorkSiteView.xaml.cs">
+      <DependentUpon>WorkSiteView.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -265,6 +276,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\AuditLogsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CalendarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -321,6 +336,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WorkScheduleView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WorkSiteView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -398,6 +417,11 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)reports" (md "$(TargetDir)reports")
 rem ==========================================
-copy "$(SolutionDir)TKProcessor.Reports\bin\Debug\*.rdl" "$(TargetDir)reports\"</PostBuildEvent>
+if exist "$(SolutionDir)TKProcessor.Reports\bin" copy "$(SolutionDir)TKProcessor.Reports\bin\Debug\*.rdl" "$(TargetDir)reports\"
+if not exist "$(SolutionDir)TKProcessor.Reports\bin" copy "$(SolutionDir)TKProcessor.Reports\*.rdl" "$(TargetDir)reports\"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

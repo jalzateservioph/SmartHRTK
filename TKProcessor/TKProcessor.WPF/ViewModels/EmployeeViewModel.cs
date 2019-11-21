@@ -17,10 +17,11 @@ using TKModels = TKProcessor.Models.TK;
 
 namespace TKProcessor.WPF.ViewModels
 {
-    public class EmployeeViewModel : ViewModelBase<Employee>
+    public class EmployeeViewModel : EditableViewModelBase<Employee>
     {
         readonly IMapper mapper;
         readonly EmployeeService employeeService;
+        private Employee currentItem;
 
         public EmployeeViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -31,6 +32,12 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<Employee, TKModels.Employee>();
                 cfg.CreateMap<TKModels.Employee, Employee>()
                     .AfterMap((empDto, emp) => emp.IsDirty = false);
+
+                cfg.CreateMap<TKModels.EmployeeWorkSite, EmployeeWorkSite>();
+                cfg.CreateMap<EmployeeWorkSite, TKModels.EmployeeWorkSite>();
+
+                cfg.CreateMap<WorkSite, TKModels.WorkSite>();
+                cfg.CreateMap<TKModels.WorkSite, WorkSite>();
 
                 cfg.CreateMap<User, TKModels.User>();
                 cfg.CreateMap<TKModels.User, User>();
@@ -114,14 +121,13 @@ namespace TKProcessor.WPF.ViewModels
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving edited employees..."));
 
-                foreach (var employee in Items.Where(i => i.IsDirty))
-                {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {employee}..."));
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {CurrentItem}..."));
 
-                    employeeService.Save(mapper.Map<TKModels.Employee>(employee));
+                employeeService.Save(mapper.Map<TKModels.Employee>(CurrentItem));
 
-                    employee.IsDirty = false;
-                }
+                CurrentItem.IsDirty = false;
+
+                Items.First(i => i.Id == CurrentItem.Id).BiometricsId = CurrentItem.BiometricsId;
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Employee records saved"));
 
@@ -131,6 +137,13 @@ namespace TKProcessor.WPF.ViewModels
             {
                 eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
             }
+        }
+
+        public void OpenRecord(Employee employee)
+        {
+            CurrentItem = employee;
+
+            StartEditing();
         }
 
         public override bool Filter(object o)
@@ -177,6 +190,16 @@ namespace TKProcessor.WPF.ViewModels
         public override void Sort()
         {
             View.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
+        }
+
+        public Employee CurrentItem
+        {
+            get => currentItem;
+            set
+            {
+                currentItem = value;
+                NotifyOfPropertyChange();
+            }
         }
     }
 }

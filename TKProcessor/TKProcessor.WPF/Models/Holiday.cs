@@ -51,16 +51,45 @@ namespace TKProcessor.WPF.Models
 
     public class HolidayModel : BaseModel
     {
+        private int yearTo;
+        private DateTime date;
+
         public HolidayModel()
         {
             Date = DateTime.Today;
             YearTo = DateTime.Today.Year;
+
+            PropertyChanged += HolidayModel_PropertyChanged;
+        }
+
+        private void HolidayModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(Date))
+                YearTo = Date.Year;
         }
 
         public string Name { get; set; }
-        public int YearTo { get; set; }
-        public DateTime Date { get; set; }
+        public int YearTo
+        {
+            get => yearTo;
+            set
+            {
+                yearTo = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public DateTime Date
+        {
+            get => date;
+            set
+            {
+                date = value;
+                NotifyOfPropertyChange();
+            }
+        }
         public bool IsRegularHoliday { get; set; }
         public bool IsSpecialHoliday { get; set; }
     }
+
+    
 }

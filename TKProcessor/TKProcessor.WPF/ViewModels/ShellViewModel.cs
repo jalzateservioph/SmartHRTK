@@ -23,6 +23,7 @@ namespace TKProcessor.WPF.ViewModels
         private SolidColorBrush _messageColor;
         private SolidColorBrush _messageFontColor;
         private System.Timers.Timer t;
+        private bool verifying = true;
         private string _message;
         private bool _hasMessage;
         private bool _isLoggedIn;
@@ -41,7 +42,7 @@ namespace TKProcessor.WPF.ViewModels
 
             ActivateItem(new LoginViewModel(eventAggregator, windowManager));
 
-            bool verifying = true;
+            verifying = true;
 
             Task.Run(() =>
             {
@@ -53,7 +54,6 @@ namespace TKProcessor.WPF.ViewModels
 
                     var t = Task.Run(() =>
                     {
-
                         while (verifying)
                         {
                             if (string.IsNullOrEmpty(StartupMessage) || StartupMessage.Contains("...")) StartupMessage = customStartupMessage;
@@ -198,6 +198,8 @@ namespace TKProcessor.WPF.ViewModels
 
             if (IsLoggedIn)
             {
+                verifying = false;
+
                 Session.Default.CurrentUser = message.CurrentUser;
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Logged in as {Session.Default.CurrentUser.Name}"));

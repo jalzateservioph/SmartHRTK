@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TKProcessor.Models.TK
 {
@@ -15,7 +16,7 @@ namespace TKProcessor.Models.TK
             if (!string.IsNullOrEmpty(Remarks))
                 Remarks += "; ";
 
-            Remarks += "Employee has no work schedule setup for this date";
+            Remarks += message;
         }
 
         public Guid Id { get; set; }
@@ -201,7 +202,7 @@ namespace TKProcessor.Models.TK
             ApprovedNDRDot = 0;
         }
 
-        public void RemapWorkHours(bool isLegalHoliday, bool isSpecialHoliday)
+        public void RemapWorkHours(bool isLegalHoliday, bool isSpecialHoliday, bool isAutoApprove = true)
         {
             #region Holiday Mapping
 
@@ -211,25 +212,35 @@ namespace TKProcessor.Models.TK
                 if (ActualRestDay > 0) //if rest day
                 {
                     ActualLegSpeHolRD += ActualRestDay;
-                    ApprovedLegSpeHolRD += ApprovedRestDay;
                     ActualLegSpeHolRDot += ActualRestDayOt;
-                    ApprovedLegSpeHolRDot += ApprovedRestDayOt;
                     ActualNDLegSpeHolRD += ActualNDRD;
-                    ApprovedNDLegSpeHolRD += ApprovedNDRD;
                     ActualNDLegSpeHolRDot += ActualNDRDot;
-                    ApprovedNDLegSpeHolRDot += ApprovedNDRDot;
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedNDLegSpeHolRD += ApprovedNDRD;
+                        ApprovedLegSpeHolRDot += ApprovedRestDayOt;
+                        ApprovedLegSpeHolRD += ApprovedRestDay;
+                        ApprovedNDLegSpeHolRDot += ApprovedNDRDot;
+                    }
+
                     ResetRestDayHours();
                 }
-                if (RegularWorkHours > 0) 
+                if (RegularWorkHours > 0)
                 {
-                    ActualLegSpeHol += RegularWorkHours;
-                    //ApprovedLegSpeHol
-                    ActualLegSpeHolOt += ActualOvertime;
-                    ApprovedLegSpeHolOt += ApprovedOvertime;
-                    ActualNDLegSpeHol += NightDifferential;
-                    //ApprovedNDLegSpeHoldRD
-                    ActualNDLegSpeHolOt += NightDifferentialOt;
-                    //ApprovedNDLegSpeHolOt
+                    ActualLegHol += RegularWorkHours;
+                    ActualLegHolOt += ActualOvertime;
+                    ActualNDLegHol += NightDifferential;
+                    ActualNDLegHolOt += NightDifferentialOt;
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedLegHol += RegularWorkHours;
+                        ApprovedLegHolOt += ApprovedOvertime;
+                        ApprovedNDLegHol += NightDifferential;
+                        ApprovedNDLegHolOt += NightDifferentialOt;
+                    }
+
                     ResetRegularHours();
                 }
             }
@@ -238,28 +249,38 @@ namespace TKProcessor.Models.TK
             #region Legal Holiday
             else if (isLegalHoliday)
             {
-                if (ActualRestDay > 0)
+                if (ActualRestDay > 0) //if rest day
                 {
-                    ActualLegHolRD += ActualRestDay;
-                    ApprovedLegHolRD += ApprovedRestDay;
-                    ActualLegHolRDot += ActualRestDayOt;
-                    ApprovedLegHolRDot += ApprovedRestDayOt;
-                    ActualNDLegHolRD += ActualNDRD;
-                    ApprovedNDLegHolRD += ApprovedNDRD;
-                    ActualNDLegHolRDot += ActualNDRDot;
-                    ApprovedNDLegHolRDot += ApprovedNDRDot;
+                    ActualLegSpeHolRD += ActualRestDay;
+                    ActualLegSpeHolRDot += ActualRestDayOt;
+                    ActualNDLegSpeHolRD += ActualNDRD;
+                    ActualNDLegSpeHolRDot += ActualNDRDot;
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedNDLegSpeHolRD += ApprovedNDRD;
+                        ApprovedLegSpeHolRDot += ApprovedRestDayOt;
+                        ApprovedLegSpeHolRD += ApprovedRestDay;
+                        ApprovedNDLegSpeHolRDot += ApprovedNDRDot;
+                    }
+
                     ResetRestDayHours();
                 }
                 if (RegularWorkHours > 0)
                 {
                     ActualLegHol += RegularWorkHours;
-                    //ApprovedLegHol
                     ActualLegHolOt += ActualOvertime;
-                    ApprovedLegHolOt += ApprovedOvertime;
                     ActualNDLegHol += NightDifferential;
-                    //ApprovedNDLegHol
                     ActualNDLegHolOt += NightDifferentialOt;
-                    //ApprovedNDLegHolOt
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedLegHol += RegularWorkHours;
+                        ApprovedLegHolOt += ApprovedOvertime;
+                        ApprovedNDLegHol += NightDifferential;
+                        ApprovedNDLegHolOt += NightDifferentialOt;
+                    }
+
                     ResetRegularHours();
                 }
             }
@@ -268,31 +289,40 @@ namespace TKProcessor.Models.TK
             #region Special Holiday
             else if (isSpecialHoliday)
             {
-                if (ActualRestDay > 0)
+                if (ActualRestDay > 0) //if rest day
                 {
-                    ActualSpeHolRD += ActualRestDay;
-                    ApprovedSpeHolRD += ApprovedRestDay;
-                    ActualSpeHolRDot += ActualRestDayOt;
-                    ApprovedSpeHolRDot += ApprovedRestDayOt;
-                    ActualNDSpeHolRD += ActualNDRD;
-                    ApprovedNDSpeHolRD += ApprovedNDRD;
-                    ActualNDSpeHolRDot += ActualNDRDot;
-                    ApprovedNDSpeHolRDot += ApprovedNDRDot;
+                    ActualLegSpeHolRD += ActualRestDay;
+                    ActualLegSpeHolRDot += ActualRestDayOt;
+                    ActualNDLegSpeHolRD += ActualNDRD;
+                    ActualNDLegSpeHolRDot += ActualNDRDot;
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedNDLegSpeHolRD += ApprovedNDRD;
+                        ApprovedLegSpeHolRDot += ApprovedRestDayOt;
+                        ApprovedLegSpeHolRD += ApprovedRestDay;
+                        ApprovedNDLegSpeHolRDot += ApprovedNDRDot;
+                    }
+
                     ResetRestDayHours();
                 }
                 if (RegularWorkHours > 0)
                 {
-                    ActualSpeHol += RegularWorkHours;
-                    //ApprovedSpeHol
-                    ActualSpeHolOt += ActualOvertime;
-                    ApprovedSpeHolOt += ApprovedOvertime;
-                    ActualNDSpeHol += NightDifferential;
-                    //ApprovedNDSpeHol
-                    ActualNDSpeHolOt += NightDifferentialOt;
-                    //ApprovedNDSpeHolOt
+                    ActualLegHol += RegularWorkHours;
+                    ActualLegHolOt += ActualOvertime;
+                    ActualNDLegHol += NightDifferential;
+                    ActualNDLegHolOt += NightDifferentialOt;
+
+                    if (isAutoApprove)
+                    {
+                        ApprovedLegHol += RegularWorkHours;
+                        ApprovedLegHolOt += ApprovedOvertime;
+                        ApprovedNDLegHol += NightDifferential;
+                        ApprovedNDLegHolOt += NightDifferentialOt;
+                    }
+
                     ResetRegularHours();
                 }
-
             }
             #endregion
 

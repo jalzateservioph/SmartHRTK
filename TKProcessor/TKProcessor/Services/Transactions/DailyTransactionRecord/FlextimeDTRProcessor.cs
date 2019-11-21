@@ -130,7 +130,7 @@ namespace TKProcessor.Services
                     approvedLegalSpecialHolidayRestDayOvertime = approvedOvertime;
                     legalSpecialHolidayRestDayNightDifferential = nightDifferential;
                     legalSpecialHolidayRestDayNightDifferentialOvertime = nightDifferentialOvertime;
-                    approvedLegalSpecialHolidayNightDifferentialOvertime = approvedOvertime;
+                    approvedLegalSpecialHolidayRestDayNightDifferentialOvertime = approvedOvertime;
                 }
                 #endregion
 
@@ -223,7 +223,10 @@ namespace TKProcessor.Services
             DateTime expectedTimeOut = actualTimeIn.AddMinutes((double)(requiredWorkHours + totalBreak));
 
             #region Undertime
-            if (DTR.Shift.IsEarlyOut == true)
+            if (workHours < requiredWorkHours * 60)
+                undertime = (requiredWorkHours * 60) - workHours;
+
+                if (DTR.Shift.IsEarlyOut == true)
             {
                 int gracePeriodMinutes = 0;
                 if (DTR.Shift.GracePeriodEarlyOut.HasValue) gracePeriodMinutes = DTR.Shift.GracePeriodEarlyOut.Value;

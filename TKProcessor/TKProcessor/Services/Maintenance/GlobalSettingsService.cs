@@ -23,6 +23,7 @@ namespace TKProcessor.Services.Maintenance
             return Context.GlobalSetting
                             .Include(i => i.PayrollCodeMappings)
                             .Include(i => i.PayPackageMappings)
+                            .Include(i => i.AutoApproveDTRFieldsList)
                             .ToList();
 
         }
@@ -32,7 +33,8 @@ namespace TKProcessor.Services.Maintenance
             try
             {
                 var existing = Context.GlobalSetting.Include(i => i.PayrollCodeMappings)
-                                                    .Include(i => i.PayPackageMappings).FirstOrDefault();
+                                                    .Include(i => i.PayPackageMappings)
+                                                    .Include(i => i.AutoApproveDTRFieldsList).FirstOrDefault();
 
                 if (existing == default(GlobalSetting))
                 {
@@ -44,6 +46,10 @@ namespace TKProcessor.Services.Maintenance
 
                     // Update parent
                     Context.Entry(existing).CurrentValues.SetValues(entity);
+
+                    // PayrollCodeMappings
+                    if (existing.PayrollCodeMappings == null)
+                        existing.PayrollCodeMappings = new List<Mapping>();
 
                     // Delete children
                     foreach (var existingChild in existing.PayrollCodeMappings.ToList())
@@ -76,6 +82,10 @@ namespace TKProcessor.Services.Maintenance
                         }
                     }
 
+                    // PayPackageMappings
+                    if (existing.PayPackageMappings == null)
+                        existing.PayPackageMappings = new List<Mapping>();
+
                     // Delete children
                     foreach (var existingChild in existing.PayPackageMappings.ToList())
                     {
@@ -103,6 +113,41 @@ namespace TKProcessor.Services.Maintenance
                                 Source = childentity.Source
                             };
                             existing.PayPackageMappings.Add(newChild);
+                        }
+                    }
+
+                    // AutoApproveList
+                    if (existing.AutoApproveDTRFieldsList == null)
+                        existing.AutoApproveDTRFieldsList = new List<SelectionSetting>();
+
+                    // Delete children
+                    foreach (var existingChild in existing.AutoApproveDTRFieldsList.ToList())
+                    {
+                        if (!entity.AutoApproveDTRFieldsList.Any(c => c.Id == existingChild.Id))
+                            Context.SelectionSetting.Remove(existingChild);
+                    }
+
+                    // Update and Insert children
+                    foreach (var childentity in entity.AutoApproveDTRFieldsList)
+                    {
+                        var existingChild = existing.AutoApproveDTRFieldsList
+                            .Where(c => c.Id == childentity.Id)
+                            .SingleOrDefault();
+
+                        if (existingChild != null)
+                            // Update child
+                            Context.Entry(existingChild).CurrentValues.SetValues(childentity);
+                        else
+                        {
+                            // Insert child
+                            var newChild = new SelectionSetting
+                            {
+                                Id = childentity.Id,
+                                DisplayOrder = childentity.DisplayOrder,
+                                Name = childentity.Name,
+                                IsSelected = childentity.IsSelected
+                            };
+                            existing.AutoApproveDTRFieldsList.Add(newChild);
                         }
                     }
                 }

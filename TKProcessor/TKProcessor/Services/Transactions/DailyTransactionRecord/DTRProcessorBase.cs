@@ -71,6 +71,7 @@ namespace TKProcessor.Services
         protected decimal legalSpecialHolidayNightDifferential = 0;
         protected decimal legalSpecialHolidayNightDifferentialOvertime = 0;
         protected decimal approvedLegalSpecialHolidayNightDifferentialOvertime = 0;
+        protected decimal approvedLegalSpecialHolidayRestDayNightDifferentialOvertime = 0;
 
         protected decimal specialHolidayRestDay = 0;
         protected decimal specialHolidayRestDayOvertime = 0;
@@ -335,67 +336,94 @@ namespace TKProcessor.Services
 
         protected void MapFieldsToDTR()
         {
-            DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+            //basic fields
             DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
 
-            DTR.ApprovedLate = DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
+            DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
 
-            DTR.AbsentHours = Math.Round(absentHours / 60, 2) + 0.00m;
+            DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
+            DTR.ApprovedLate = Math.Round(approvedLate / 60, 2) + 0.00m;
 
-            DTR.ApprovedUndertime = DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
+            DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
+            DTR.ApprovedUndertime = Math.Round(approvedUndertime / 60, 2) + 0.00m;
 
             DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
             DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
 
             DTR.ActualPreOvertime = Math.Round(preShiftOvertime / 60, 2) + 0.00m;
             DTR.ApprovedPreOvertime = Math.Round(approvedPreShiftOvertime / 60, 2) + 0.00m;
+
             DTR.ActualPostOvertime = Math.Round(postShiftOvertime / 60, 2) + 0.00m;
             DTR.ApprovedPostOvertime = Math.Round(approvedPostShiftOvertime / 60, 2) + 0.00m;
 
             DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
             DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
 
-            DTR.ApprovedLegHol = DTR.ActualLegHol = Math.Round(legalHoliday / 60, 2) + 0.00m;
+
+            // complex fields
+            DTR.ActualLegHol = Math.Round(legalHoliday / 60, 2) + 0.00m;
+            DTR.ApprovedLegHol = Math.Round(legalHoliday / 60, 2) + 0.00m;
             DTR.ActualLegHolOt = Math.Round(legalHolidayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedLegHolOt = Math.Round(approvedLegalHolidayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDLegHol = DTR.ActualNDLegHol = Math.Round(legalHolidayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDLegHolOt = DTR.ActualNDLegHolOt = Math.Round(legalHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDLegHolOt = Math.Round(legalHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDLegHolOt = Math.Round(approvedLegalHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedSpeHol = DTR.ActualSpeHol = Math.Round(specialHoliday / 60, 2) + 0.00m;
-            DTR.ApprovedSpeHolOt = DTR.ActualSpeHolOt = Math.Round(specialHolidayOvertime / 60, 2) + 0.00m;
+            DTR.ActualSpeHolOt = Math.Round(specialHolidayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedSpeHolOt = Math.Round(approvedSpecialHolidayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDSpeHol = DTR.ActualNDSpeHol = Math.Round(specialHolidayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDSpeHolOt = DTR.ActualNDSpeHolOt = Math.Round(specialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDSpeHolOt = Math.Round(specialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDSpeHolOt = Math.Round(approvedSpecialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedRestDay = DTR.ActualRestDay = Math.Round(restDay / 60, 2) + 0.00m;
             DTR.ActualRestDayOt = Math.Round(restDayOvertime / 60, 2) + 0.00m;
             DTR.ApprovedRestDayOt = Math.Round(approvedRestDayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDRD = DTR.ActualNDRD = Math.Round(restDayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDRDot = DTR.ActualNDRDot = Math.Round(restDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDRDot = Math.Round(restDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDRDot = Math.Round(approvedRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedLegSpeHol = DTR.ActualLegSpeHol = Math.Round(legalSpecialHoliday / 60, 2) + 0.00m;
-            DTR.ApprovedLegSpeHolOt = DTR.ActualLegSpeHolOt = Math.Round(legalSpecialHolidayOvertime / 60, 2) + 0.00m;
+            DTR.ActualLegSpeHolOt = Math.Round(legalSpecialHolidayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedLegSpeHolOt = Math.Round(approvedLegalSpecialHolidayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDLegSpeHol = DTR.ActualNDLegSpeHol = Math.Round(legalSpecialHolidayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDLegSpeHolOt = DTR.ActualNDLegSpeHolOt = Math.Round(legalSpecialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDLegSpeHolOt = Math.Round(legalSpecialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDLegSpeHolOt = Math.Round(approvedLegalSpecialHolidayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedSpeHolRD = DTR.ActualSpeHolRD = Math.Round(specialHolidayRestDay / 60, 2) + 0.00m;
-            DTR.ApprovedSpeHolRDot = DTR.ActualSpeHolRDot = Math.Round(specialHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ActualSpeHolRDot = Math.Round(specialHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedSpeHolRDot = Math.Round(approvedSpecialHolidayRestDayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDSpeHolRD = DTR.ActualNDSpeHolRD = Math.Round(specialHolidayRestDayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDSpeHolRDot = DTR.ActualNDSpeHolRDot = Math.Round(specialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDSpeHolRDot = Math.Round(specialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDSpeHolRDot = Math.Round(approvedSpecialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedLegHolRD = DTR.ActualLegHolRD = Math.Round(legalHolidayRestDay / 60, 2) + 0.00m;
-            DTR.ApprovedLegHolRDot = DTR.ActualLegHolRDot = Math.Round(legalHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ActualLegHolRDot = Math.Round(legalHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedLegHolRDot = Math.Round(approvedLegalHolidayRestDayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDLegHolRD = DTR.ActualNDLegHolRD = Math.Round(legalHolidayRestDayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDLegHolRDot = DTR.ActualNDLegHolRDot = Math.Round(legalHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDLegHolRDot = Math.Round(legalHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDLegHolRDot = Math.Round(approvedLegalHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
 
             DTR.ApprovedLegSpeHolRD = DTR.ActualLegSpeHolRD = Math.Round(legalSpecialHolidayRestDay / 60, 2) + 0.00m;
-            DTR.ApprovedLegSpeHolRDot = DTR.ActualLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ActualLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedLegSpeHolRDot = Math.Round(approvedLegalSpecialHolidayRestDayOvertime / 60, 2) + 0.00m;
+
             DTR.ApprovedNDLegSpeHolRD = DTR.ActualNDLegSpeHolRD = Math.Round(legalSpecialHolidayRestDayNightDifferential / 60, 2) + 0.00m;
-            DTR.ApprovedNDLegSpeHolRDot = DTR.ActualNDLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ActualNDLegSpeHolRDot = Math.Round(legalSpecialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedNDLegSpeHolRDot = Math.Round(approvedLegalSpecialHolidayRestDayNightDifferentialOvertime / 60, 2) + 0.00m;
 
         }
 
         protected void MapFields() //new map
         {
             DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
+
             if (DTR.Shift.IsRestDay.HasValue && DTR.Shift.IsRestDay.Value)
             {
                 DTR.ActualRestDay = Math.Round(regularWorkHours / 60, 2) + 0.00m;

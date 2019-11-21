@@ -18,6 +18,7 @@ namespace TKProcessor.WPF.Models
         private DateTime _defaultNDEnd;
         private bool _createDTRForNoWorkDays;
         private bool displayDTRColumnsAsMinutes;
+        private bool autoApproveDTRFields;
 
         public GlobalSettings()
         {
@@ -25,6 +26,7 @@ namespace TKProcessor.WPF.Models
 
             PayrollCodeMappings = new ObservableCollection<Mapping>();
             PayPackageMappings = new ObservableCollection<Mapping>();
+            AutoApproveDTRFieldsList = new ObservableCollection<SelectionSetting>();
         }
 
         private void GlobalSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -48,6 +50,9 @@ namespace TKProcessor.WPF.Models
 
             PayPackageMappingsView = CollectionViewSource.GetDefaultView(PayPackageMappings);
             PayPackageMappingsView.SortDescriptions.Add(new SortDescription("Order", ListSortDirection.Ascending));
+
+            AutoApproveDTRFieldsListView = CollectionViewSource.GetDefaultView(AutoApproveDTRFieldsList);
+            AutoApproveDTRFieldsListView.SortDescriptions.Add(new SortDescription("DisplayOrder", ListSortDirection.Ascending));
         }
 
         public DateTime DefaultNDStart
@@ -59,30 +64,13 @@ namespace TKProcessor.WPF.Models
                 NotifyOfPropertyChange();
             }
         }
+
         public DateTime DefaultNDEnd
         {
             get => _defaultNDEnd;
             set
             {
                 _defaultNDEnd = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        public bool CreateDTRForNoWorkDays
-        {
-            get => _createDTRForNoWorkDays;
-            set
-            {
-                _createDTRForNoWorkDays = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        public bool DisplayDTRColumnsAsMinutes
-        {
-            get => displayDTRColumnsAsMinutes;
-            set
-            {
-                displayDTRColumnsAsMinutes = value;
                 NotifyOfPropertyChange();
             }
         }
@@ -97,6 +85,7 @@ namespace TKProcessor.WPF.Models
             }
         }
         public ICollectionView PayrollCodeMappingsView { get; set; }
+
         public ObservableCollection<Mapping> PayPackageMappings
         {
             get => _payPackageMappings;
@@ -107,5 +96,8 @@ namespace TKProcessor.WPF.Models
             }
         }
         public ICollectionView PayPackageMappingsView { get; set; }
+
+        public ObservableCollection<SelectionSetting> AutoApproveDTRFieldsList { get; set; }
+        public ICollectionView AutoApproveDTRFieldsListView { get; set; }
     }
 }

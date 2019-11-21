@@ -38,6 +38,9 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<TKModels.Mapping, Mapping>()
                     .AfterMap((from, to) => { to.Source = to.Source ?? ""; });
 
+                cfg.CreateMap<SelectionSetting, TKModels.SelectionSetting>();
+                cfg.CreateMap<TKModels.SelectionSetting, SelectionSetting>();
+
                 cfg.CreateMap<User, TKModels.User>();
                 cfg.CreateMap<TKModels.User, User>();
             }).CreateMapper();
@@ -123,6 +126,24 @@ namespace TKProcessor.WPF.ViewModels
                         App.Current.Dispatcher.Invoke(() =>
                         {
                             ActiveItem.PayPackageMappings.Add(new Mapping() { Target = jobGradeBand, Source = "", Order = index++ });
+                        });
+                    }
+
+                    App.Current.Dispatcher.Invoke(() => { ActiveItem.ViewAndSort(); });
+
+                    index = 0;
+
+                    // load auto approve list
+                    foreach (var propInfo in typeof(TKModels.DailyTransactionRecord).GetProperties().Where(i => i.PropertyType == typeof(decimal) && i.Name.Contains("Approved")))
+                    {
+                        string name = propInfo.Name.Replace("Approved", "");
+
+                        if (ActiveItem.AutoApproveDTRFieldsList.Any(i => i.Name == name))
+                            continue;
+
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            ActiveItem.AutoApproveDTRFieldsList.Add(new SelectionSetting() { Name = name, IsSelected = true, DisplayOrder = index++ });
                         });
                     }
 
