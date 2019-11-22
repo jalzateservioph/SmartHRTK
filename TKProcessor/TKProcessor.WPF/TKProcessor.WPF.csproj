@@ -178,6 +178,7 @@
     <Compile Include="Models\EmployeeWorkSite.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\ExcelFileMap.cs" />
+    <Compile Include="Models\ExcelMappingModel.cs" />
     <Compile Include="Models\GlobalSettings.cs" />
     <Compile Include="Models\Mapping.cs" />
     <Compile Include="Models\PayrollCode.cs" />

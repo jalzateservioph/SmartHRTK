@@ -6,13 +6,14 @@ namespace TKProcessor.Models.TK
     public partial class RawData : Entity
     {
         public string BiometricsId { get; set; }
-        public int? TransactionType { get; set; }
-        public DateTime? TransactionDateTime { get; set; }
-        public DateTime? ScheduleDate { get; set; }
+        public int TransactionType { get; set; }
+        public DateTime TransactionDateTime { get; set; }
+        public DateTime ScheduleDate { get; set; }
     }
 
     public enum TransactionType
     {
+        None = 0,
         TimeIn = 1,
         TimeOut = 2,
         AMBreakIn = 3,

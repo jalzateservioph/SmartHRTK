@@ -126,7 +126,7 @@ namespace TKProcessor.Services
                 foreach (var employee in employees)
                 {
                     var rawdata = rawDataList.Where(i => i.ScheduleDate >= start &&
-                                                        i.ScheduleDate.Value.Date <= end &&
+                                                        i.ScheduleDate.Date <= end &&
                                                         string.Compare(i.BiometricsId ,employee.BiometricsId) == 0).ToList();
 
                     var existing = dtrRecords.Where(i => i.Employee == employee);
@@ -149,38 +149,38 @@ namespace TKProcessor.Services
                             var shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
 
                             var timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == scheduleDate.Date) &&
+                                                                        (i.ScheduleDate.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeIn);
 
                             var timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                                        (i.ScheduleDate.HasValue && i.ScheduleDate.Value.Date == scheduleDate.Date) &&
+                                                                        ( i.ScheduleDate.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.TimeOut);
 
                             var ambreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                                        (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                                        ( i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                                         i.TransactionType == (int)TransactionType.AMBreakIn);
 
                             var ambreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 ( i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.AMBreakOut);
 
                             var lunchin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 ( i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchIn);
                             var lunchout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 ( i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.LunchOut);
                             var pmbreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 ( i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakIn);
                             var pmbreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.PMBreakOut);
                             var dinnerin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerIn);
                             var dinnerout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId ,employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.HasValue && i.TransactionDateTime.Value.Date == scheduleDate.Date) &&
+                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
                                                  i.TransactionType == (int)TransactionType.DinnerOut);
 
                             DailyTransactionRecord DTR = new DailyTransactionRecord()
@@ -188,8 +188,8 @@ namespace TKProcessor.Services
                                 Employee = employee,
                                 TransactionDate = scheduleDate,
                                 Shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate)?.Shift,
-                                TimeIn = timein?.TransactionDateTime?.RemoveSeconds(),
-                                TimeOut = timeout?.TransactionDateTime?.RemoveSeconds(),
+                                TimeIn = timein?.TransactionDateTime.RemoveSeconds(),
+                                TimeOut = timeout?.TransactionDateTime.RemoveSeconds(),
                             };
 
                             if (DTR.Shift == null)
@@ -362,7 +362,7 @@ namespace TKProcessor.Services
                         throw new Exception($"Filtered employees have no records to process");
                 }
 
-                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Value.Date <= end &&
+                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
 
                 if (workschedules.Count == 0)
@@ -419,8 +419,8 @@ namespace TKProcessor.Services
 
                         hangingDTR = new DailyTransactionRecord(); //Reset hanging DTR
 
-                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
-                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType.Value == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
+                        IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
 
                         var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == dateIterator).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
 

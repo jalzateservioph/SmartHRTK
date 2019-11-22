@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <conv:RawDataTransactionTypeConverter x:Key="RawDataTransactionTypeConverter"/>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -19,15 +19,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Biometrics Raw Data" FontSize="20" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}" Margin="0,0,0,5"/>
-        
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1">
+        <Label Content="Biometrics Raw Data" FontSize="20" FontFamily="Segoe UI Semibold" Background="#FF8BDAF1" Margin="0"/>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,5,0,0">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="OpenCustomImport" Content="Import From Custom Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="DownloadTemplate" Content="Download Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
-        
+
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
         <TextBox Height="26" Margin="53,10,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"
                  Text="{Binding FilterString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
@@ -48,11 +49,103 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding BiometricsId}" Header="Biometrcis Id" Width="auto" />
+                <DataGridTextColumn Binding="{Binding BiometricsId}" Header="Biometrics Id" Width="auto" />
                 <DataGridTextColumn Binding="{Binding TransactionType, Converter={StaticResource RawDataTransactionTypeConverter}}" Header="Transaction Type" Width="auto" />
                 <DataGridTextColumn Binding="{Binding ScheduleDate, StringFormat=d}" Header="Schedule Date" Width="auto" />
                 <DataGridTextColumn Binding="{Binding TransactionDateTime}" Header="Date/Time" Width="auto" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
+            <Border BorderBrush="#FF767676" BorderThickness="1" Margin="50" Padding="0" IsEnabled="{Binding IsEnabled}">
+
+                <Grid Background="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
+                        <Label Content="Map Excel file to " FontFamily="Segoe UI Semibold" Background="{DynamicResource ModalTopBarBackground}"/>
+                    </Border>
+
+                    <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
+                            Background="{DynamicResource ModalCloseButtonBackground}" Foreground="White"/>
+
+                    <Grid Background="White" Grid.Row="1" Margin="5">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Choose file:"/>
+                            <Button x:Name="ChooseCustomFile" Content="{Binding ImportCustomFile}" Grid.Column="1" Background="#FFFDFDFD" BorderBrush="#FFCBCBCB" HorizontalContentAlignment="Left"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,5,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"/>
+                                <ColumnDefinition Width="6*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="Mapping Options" FontSize="11" />
+                            <DataGrid Margin="0" Grid.Row="1" ItemsSource="{Binding ImportMapping}" AutoGenerateColumns="False"
+                                      CanUserReorderColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Target" Binding="{Binding Target}" Width="auto" MinWidth="75"/>
+                                    <DataGridTemplateColumn Header="Source" Width="auto" MinWidth="75">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.SourceValues, ElementName=baseControl}" SelectedItem="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Replacement Values" Binding="{Binding ReplacementValues, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Label Content="Data View" FontSize="11" Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" />
+
+                            <TabControl Margin="5,0,0,0" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+                                <TabItem Header="Input">
+                                    <DataGrid ItemsSource="{Binding InputData}"/>
+                                </TabItem>
+                                <TabItem Header="Output">
+                                    <DataGrid  CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding OutputData}" AutoGenerateColumns="False" IsReadOnly="True" Background="#FFF3F3F3">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding BiometricsId}" Header="Biometrics Id" Width="auto" />
+                                            <DataGridTextColumn Binding="{Binding TransactionType, Converter={StaticResource RawDataTransactionTypeConverter}}" Header="Transaction Type" Width="auto" />
+                                            <DataGridTextColumn Binding="{Binding ScheduleDate, StringFormat=d}" Header="Schedule Date" Width="auto" />
+                                            <DataGridTextColumn Binding="{Binding TransactionDateTime}" Header="Date/Time" Width="auto" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </TabItem>
+                            </TabControl>
+
+                            <Button x:Name="MapValues" Content="Map Values" Grid.Row="2" Grid.Column="0" Margin="0" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+
+                            <Button x:Name="ImportCustom" Content="Import Mapped Data" Grid.Row="2"  Grid.Column="1" Margin="5,0,0,0" Padding="20,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+                            
+                        </Grid>
+
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+        </Grid>
+
     </Grid>
 </UserControl>

@@ -298,6 +298,10 @@
     <Compile Include="Migrations\20191121012622_GlobalSettingsAddedAndRemovedFields1.designer.cs">
       <DependentUpon>20191121012622_GlobalSettingsAddedAndRemovedFields1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191122071059_RawDataUpdateFromNullableToNotNullable.cs" />
+    <Compile Include="Migrations\20191122071059_RawDataUpdateFromNullableToNotNullable.designer.cs">
+      <DependentUpon>20191122071059_RawDataUpdateFromNullableToNotNullable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />

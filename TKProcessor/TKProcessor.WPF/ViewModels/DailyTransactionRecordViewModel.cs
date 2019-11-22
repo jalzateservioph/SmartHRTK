@@ -122,6 +122,46 @@ namespace TKProcessor.WPF.ViewModels
                     SelectedEmployeesView = CollectionViewSource.GetDefaultView(SelectedEmployees);
 
                     SelectedEmployeesView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
+
+                    EmployeeListView.Filter += (o) =>
+                    {
+                        Employee emp = (Employee)o;
+
+                        if (SelectedEmployees.Cast<Employee>().Any(i => i.Id == emp.Id))
+                            return false;
+
+                        if (string.IsNullOrEmpty(EmployeeListViewSearch))
+                            return true;
+
+                        if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                            return true;
+
+                        if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                            return true;
+
+                        return false;
+                    };
+
+                    SelectedEmployeesView.Filter += (o) =>
+                    {
+                        Employee emp = (Employee)o;
+
+                        if (EmployeeListView.Cast<Employee>().Any(i => i.Id == emp.Id))
+                            return false;
+
+                        if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
+                            return true;
+
+                        if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                            return true;
+
+                        if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                            return true;
+
+                        return false;
+                    };
+
+                    SelectedEmployeesView.Refresh();
                 });
 
                 RaiseMessage("Filters loaded");
@@ -278,7 +318,7 @@ namespace TKProcessor.WPF.ViewModels
                         Populate();
 
                         var data = dtrService.GetExportExcelData(
-                            StartDate, EndDate, (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes), 
+                            StartDate, EndDate, (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
                             (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i))
                         );
 
@@ -317,47 +357,16 @@ namespace TKProcessor.WPF.ViewModels
 
         public void FilterEmployeeFilter()
         {
-            EmployeeListView.Filter += (o) =>
+            try
             {
-                Employee emp = (Employee)o;
+                EmployeeListView.Refresh();
 
-                if (SelectedEmployees.Cast<Employee>().Any(i => i.Id == emp.Id))
-                    return false;
-
-                if (string.IsNullOrEmpty(EmployeeListViewSearch))
-                    return true;
-
-                if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                    return true;
-
-                if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                    return true;
-
-                return false;
-            };
-
-            EmployeeListView.Refresh();
-
-            SelectedEmployeesView.Filter += (o) =>
+                SelectedEmployeesView.Refresh();
+            }
+            catch
             {
-                Employee emp = (Employee)o;
 
-                if (EmployeeListView.Cast<Employee>().Any(i => i.Id == emp.Id))
-                    return false;
-
-                if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
-                    return true;
-
-                if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                    return true;
-
-                if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                    return true;
-
-                return false;
-            };
-
-            SelectedEmployeesView.Refresh();
+            }
         }
 
         public void InvokeEmployeeFilter(KeyEventArgs e)

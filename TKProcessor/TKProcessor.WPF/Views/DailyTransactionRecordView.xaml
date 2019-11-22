@@ -37,7 +37,7 @@
             <Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
-        <Grid Margin="0,5,0,0" Grid.Row="2" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled}">
+        <Grid x:Name="gridFilters" Margin="0,5,0,0" Grid.Row="2" IsEnabled="{Binding IsEnabled}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -82,7 +82,7 @@
 
             <!--row 3-->
             <Label Grid.Column="0" Grid.Row="2" Content="Employees:" Margin="0,0,0,0"/>
-            <Button x:Name="StartEditing" Grid.Column="1" Grid.Row="2" Foreground="Black" Grid.ColumnSpan="7"
+            <Button x:Name="StartEditing" Grid.Column="1" Grid.Row="2" Foreground="Black" Grid.ColumnSpan="99" MaxWidth="{Binding ActualWidth, ElementName=gridFilters}"
                     Background="{x:Null}" BorderBrush="#FFB6B6B6" HorizontalContentAlignment="Left" Padding="5,1">
                 <Border>
                     <TextBlock IsEnabled="{Binding IsEnabled}">
@@ -920,7 +920,8 @@
         </DataGrid>
 
         <!--<Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="Hidden"  Margin="0,0,0,0">-->
-        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0">
+        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0"
+              IsEnabled="{Binding IsEnabled}">
             <Border BorderBrush="#FF767676" BorderThickness="1" Margin="100" Padding="0">
 
                 <Grid Background="White">
@@ -954,7 +955,7 @@
                         <TextBox Height="23" Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Text="{Binding EmployeeListViewSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                  Margin="0,0,5,0" VerticalContentAlignment="Center" cal:Message.Attach="[Event PreviewKeyDown] = [Action InvokeEmployeeFilter($eventArgs)]"/>
 
-                        <DataGrid x:Name="FilterEmployeeList" Grid.Row="2" Grid.Column="0" Margin="0,5,5,0" AutoGenerateColumns="False" 
+                        <DataGrid x:Name="FilterEmployeeList" Grid.Row="2" Grid.Column="0" Margin="0,5,5,0" AutoGenerateColumns="False" SelectionMode="Extended"
                                   ItemsSource="{Binding EmployeeListView}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Width="*">
