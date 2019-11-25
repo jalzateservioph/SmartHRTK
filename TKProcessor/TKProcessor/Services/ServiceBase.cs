@@ -97,6 +97,8 @@ namespace TKProcessor.Services
         {
             var existing = Context.Set<T>().Find(entity.Id);
 
+            CurrentUser = Context.User.Find(CurrentUser.Id);
+
             if (existing == default(T))
             {
                 entity.IsActive = true;

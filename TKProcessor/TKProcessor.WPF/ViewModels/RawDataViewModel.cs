@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
+using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Events;
 using TKProcessor.WPF.Models;
 using TK = TKProcessor.Models.TK;
@@ -37,7 +38,7 @@ namespace TKProcessor.WPF.ViewModels
         {
             PropertyChanged += RawDataViewModel_PropertyChanged;
 
-            service = new RawDataService();
+            service = new RawDataService(Session.Default.CurrentUser.Id);
 
             mapper = new MapperConfiguration(cfg =>
             {

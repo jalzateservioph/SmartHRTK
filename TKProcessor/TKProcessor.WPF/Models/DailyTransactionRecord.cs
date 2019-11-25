@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Caliburn.Micro;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -99,6 +100,11 @@ namespace TKProcessor.WPF.Models
 
                 IsDirty = true;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Employee} - {TransactionDate.Value.ToShortDateString()}";
         }
 
         public Employee Employee { get; set; }
@@ -719,5 +725,46 @@ namespace TKProcessor.WPF.Models
         }
         public string Remarks { get; set; }
         public string LeaveType { get; set; }
+    }
+
+    public class DTRAdjustmentModel : PropertyChangedBase
+    {
+        private Shift shift;
+        private DateTime? timeIn;
+        private DateTime? timeOut;
+
+
+        public Employee Employee { get; set; }
+        public DateTime TransactionDate { get; set; }
+
+        public Shift Shift
+        {
+            get => shift;
+            set
+            {
+                shift = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public DateTime? TimeIn
+        {
+            get => timeIn;
+            set
+            {
+                timeIn = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public DateTime? TimeOut
+        {
+            get => timeOut;
+            set
+            {
+                timeOut = value;
+                NotifyOfPropertyChange();
+            }
+        }
     }
 }

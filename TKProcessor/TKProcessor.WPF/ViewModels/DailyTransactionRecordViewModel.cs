@@ -26,8 +26,8 @@ namespace TKProcessor.WPF.ViewModels
         readonly IMapper mapper;
         readonly DailyTransactionRecordService dtrService;
         readonly EmployeeService employeeService;
-        readonly JobGradeBandService payCodeService;
         readonly SaveFileDialog saveDiag;
+        readonly ShiftService shiftService;
 
         private DateTime _startDate;
         private DateTime _endDate;
@@ -40,6 +40,9 @@ namespace TKProcessor.WPF.ViewModels
         private ObservableCollection<Employee> employeesList;
         private ICollectionView selectedEmployeesView;
         private ObservableCollection<Employee> selectedEmployees;
+        private bool isFilteringEmployees;
+        private DTRAdjustmentModel currentItem;
+        private ObservableCollection<Shift> shifts;
 
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -47,7 +50,7 @@ namespace TKProcessor.WPF.ViewModels
 
             employeeService = new EmployeeService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
-            payCodeService = new JobGradeBandService();
+            shiftService = new ShiftService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
             mapper = new MapperConfiguration(cfg =>
             {
@@ -65,7 +68,12 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<TK.WorkSite, WorkSite>();
 
                 cfg.CreateMap<Shift, TK.Shift>();
-                cfg.CreateMap<TK.Shift, Shift>();
+                cfg.CreateMap<TK.Shift, Shift>().AfterMap((entity, model) =>
+                {
+                    model.IsDirty = true;
+                    model.IsSelected = false;
+                    model.IsValid = true;
+                });
 
                 cfg.CreateMap<User, TK.User>();
                 cfg.CreateMap<TK.User, User>();
@@ -78,12 +86,12 @@ namespace TKProcessor.WPF.ViewModels
 
             PropertyChanged += DailyTransactionRecordViewModel_PropertyChanged;
 
-            InitializeFilters();
+            InitializeCollections();
 
             AutoFilter = false;
         }
 
-        private void InitializeFilters()
+        private void InitializeCollections()
         {
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
@@ -162,6 +170,8 @@ namespace TKProcessor.WPF.ViewModels
                     };
 
                     SelectedEmployeesView.Refresh();
+
+                    EmployeeShiftList = new ObservableCollection<Shift>(shiftService.List().Where(i => i.IsActive).Select(i => mapper.Map<Shift>(i)));
                 });
 
                 RaiseMessage("Filters loaded");
@@ -239,6 +249,58 @@ namespace TKProcessor.WPF.ViewModels
 
                 EndProcessing();
             });
+        }
+
+        public void EditItem(DailyTransactionRecord dtr)
+        {
+            if (dtr == null)
+                return;
+
+            CurrentItem = new DTRAdjustmentModel()
+            {
+                Employee = dtr.Employee,
+                TransactionDate = dtr.TransactionDate.Value,
+                Shift = shifts.FirstOrDefault(i => i.Id == dtr.Shift.Id),
+                TimeIn = dtr.TimeIn,
+                TimeOut = dtr.TimeOut
+            };
+
+            StartEditing();
+        }
+
+        public override void StartEditing()
+        {
+            IsFilteringEmployees = false;
+
+            base.StartEditing();
+        }
+
+        public void SaveAdjustment()
+        {
+            try
+            {
+                if (currentItem.TimeIn == null)
+                    throw new Exception("Time in cannot be empty");
+
+                if (currentItem.TimeOut == null)
+                    throw new Exception("Time out cannot be empty");
+
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing adjustment...", 0));
+
+                dtrService.Adjust(
+                    mapper.Map<TK.Employee>(currentItem.Employee),
+                    currentItem.TransactionDate,
+                    mapper.Map<TK.Shift>(currentItem.Shift),
+                    currentItem.TimeIn,
+                    currentItem.TimeOut
+                );
+
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Adjustmnet complete"));
+            }
+            catch (Exception ex)
+            {
+                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+            }
         }
 
         public void Process()
@@ -338,7 +400,16 @@ namespace TKProcessor.WPF.ViewModels
 
         public void OpenEmployeeSelector()
         {
-            StartEditing();
+            EndEditing();
+
+            IsFilteringEmployees = true;
+        }
+
+        public void CloseEmployeeSelector()
+        {
+            EndEditing();
+
+            IsFilteringEmployees = false;
         }
 
         public void AddSelectedEmployees(Employee source)
@@ -398,6 +469,16 @@ namespace TKProcessor.WPF.ViewModels
                 return true;
 
             return false;
+        }
+
+        public DTRAdjustmentModel CurrentItem
+        {
+            get => currentItem;
+            set
+            {
+                currentItem = value;
+                NotifyOfPropertyChange();
+            }
         }
 
         public DateTime StartDate
@@ -498,6 +579,26 @@ namespace TKProcessor.WPF.ViewModels
             set
             {
                 selectedEmployeesView = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public bool IsFilteringEmployees
+        {
+            get => isFilteringEmployees;
+            set
+            {
+                isFilteringEmployees = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public ObservableCollection<Shift> EmployeeShiftList
+        {
+            get => shifts;
+            set
+            {
+                shifts = value;
                 NotifyOfPropertyChange();
             }
         }

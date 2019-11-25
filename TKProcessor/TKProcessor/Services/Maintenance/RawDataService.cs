@@ -15,7 +15,7 @@ namespace TKProcessor.Services.Maintenance
     {
         readonly string[] columns;
 
-        public RawDataService()
+        public RawDataService(Guid id) : base(id)
         {
             var exclude1 = typeof(IEntity).GetProperties().Select(i => i.Name);
             var exclude2 = typeof(IModel).GetProperties().Select(i => i.Name);

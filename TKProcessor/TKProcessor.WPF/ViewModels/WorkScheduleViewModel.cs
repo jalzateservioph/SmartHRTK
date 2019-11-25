@@ -230,6 +230,9 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Edit()
         {
+            if (ActiveItem == null)
+                return;
+
             CurrentItem = mapper.Map<WorkSchedule>(ActiveItem);
 
             CurrentItem.Employee = EmployeeList.FirstOrDefault(i => i.Id == ActiveItem.Employee.Id);

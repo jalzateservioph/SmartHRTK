@@ -116,6 +116,92 @@ namespace TKProcessor.WPF.ViewModels
         }
     }
 
+    public class ViewModel<T> : Conductor<T>.Collection.OneActive
+        where T : class, new()
+    {
+        protected readonly IEventAggregator eventAggregator;
+        protected readonly IWindowManager windowManager;
+
+        private bool isFormEnabled;
+
+        public ViewModel(IEventAggregator eventAggregator, IWindowManager windowManager)
+        {
+            this.eventAggregator = eventAggregator;
+            this.windowManager = windowManager;
+        }
+
+        public virtual void HandleError(Exception ex)
+        {
+            eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+        }
+
+        public virtual void RaiseGlobalMessage(string message, MessageType messageType = MessageType.Information, int duration = 3)
+        {
+            eventAggregator.PublishOnUIThread(new NewMessageEvent(message, messageType, duration));
+        }
+
+        public bool IsFormEnabled
+        {
+            get => isFormEnabled;
+            set
+            {
+                isFormEnabled = value;
+                NotifyOfPropertyChange();
+            }
+        }
+    }
+
+    public class DialogViewModelBase<T> : PropertyChangedBase
+    {
+        private readonly Dictionary<string, object> modalCollection;
+
+        private bool isModalShown;
+
+        private object activeModal;
+
+        public DialogViewModelBase()
+        {
+            modalCollection = new Dictionary<string, object>();
+        }
+
+        public void AddModal(string key, object modal)
+        {
+            modalCollection[key] = modal;
+        }
+
+        public virtual void ShowModal(string key)
+        {
+            ActiveModal = modalCollection[key];
+
+            IsModalShown = true;
+        }
+
+        public virtual void CloseModal()
+        {
+            IsModalShown = false;
+        }
+
+        public bool IsModalShown
+        {
+            get => isModalShown;
+            set
+            {
+                isModalShown = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public object ActiveModal
+        {
+            get => activeModal;
+            set
+            {
+                activeModal = value;
+                NotifyOfPropertyChange();
+            }
+        }
+    }
+
     public class EditableViewModelBase<T> : ViewModelBase<T>
         where T : class, new()
     {

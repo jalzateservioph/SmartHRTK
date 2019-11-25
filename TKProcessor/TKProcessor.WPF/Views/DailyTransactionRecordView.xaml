@@ -82,7 +82,7 @@
 
             <!--row 3-->
             <Label Grid.Column="0" Grid.Row="2" Content="Employees:" Margin="0,0,0,0"/>
-            <Button x:Name="StartEditing" Grid.Column="1" Grid.Row="2" Foreground="Black" Grid.ColumnSpan="99" MaxWidth="{Binding ActualWidth, ElementName=gridFilters}"
+            <Button x:Name="OpenEmployeeSelector" Grid.Column="1" Grid.Row="2" Foreground="Black" Grid.ColumnSpan="99" MaxWidth="{Binding ActualWidth, ElementName=gridFilters}"
                     Background="{x:Null}" BorderBrush="#FFB6B6B6" HorizontalContentAlignment="Left" Padding="5,1">
                 <Border>
                     <TextBlock IsEnabled="{Binding IsEnabled}">
@@ -110,9 +110,17 @@
                   ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Employee.EmployeeCode}" Header="Employee Code" Width="auto" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Employee Code" Width="auto" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
+                                <TextBlock Text="{Binding Employee}"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=d}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=D}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
@@ -919,8 +927,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!--<Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="Hidden"  Margin="0,0,0,0">-->
-        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0"
+        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsFilteringEmployees, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0"
               IsEnabled="{Binding IsEnabled}">
             <Border BorderBrush="#FF767676" BorderThickness="1" Margin="100" Padding="0">
 
@@ -935,7 +942,7 @@
                         <Label Content="Select Employees" FontFamily="Segoe UI Semibold" Background="#FFE0E0E0"/>
                     </Border>
 
-                    <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
+                    <Button x:Name="CloseEmployeeSelector" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
                             Background="#FFC94D4D" Foreground="White"/>
 
                     <Grid Margin="5" Grid.Row="1" >
@@ -996,6 +1003,62 @@
                         </DataGrid>
 
                     </Grid>
+                </Grid>
+
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0"
+              IsEnabled="{Binding IsEnabled}">
+            <Border BorderBrush="#FF767676" BorderThickness="1" Padding="0" Width="400" Height="200">
+
+                <Grid Background="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
+                        <Label FontFamily="Segoe UI Semibold" Background="#FFE0E0E0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Editing "/>
+                                <TextBlock Text="{Binding CurrentItem}"/>
+                            </StackPanel>
+                        </Label>
+                    </Border>
+
+                    <Button x:Name="EndEditing" Content="X" Margin="0,0,2,0" HorizontalAlignment="Right" Width="20" Height="20" 
+                            Background="#FFC94D4D" Foreground="White"/>
+
+                    <Grid Margin="5" Grid.Row="1" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Shift" Grid.Column="0" HorizontalAlignment="Left" Margin="0" Grid.Row="0" VerticalAlignment="Top"/>
+                        <ComboBox Grid.Column="1" Height="23" Margin="0" Grid.Row="0" VerticalAlignment="Center" ItemsSource="{Binding EmployeeShiftList}"
+                                  SelectedItem="{Binding CurrentItem.Shift}"/>
+
+                        <Label Content="Time In" Grid.Column="0" HorizontalAlignment="Left" Margin="0" Grid.Row="1" VerticalAlignment="Top"/>
+                        <xctk:TimePicker Grid.Column="1" Height="23" Margin="0" Grid.Row="1" VerticalAlignment="Center" Value="{Binding CurrentItem.TimeIn}"/>
+
+
+                        <Label Content="Time Out" Grid.Column="0" HorizontalAlignment="Left" Margin="0" Grid.Row="2" VerticalAlignment="Top"/>
+                        <xctk:TimePicker Grid.Column="1" Height="23" Margin="0" Grid.Row="2" VerticalAlignment="Center" Value="{Binding CurrentItem.TimeOut}"/>
+
+
+                    </Grid>
+
+                    <Button x:Name="SaveAdjustment" Grid.Row="2" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+
                 </Grid>
 
             </Border>

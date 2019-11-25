@@ -49,9 +49,9 @@ namespace TKProcessor.Services.Maintenance
         {
             var existing = Context.WorkSchedule.Find(entity.Id);
 
-            if(existing == null)
+            if (existing == null)
             {
-                existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id && 
+                existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id &&
                                                                     i.ScheduleDate == entity.ScheduleDate);
             }
 
@@ -77,22 +77,11 @@ namespace TKProcessor.Services.Maintenance
 
                 CreateAuditLog(entity, existing);
 
-                if (existing.ScheduleDate != entity.ScheduleDate)
-                {
-                    existing.ScheduleDate = entity.ScheduleDate;
-                }
-                if (existing.Shift.Id != entity.Shift.Id)
-                {
-                    existing.Shift = entity.Shift;
+                existing.Employee = Context.Employee.First(i => i.Id == entity.Employee.Id);
 
-                    Context.Entry(existing.Shift).State = EntityState.Unchanged;
-                }
-                if (existing.Employee.Id != entity.Employee.Id)
-                {
-                    existing.Employee = entity.Employee;
+                existing.ScheduleDate = entity.ScheduleDate;
 
-                    Context.Entry(existing.Employee).State = EntityState.Unchanged;
-                }
+                existing.Shift = Context.Shift.First(i => i.Id == entity.Shift.Id);
             }
 
             if (AutoSaveChanges)
