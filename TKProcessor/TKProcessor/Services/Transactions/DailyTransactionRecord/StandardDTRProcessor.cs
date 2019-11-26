@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TKProcessor.Common;
 using TKProcessor.Models.TK;
-
+using System.Linq;
 namespace TKProcessor.Services
 {
     public class StandardDTRProcessor : DTRProcessorBase, IDTRProcessor
@@ -159,7 +159,7 @@ namespace TKProcessor.Services
             }
             else
             {
-                if (!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false)
+                if ((!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false) &&  (Holidays == null || Holidays.Count() == 0))
                 {
                     absentHours = requiredWorkHours * 60;
 

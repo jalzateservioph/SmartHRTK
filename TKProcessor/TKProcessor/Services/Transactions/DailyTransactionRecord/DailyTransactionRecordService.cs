@@ -206,13 +206,22 @@ namespace TKProcessor.Services
 
                             if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
                             {
-                                holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
-                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
+                                //holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
+                                holidays = holidayService.GetHolidays(DTR.TimeIn ?? scheduleDate);
+                                //leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode,DTR.TimeIn ?? scheduleDate);
+
                             }
                             else if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleOut)
                             {
-                                holidays = holidayService.GetHolidays(DTR.TimeOut ?? DTR.Shift.ScheduleOut.Value);
-                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
+                                DateTime date = scheduleDate;
+                                if(DTR.Shift?.ScheduleOut < DTR.Shift?.ScheduleIn)
+                                {
+                                    date = date.AddDays(1);
+                                }
+
+                                holidays = holidayService.GetHolidays(DTR.TimeOut ?? date);
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeOut ?? date);
                             }
 
                             bool isLegalHoliday = false;
@@ -239,7 +248,7 @@ namespace TKProcessor.Services
 
                             var requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
-                            if (timein == null && timeout == null)
+                            if (timein == null && timeout == null && (!shift.IsRestDay.HasValue || shift.IsRestDay.Value == false))
                             {
 
                                 if (holidays != null && holidays.Count() > 0)
