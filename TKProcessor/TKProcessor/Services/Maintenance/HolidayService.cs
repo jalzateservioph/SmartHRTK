@@ -14,9 +14,19 @@ namespace TKProcessor.Services.Maintenance
 {
     public class HolidayService : TKService<Holiday>, IExportTemplate
     {
-        readonly string[] columns;
+        string[] columns;
 
         public HolidayService() : base()
+        {
+            Initialize();
+        }
+
+        public HolidayService(Guid userId) : base(userId)
+        {
+            Initialize();
+        }
+
+        private void Initialize()
         {
             var exclude1 = typeof(IEntity).GetProperties().Select(i => i.Name);
             var exclude2 = typeof(IModel).GetProperties().Select(i => i.Name);
@@ -28,7 +38,6 @@ namespace TKProcessor.Services.Maintenance
 
         public IEnumerable<Holiday> GetHolidays(DateTime date)
         {
-
             var holidays = Context.Holiday.Where(i => i.Date == date.Date).Select(i => i);
 
             return holidays.AsEnumerable();

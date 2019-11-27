@@ -31,7 +31,7 @@ namespace TKProcessor.Common
                         {
                             foreach (IXLCell cell in row.Cells())
                             {
-                                dt.Columns.Add(cell.Value.ToString());
+                                dt.Columns.Add(cell.Value.ToString().Replace("/", " "));
                             }
 
                             firstRow = false;
@@ -66,6 +66,7 @@ namespace TKProcessor.Common
                     throw new Exception("There was a problem importing the file. Please verify the file's data and try again.");
             }
         }
+
         public static void Export(string filename, DataTable table)
         {
             table.TableName = "Sheet1";

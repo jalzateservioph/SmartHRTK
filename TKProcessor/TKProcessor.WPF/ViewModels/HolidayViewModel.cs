@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
+using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Events;
 using TKProcessor.WPF.Models;
 using TK = TKProcessor.Models.TK;
@@ -30,7 +31,7 @@ namespace TKProcessor.WPF.ViewModels
         {
             PropertyChanged += HolidayViewModel_PropertyChanged;
 
-            service = new HolidayService();
+            service = new HolidayService(Session.Default.CurrentUser.Id);
 
             mapper = new MapperConfiguration(cfg =>
             {
