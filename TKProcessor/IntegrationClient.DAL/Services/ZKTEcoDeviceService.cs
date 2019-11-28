@@ -1,6 +1,7 @@
 ﻿using IntegrationClient.DAL.Interfaces;
 using IntegrationClient.DAL.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,86 +14,106 @@ namespace IntegrationClient.DAL.Services
     {
         private IConfiguration _configuration;
         private ILoggingService _loggingService;
-        private CZKEMClass device;
+        private List<CZKEMClass> deviceList;
         private readonly int machineNumber = 1; //Not sure why this is 1 but this is what is set on the SDK.
 
         public ZKTEcoDeviceService(IConfiguration configuration, ILoggingService loggingService)
         {
             _configuration = configuration;
             _loggingService = loggingService;
-            device = new CZKEMClass();
+            deviceList = new List<CZKEMClass>();
         }
 
         public IEnumerable<RawData> GetRawData(DateTime? from, DateTime? to)
         {
-            ConnectToDevice();
-            //Disable the device
-            EnableDevice(false);
-            //Get records
+            ConnectToDevices();
             List<RawData> rawData = new List<RawData>();
-            _loggingService.Log("Reading raw data from device...", Enums.LogLevel.Info);
-            string sdwEnrollNumber = "";
-            int idwVerifyMode = 0;
-            int idwInOutMode = 0;
-            int idwYear = 0;
-            int idwMonth = 0;
-            int idwDay = 0;
-            int idwHour = 0;
-            int idwMinute = 0;
-            int idwSecond = 0;
-            int idwWorkcode = 0;
-
-            if (from.HasValue && to.HasValue) //Filter by date
+            foreach (var device in deviceList)
             {
-                if (device.ReadTimeGLogData(machineNumber, from.Value.ToString("yyyy-MM-dd HH:mm:ss"), to.Value.ToString("yyyy-MM-dd HH:mm:ss")))
-                {
-                    while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
-                    {
-                        RawData raw = new RawData()
-                        {
-                            EmployeeBiometricsID = sdwEnrollNumber,
-                            TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
-                        };
+                EnableDevice(device,false);
 
-                        rawData.Add(raw);
+                _loggingService.Log("Reading raw data from device...", Enums.LogLevel.Info);
+                string sdwEnrollNumber = "";
+                int idwVerifyMode = 0;
+                int idwInOutMode = 0;
+                int idwYear = 0;
+                int idwMonth = 0;
+                int idwDay = 0;
+                int idwHour = 0;
+                int idwMinute = 0;
+                int idwSecond = 0;
+                int idwWorkcode = 0;
+
+                EnableDevice(device, true);
+
+
+                if (from.HasValue && to.HasValue) //Filter by date
+                {
+                    if (device.ReadTimeGLogData(machineNumber, from.Value.ToString("yyyy-MM-dd HH:mm:ss"), to.Value.ToString("yyyy-MM-dd HH:mm:ss")))
+                    {
+                        while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
+                        {
+                            RawData raw = new RawData()
+                            {
+                                EmployeeBiometricsID = sdwEnrollNumber,
+                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
+                            };
+
+                            rawData.Add(raw);
+                        }
+                    }
+                }
+                else
+                {
+                    if (device.ReadGeneralLogData(machineNumber))
+                    {
+
+
+                        while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
+                        {
+                            RawData raw = new RawData()
+                            {
+                                EmployeeBiometricsID = sdwEnrollNumber,
+                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
+                                //Map Transaction Type
+                            };
+
+                            rawData.Add(raw);
+                        }
                     }
                 }
             }
-            else
-            {
-                if (device.ReadGeneralLogData(machineNumber))
-                {
-
-
-                    while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
-                    {
-                        RawData raw = new RawData()
-                        {
-                            EmployeeBiometricsID = sdwEnrollNumber,
-                            TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
-                        };
-
-                        rawData.Add(raw);
-                    }
-                }
-            }
-            
-            
-            //Enable the device
-            EnableDevice(true);
-            DisconnectFromDevice();
+            DisconnectFromDevices();
             return rawData;        
         }
 
         public void EnrollUsers(IEnumerable<Employee> employees) 
         {
-            if (employees != null)
+            _loggingService.Log($"Employees count from TK: {employees.Count()}", Enums.LogLevel.Info);
+            ConnectToDevices();
+            foreach (var device in deviceList)
             {
-                _loggingService.Log($"Employees count: {employees.Count()}", Enums.LogLevel.Info);
-                foreach (var employee in employees)
+                IList<Employee> empList = (IList<Employee>)employees;
+                EnableDevice(device, false);
+                device.ReadAllUserID(machineNumber);
+
+                string sEnrollNumber = "";
+                string sName = "";
+                string sPassword = "";
+                int iPrivilege = 0;
+                bool bEnabled = false;
+
+                while (device.SSR_GetAllUserInfo(machineNumber, out sEnrollNumber, out sName, out sPassword, out iPrivilege, out bEnabled))
                 {
-                    ConnectToDevice();
-                    EnableDevice(false);
+                    int index = empList.Select(e => e.BiometricsId).ToList().IndexOf(sEnrollNumber); // enrollNumber matches any from empList, returns -1 if not found in list
+                    if (index >= 0)
+                    {
+                        empList.RemoveAt(index);
+                    }
+                }
+
+                foreach (var employee in empList)
+                {
                     device.SetStrCardNumber("");
                     if (device.SSR_SetUserInfo(machineNumber, employee.BiometricsId, employee.EmployeeName, "123", 0, true))
                     {
@@ -102,73 +123,59 @@ namespace IntegrationClient.DAL.Services
                     {
                         _loggingService.Log($"Failed creating/updating user {employee.BiometricsId} - {employee.EmployeeName}", Enums.LogLevel.Warn);
                     }
-                    EnableDevice(true);
                 }
 
-                DisconnectFromDevice();
+                EnableDevice(device, true);
             }
-
+            DisconnectFromDevices();
         }
 
-        private void ConnectToDevice()
+        private void ConnectToDevices()
         {
-            string config = _configuration.GetConnectionString("ZKTEcoDevice");
+            IEnumerable<DeviceConnectionString> conStringList = _configuration.GetSection("ZKTEcoDevice").Get<DeviceConnectionString[]>();
 
-            string[] _config = config.Split(';');
-            bool invalid = false;
-            string IP = "";
-            int port = 0;
-            int commKey = 0;
-
-            if (_config.Length != 3)
+            foreach(var conString in conStringList)
             {
-                invalid = true;
-            }
-            else
-            {
-                IP = _config[0];
+                CZKEMClass device = new CZKEMClass();
+                device.SetCommPassword(int.Parse(conString.CommKey));
 
-                if (!int.TryParse(_config[1], out port))
+                _loggingService.Log($"Connecting to Device {conString.Name}...", Enums.LogLevel.Info);
+                if (device.Connect_Net(conString.IP, int.Parse(conString.Port)))
                 {
-                    invalid = true;
+                    _loggingService.Log($"Connection to {conString.Name} successful", Enums.LogLevel.Info);
+                    deviceList.Add(device);
                 }
-                if (!int.TryParse(_config[2], out commKey))
+                else
                 {
-                    invalid = true;
+                    _loggingService.Log($"Connection to {conString.Name} failed", Enums.LogLevel.Fatal);
+                    throw new Exception($"Connection to {conString.Name} failed");
                 }
-            }
 
-
-            if (invalid)
-            {
-                _loggingService.Log("Invalid device connection string", Enums.LogLevel.Fatal);
-                throw new Exception("Invalid device connection string");
-            }
-            device.SetCommPassword(commKey);
-
-
-            _loggingService.Log("Connecting to Device...", Enums.LogLevel.Info);
-            if (device.Connect_Net(IP, port))
-            { 
-                _loggingService.Log("Connection successful", Enums.LogLevel.Info);
-            }
-            else
-            {
-                _loggingService.Log("Connection failed", Enums.LogLevel.Fatal);
-                throw new Exception("Connection to device failed");
             }
         }
 
-        private void DisconnectFromDevice()
+        private void DisconnectFromDevices()
         {
-            device.Disconnect();
+            foreach(var device in deviceList)
+            {
+                device.Disconnect();
+            }
         }
 
 
-        private void EnableDevice(bool enable)
+        private void EnableDevice(CZKEMClass device, bool enable)
         {
             device.EnableDevice(machineNumber, enable);
         }
 
+
+
+        class DeviceConnectionString
+        {
+            public string Name { get; set; }
+            public string IP { get; set; }
+            public string Port { get; set; }
+            public string CommKey { get; set; }
+        }
     }
 }
