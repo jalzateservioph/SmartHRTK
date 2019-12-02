@@ -6,11 +6,21 @@ using System.Threading.Tasks;
 using TKProcessor.Models.TK;
 using System.Security.Cryptography;
 using System.Configuration;
+using TKProcessor.Contexts;
 
 namespace TKProcessor.Services.Maintenance
 {
     public class UserService : TKService<User>
     {
+        public UserService() : base()
+        {
+
+        }
+        public UserService(TKContext context) : base(context)
+        {
+
+        }
+
         public bool TryLogin(string username, string password, out User user)
         {
             try

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
-
+using BiometricsIntegrationWebAPI.Helpers;
 namespace BiometricsIntegrationWebAPI
 {
     public class Startup
@@ -36,6 +36,9 @@ namespace BiometricsIntegrationWebAPI
             services.AddScoped<EmployeeService, EmployeeService>();
             services.AddScoped<WorkSiteService, WorkSiteService>();
             services.AddScoped<RawDataService, RawDataService>();
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +65,10 @@ namespace BiometricsIntegrationWebAPI
                 endpoints.MapControllers();
             });
 
+            if (!TKAuthHelper.LoginUser(Configuration.GetSection("TKAuth")["username"], Configuration.GetSection("TKAuth")["password"], app.ApplicationServices.GetService<TKProcessor.Contexts.TKContext>()))
+            {
+                throw new System.Exception("Invalid TK credentials");
+            }
             //UpdateDatabase<ApplicationContext>(app);
         }
         

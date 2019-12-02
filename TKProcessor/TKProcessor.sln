@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiometricsIntegrationWebAPI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient", "IntegrationClient\IntegrationClient.csproj", "{E0076BD2-21DF-4335-B2B5-1ADDBF4856B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationClient.DAL", "IntegrationClient.DAL\IntegrationClient.DAL.csproj", "{46662883-F791-42D8-97ED-90BB98371753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient.DAL", "IntegrationClient.DAL\IntegrationClient.DAL.csproj", "{46662883-F791-42D8-97ED-90BB98371753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

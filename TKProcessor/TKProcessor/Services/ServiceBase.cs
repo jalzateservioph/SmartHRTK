@@ -54,6 +54,16 @@ namespace TKProcessor.Services
             logs = new List<AuditLog>();
         }
 
+        public TKService(TKContext context)
+        {
+            AutoSaveChanges = true;
+            UseDefaultUser = true;
+
+            this.Context = context;
+
+            logs = new List<AuditLog>();
+        }
+
         public TKService(Guid userId) : this()
         {
             CurrentUser = Context.User.First(i => i.Id == userId);

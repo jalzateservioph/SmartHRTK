@@ -14,6 +14,7 @@ namespace TKProcessor.Services.Maintenance
     public class RawDataService : TKService<RawData>, IExportTemplate
     {
         readonly string[] columns;
+        private WorkScheduleService workScheduleService;
 
         public RawDataService(Guid id) : base(id)
         {
@@ -23,6 +24,7 @@ namespace TKProcessor.Services.Maintenance
             var include = shift.Where(s => !exclude1.Any(e => e == s) && !exclude2.Any(e => e == s));
 
             columns = include.ToArray();
+            workScheduleService = new WorkScheduleService(id);
         }
 
         public void ExportTemplate(string filename)
@@ -39,6 +41,7 @@ namespace TKProcessor.Services.Maintenance
             if (existing != default(RawData))
                 entity.Id = existing.Id;
 
+            entity = SetScheduleDate(entity);
             base.Save(entity);
         }
 
@@ -107,6 +110,60 @@ namespace TKProcessor.Services.Maintenance
 
                 throw ex;
             }
+        }
+
+        public RawData SetScheduleDate(RawData rawData)
+        {
+            rawData.ScheduleDate = rawData.TransactionDateTime.Date; //by default
+            if (rawData.TransactionType == (int) TransactionType.TimeIn)
+            {
+                WorkSchedule ws = workScheduleService.List().Where(e => e.Employee.BiometricsId == rawData.BiometricsId && e.ScheduleDate == rawData.TransactionDateTime.Date.AddDays(-1)).FirstOrDefault();
+
+                if (ws != null)
+                {
+                    if (ws.Shift.ScheduleIn.HasValue && ws.Shift.ScheduleOut.HasValue)
+                    {
+                        if (ws.Shift.ScheduleOut.Value < ws.Shift.ScheduleIn.Value) //splittable
+                        {
+                            DateTime actualScheduleOut = new DateTime(rawData.TransactionDateTime.Year, rawData.TransactionDateTime.Month, rawData.TransactionDateTime.Day).Add(ws.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
+
+                            if (actualScheduleOut > rawData.TransactionDateTime) 
+                            {
+                                rawData.ScheduleDate = rawData.TransactionDateTime.Date.AddDays(-1);
+                            } 
+                        }
+                    }
+                }
+            }
+            else if (rawData.TransactionType == (int) TransactionType.TimeOut) 
+            {
+                WorkSchedule ws_t = workScheduleService.List().Where(e => e.Employee.BiometricsId == rawData.BiometricsId && e.ScheduleDate == rawData.TransactionDateTime.Date).FirstOrDefault();
+
+                if (ws_t != null)
+                {
+                    if (ws_t.Shift.ScheduleIn.HasValue && ws_t.Shift.ScheduleOut.HasValue) //Splittable
+                    {
+                        DateTime actualScheduleIn = new DateTime(rawData.TransactionDateTime.Year, rawData.TransactionDateTime.Month, rawData.TransactionDateTime.Day).Add(ws_t.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
+                        
+                        if (actualScheduleIn > rawData.TransactionDateTime)
+                        {
+                            WorkSchedule ws = workScheduleService.List().Where(e => e.Employee.BiometricsId == rawData.BiometricsId && e.ScheduleDate == rawData.TransactionDateTime.Date.AddDays(-1)).FirstOrDefault();
+                            if (ws != null)
+                            {
+                                if (ws.Shift.ScheduleIn.HasValue && ws.Shift.ScheduleOut.HasValue)
+                                {
+                                    if (ws.Shift.ScheduleOut.Value < ws.Shift.ScheduleIn.Value) //splittable
+                                    {
+                                        rawData.ScheduleDate = rawData.TransactionDateTime.Date.AddDays(-1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return rawData;
         }
     }
 }
