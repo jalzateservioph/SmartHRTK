@@ -19,7 +19,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Holiday Setup" FontSize="20" FontFamily="Segoe UI Semibold" Background="{DynamicResource HeaderBackground}"/>
+        <Label Content="Holiday Setup" FontSize="30" FontFamily="Segoe UI Light" Background="{DynamicResource HeaderBackground}" Foreground="{DynamicResource OverlayBackground1}"/>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,5,0,0">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
