@@ -20,7 +20,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IntegrationClient.DAL\IntegrationClient.DAL.csproj" />
-    <ProjectReference Include="..\TKProcessor\TKProcessor.csproj" />
+    <ProjectReference Include="..\TKProcessor\TKProcessor.csproj">
+      <Private>true</Private>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

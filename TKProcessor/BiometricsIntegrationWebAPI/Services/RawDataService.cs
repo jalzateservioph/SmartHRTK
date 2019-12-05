@@ -1,32 +1,28 @@
-﻿using System;
+﻿using AutoMapper;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TKProcessor.Contexts;
 using Integration = IntegrationClient.DAL.Models;
-using Context = TKProcessor.Contexts;
 using TK = TKProcessor.Models.TK;
-using AutoMapper;
-
+using TKServices = TKProcessor.Services.Maintenance;
 namespace BiometricsIntegrationWebAPI.Services
 {
     public class RawDataService
     {
-        private readonly Context.TKContext context;
+        private readonly TKServices.RawDataService rawDataService;
         private readonly IMapper mapper;
 
-        public RawDataService(Context.TKContext context, IMapper mapper)
+        public RawDataService(TKContext context, IMapper mapper, TKAuthService authService)
         {
-            this.context = context;
             this.mapper = mapper;
+            rawDataService = new TKServices.RawDataService(authService.GetUser().Id, context);
         }
 
         public void PushRawData(IEnumerable<Integration.RawData> rawData)
         {
             foreach (var i in rawData)
             {
-                context.RawData.Add(mapper.Map<Integration.RawData, TK.RawData>(i));
+                rawDataService.Save(mapper.Map<Integration.RawData, TK.RawData>(i));
             }
-            context.SaveChanges();
         }
     }
 }

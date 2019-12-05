@@ -12,6 +12,8 @@ namespace TKProcessor.Services.Maintenance
 {
     public class UserService : TKService<User>
     {
+
+        private const string salt = "PNeAscT6iJcRna80tFwb60wUVQbHeOLpnTE4G0gilNKEjwW1gaztxOrDoWHKzOGe1wH3UzhkMZjv4uQ43xPNy2r85iai9cLdg5NnnbNnwpkfvbM37dNcAOYxu8DtFR6I";
         public UserService() : base()
         {
 
@@ -51,7 +53,6 @@ namespace TKProcessor.Services.Maintenance
 
         private string Hash(string input)
         {
-            string salt = ConfigurationManager.AppSettings["salt"];
             SHA256Managed hasher = new SHA256Managed();
             string saltedInput = String.Concat(input, salt);
 
