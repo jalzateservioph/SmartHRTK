@@ -57,8 +57,6 @@ namespace IntegrationClient.DAL.Services
                             {
                                 EmployeeBiometricsID = sdwEnrollNumber,
                                 TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
-
-                                //Map Transaction Type
                             };
 
                             rawData.Add(raw);

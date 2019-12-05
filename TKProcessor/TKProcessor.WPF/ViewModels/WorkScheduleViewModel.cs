@@ -55,6 +55,9 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<WorkSchedule, WorkSchedule>();
                 cfg.CreateMap<WorkSchedule, WorkSchedule>();
 
+                cfg.CreateMap<TK.WorkSite, WorkSite>();
+                cfg.CreateMap<WorkSite,TK.WorkSite>();
+
                 cfg.CreateMap<Employee, Employee>();
                 cfg.CreateMap<Employee, Employee>();
 

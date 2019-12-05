@@ -36,6 +36,8 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<TK.Employee, Employee>();
                 cfg.CreateMap<Employee, TK.Employee>();
 
+                cfg.CreateMap<Employee, TK.WorkSite>();
+
                 cfg.CreateMap<TK.Shift, Shift>();
 
                 cfg.CreateMap<TK.User, User>();

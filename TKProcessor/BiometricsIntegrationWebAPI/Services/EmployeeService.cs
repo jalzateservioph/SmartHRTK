@@ -4,24 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using TKProcessor.Contexts;
 using TKProcessor.Models.TK;
-using TKServices = TKProcessor.Services.Maintenance;
 namespace BiometricsIntegrationWebAPI.Services
 {
     public class EmployeeService
     {
-        private readonly TKServices.EmployeeService employeeService;
         private readonly TKContext context;
 
-        public EmployeeService(TKContext context, TKAuthService authService)
+        public EmployeeService(TKContext context)
         {
             this.context = context;
-            employeeService = new TKServices.EmployeeService(authService.GetUser().Id, context);
         }
 
         public IEnumerable<Employee> GetEmployees(Guid siteId)
         {
-            return employeeService.List().Where(e => e.EmployeeWorkSites.Any(s => s.WorkSiteId == siteId));
+            return context.Employee.Where(e => e.EmployeeWorkSites.Any( s => s.WorkSiteId == siteId));
+            //return context.Employee.ToList();
         }
     }
 }
-    

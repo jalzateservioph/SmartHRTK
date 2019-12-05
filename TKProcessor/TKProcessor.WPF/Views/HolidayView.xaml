@@ -83,7 +83,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
+        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2" d:IsHidden="True">
             <Border Width="500" Height="250" BorderBrush="#FF767676" BorderThickness="1" VerticalAlignment="Center">
 
                 <Grid Background="White">

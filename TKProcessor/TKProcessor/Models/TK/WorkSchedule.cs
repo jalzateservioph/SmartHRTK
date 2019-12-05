@@ -8,5 +8,6 @@ namespace TKProcessor.Models.TK
         public Employee Employee { get; set; }
         public DateTime ScheduleDate { get; set; }
         public Shift Shift { get; set; }
+        public WorkSite WorkSite { get; set; }
     }
 }

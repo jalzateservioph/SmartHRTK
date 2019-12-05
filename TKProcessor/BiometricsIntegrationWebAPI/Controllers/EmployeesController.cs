@@ -32,7 +32,6 @@ namespace BiometricsIntegrationWebAPI.Controllers
         {
             string siteId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var employees = new List<Integration.Employee>();
-            var q = service.GetEmployees(Guid.Parse(siteId));
             foreach (var e in service.GetEmployees(Guid.Parse(siteId)))
             {
                 employees.Add(mapper.Map<TK.Employee, Integration.Employee>(e));

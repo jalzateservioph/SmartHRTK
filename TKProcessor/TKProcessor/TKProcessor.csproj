@@ -302,6 +302,10 @@
     <Compile Include="Migrations\20191122071059_RawDataUpdateFromNullableToNotNullable.designer.cs">
       <DependentUpon>20191122071059_RawDataUpdateFromNullableToNotNullable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20191203022647_AddWorkSiteFieldsToWorkSched.cs" />
+    <Compile Include="Migrations\20191203022647_AddWorkSiteFieldsToWorkSched.designer.cs">
+      <DependentUpon>20191203022647_AddWorkSiteFieldsToWorkSched.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />

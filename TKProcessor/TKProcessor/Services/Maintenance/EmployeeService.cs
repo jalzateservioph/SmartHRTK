@@ -17,16 +17,9 @@ namespace TKProcessor.Services.Maintenance
 
         }
 
-        public EmployeeService(Guid userId, TKContext context) : base(userId, context)
-        {
-
-        }
-
-
         public override IEnumerable<Employee> List()
         {
-            //return base.List();
-            return Context.Employee.Include(emp => emp.EmployeeWorkSites).ToList(); //Need to include relationship before making it to a list
+            return base.List();
         }
 
         public override void Save(Employee entity)

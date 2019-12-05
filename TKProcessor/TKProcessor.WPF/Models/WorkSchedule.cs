@@ -40,7 +40,8 @@ namespace TKProcessor.WPF.Models
                 NotifyOfPropertyChange();
             }
         }
-
+        public WorkSite WorkSite { get; set; }
+         
         //Advanced Fields
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

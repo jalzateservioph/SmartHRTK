@@ -69,11 +69,6 @@ namespace TKProcessor.Services
             CurrentUser = Context.User.First(i => i.Id == userId);
         }
 
-        public TKService(Guid userId, TKContext context) : this(context)
-        {
-            CurrentUser = Context.User.First(i => i.Id == userId);
-        }
-
         public virtual void Delete(T entity)
         {
             var existing = Context.Set<T>().Find(entity.Id);
