@@ -6,8 +6,6 @@ namespace TKProcessor.Models.TK
 {
     public partial class DailyTransactionRecord : IEntity
     {
-        private DateTime? transactionDate;
-
         public DailyTransactionRecord()
         {
             Id = Guid.NewGuid();
@@ -31,7 +29,7 @@ namespace TKProcessor.Models.TK
 
         public Employee Employee { get; set; }
         public Shift Shift { get; set; }
-        public DateTime? TransactionDate { get => transactionDate; set => transactionDate = value?.Date; }
+        public DateTime? TransactionDate { get; set; }
         public DateTime? TimeIn { get; set; }
         public DateTime? TimeOut { get; set; }
         public decimal RegularWorkHours { get; set; }

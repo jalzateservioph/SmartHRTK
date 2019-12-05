@@ -12,8 +12,8 @@ namespace TKProcessor.Models.TK
 
         public string ShiftCode { get; set; }
         public string Description { get; set; }
-        public int? ShiftType { get; set; }
-        public int? FocusDate { get; set; }
+        public int? ShiftType { get; set; } = (int)TK.ShiftType.Standard;
+        public int? FocusDate { get; set; } = (int)TK.FocusDate.ScheduleIn;
         public DateTime? ScheduleIn { get; set; }
         public DateTime? ScheduleOut { get; set; }
         public decimal? RequiredWorkHours { get; set; }

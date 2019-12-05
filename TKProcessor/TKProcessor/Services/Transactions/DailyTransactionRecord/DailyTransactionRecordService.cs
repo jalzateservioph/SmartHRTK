@@ -15,6 +15,8 @@ namespace TKProcessor.Services
 {
     public class DailyTransactionRecordService : TKService<DailyTransactionRecord>
     {
+        System.Diagnostics.Stopwatch sw;
+
         private readonly DPContext dPContext;
 
         IDTRProcessor processor;
@@ -26,6 +28,13 @@ namespace TKProcessor.Services
             dPContext = new DPContext();
             holidayService = new HolidayService();
             leaveService = new LeaveService();
+
+            sw = new System.Diagnostics.Stopwatch();
+        }
+
+        private void WriteToConsole(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(sw.Elapsed + " >> " + message);
         }
 
         public IEnumerable<DailyTransactionRecord> List(DateTime start, DateTime end, IEnumerable<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null)
@@ -42,14 +51,14 @@ namespace TKProcessor.Services
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
 
-                var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
+                List<WorkSchedule> workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
                                             .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end)
                                             .ToList();
 
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
+                List<Employee> employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
 
                 if (employees.Count == 0)
                     throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
@@ -83,6 +92,27 @@ namespace TKProcessor.Services
         {
             try
             {
+                sw.Start();
+
+                WriteToConsole("Process start");
+
+                WorkSchedule empWorkSched = null;
+
+                Shift shift = null;
+
+                WorkSite worksite = null;
+
+                RawData timein = null,
+                        timeout = null,
+                        ambreakin = null,
+                        ambreakout = null,
+                        lunchin = null,
+                        lunchout = null,
+                        pmbreakin = null,
+                        pmbreakout = null,
+                        dinnerin = null,
+                        dinnerout = null;
+
                 iterationCallback?.Invoke($"Initializing...");
 
                 start = start.Date;
@@ -91,7 +121,7 @@ namespace TKProcessor.Services
                 if (start > end)
                     throw new Exception("Start date should not be greater than the end date");
 
-                var workschedules = Context.WorkSchedule.Include(i => i.Employee)
+                WorkSchedule[] workschedules = Context.WorkSchedule.Include(i => i.Employee)
                                                         .Include(i => i.Shift)
                                                         .Where(i => i.ScheduleDate.Date >= start && i.ScheduleDate.Date <= end && i.IsActive)
                                                         .ToArray();
@@ -99,7 +129,7 @@ namespace TKProcessor.Services
                 if (workschedules.Length == 0)
                     throw new Exception($"No work schedules were found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Select(i => i.Employee)
+                Employee[] employees = workschedules.Select(i => i.Employee)
                                              .Distinct()
                                              .ToArray();
 
@@ -119,28 +149,32 @@ namespace TKProcessor.Services
                         throw new Exception($"Filtered employees have no records to process");
                 }
 
-                var globalSettings = Context.GlobalSetting.Include(i => i.AutoApproveDTRFieldsList).FirstOrDefault();
+                GlobalSetting globalSettings = Context.GlobalSetting.Include(i => i.AutoApproveDTRFieldsList).FirstOrDefault();
 
-                var rawDataList = Context.RawData.ToArray();
+                RawData[] rawDataList = Context.RawData.ToArray();
 
-                var dtrRecords = Context.DailyTransactionRecord.Where(i => i.TransactionDate.Value.Date >= start && i.TransactionDate.Value.Date <= end);
+                IQueryable<DailyTransactionRecord> dtrRecords = Context.DailyTransactionRecord.Where(i => i.TransactionDate.Value.Date >= start && i.TransactionDate.Value.Date <= end);
 
-                foreach (var employee in employees)
+                for (int loopCounter = 0; loopCounter < employees.Length; loopCounter++)
                 {
-                    var rawdata = rawDataList.Where(i => i.ScheduleDate >= start &&
-                                                        i.ScheduleDate.Date <= end &&
-                                                        string.Compare(i.BiometricsId, employee.BiometricsId) == 0).ToList();
+                    WriteToConsole("Retrieving employee..");
 
-                    var existing = dtrRecords.Where(i => i.Employee == employee);
+                    var employee = employees[0];
+
+                    WriteToConsole("Retrieved employee");
+
+                    List<RawData> rawdata = rawDataList.Where(i => i.ScheduleDate >= start &&
+                                                                   i.ScheduleDate.Date <= end &&
+                                                                   string.Compare(i.BiometricsId, employee.BiometricsId) == 0).ToList();
+
+                    IQueryable<DailyTransactionRecord> existing = dtrRecords.Where(i => i.Employee == employee);
 
                     if (existing.Count() > 0)
                     {
                         Context.DailyTransactionRecord.RemoveRange(existing);
-
-                        Context.SaveChanges();
                     }
 
-                    var scheduleDate = start;
+                    DateTime scheduleDate = start;
 
                     while (scheduleDate <= end)
                     {
@@ -148,46 +182,46 @@ namespace TKProcessor.Services
                         {
                             iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
 
-                            var empWorkSched = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
+                            empWorkSched = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
 
-                            var shift = empWorkSched?.Shift;
+                            shift = empWorkSched?.Shift;
 
-                            var worksite = empWorkSched?.WorkSite;
+                            worksite = empWorkSched?.WorkSite;
 
-                            var timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                                        (i.ScheduleDate.Date == scheduleDate.Date) &&
-                                                                        i.TransactionType == (int)TransactionType.TimeIn);
+                            timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                       (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                       i.TransactionType == (int)TransactionType.TimeIn);
 
-                            var timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                                        (i.ScheduleDate.Date == scheduleDate.Date) &&
-                                                                        i.TransactionType == (int)TransactionType.TimeOut);
+                            timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                       (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                       i.TransactionType == (int)TransactionType.TimeOut);
 
-                            var ambreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                                        (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                                        i.TransactionType == (int)TransactionType.AMBreakIn);
+                            ambreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                                                i.TransactionType == (int)TransactionType.AMBreakIn);
 
-                            var ambreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.AMBreakOut);
+                            ambreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.AMBreakOut);
 
-                            var lunchin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.LunchIn);
-                            var lunchout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.LunchOut);
-                            var pmbreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.PMBreakIn);
-                            var pmbreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.PMBreakOut);
-                            var dinnerin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.DinnerIn);
-                            var dinnerout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
-                                                 i.TransactionType == (int)TransactionType.DinnerOut);
+                            lunchin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.LunchIn);
+                            lunchout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.LunchOut);
+                            pmbreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.PMBreakIn);
+                            pmbreakout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.PMBreakOut);
+                            dinnerin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                         (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                         i.TransactionType == (int)TransactionType.DinnerIn);
+                            dinnerout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                (i.TransactionDateTime.Date == scheduleDate.Date) &&
+                                                i.TransactionType == (int)TransactionType.DinnerOut);
 
                             DailyTransactionRecord DTR = new DailyTransactionRecord()
                             {
@@ -211,7 +245,7 @@ namespace TKProcessor.Services
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
 
-                            if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
+                            if (DTR.Shift?.FocusDate == null || DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
                             {
                                 //holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
                                 holidays = holidayService.GetHolidays(DTR.TimeIn ?? scheduleDate);
@@ -236,7 +270,7 @@ namespace TKProcessor.Services
 
                             if (holidays != null)
                             {
-                                foreach (var holiday in holidays)
+                                foreach (Holiday holiday in holidays)
                                 {
                                     if (holiday.Type == (int)HolidayType.Legal)
                                     {
@@ -253,7 +287,7 @@ namespace TKProcessor.Services
                                 }
                             }
 
-                            var requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
+                            decimal requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
                             if (timein == null && timeout == null && !shift.IsRestDay.HasValue)
                             {
@@ -275,7 +309,7 @@ namespace TKProcessor.Services
                                 }
                                 else
                                 {
-                                    if (DTR.Shift?.ShiftType == (int)ShiftType.Standard)
+                                    if (DTR.Shift?.ShiftType == null || DTR.Shift?.ShiftType == (int)ShiftType.Standard)
                                     {
                                         //if (holidays.Count() > 0 || DTR.Shift.IsRestDay.Value)
                                         //{
@@ -312,7 +346,7 @@ namespace TKProcessor.Services
                                         }
                                     }
 
-                                    foreach (var notAutoApprove in globalSettings.AutoApproveDTRFieldsList.Where(i => !i.IsSelected))
+                                    foreach (SelectionSetting notAutoApprove in globalSettings.AutoApproveDTRFieldsList.Where(i => !i.IsSelected))
                                     {
                                         typeof(DailyTransactionRecord).GetProperty("Approved" + notAutoApprove.Name).SetValue(DTR, 0m);
                                     }
@@ -342,6 +376,8 @@ namespace TKProcessor.Services
 
                 throw ex;
             }
+
+            sw.Stop();
         }
 
         public void ProcessSplit(DateTime start, DateTime end, IList<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null,
@@ -358,13 +394,13 @@ namespace TKProcessor.Services
                 if (jobGradeBandFilter.Count() == 0)
                     throw new ArgumentNullException("Job Grade Band cannot be empty");
 
-                var workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
+                List<WorkSchedule> workschedules = Context.WorkSchedule.Include(i => i.Employee).Include(i => i.Shift)
                                            .Where(i => i.ScheduleDate.Date >= start.AddDays(-1) && i.ScheduleDate.Date <= end).ToList(); //Include work schedule of day before start day... Filter split shifts
 
                 if (workschedules.Count == 0)
                     throw new Exception($"No work schedules found with dates between {start.ToShortDateString()} and {end.ToShortDateString()}");
 
-                var employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
+                List<Employee> employees = workschedules.Where(ws => jobGradeBandFilter.Any(jgb => jgb == ws.Employee.JobGradeBand)).Select(i => i.Employee).Distinct().ToList();
 
                 if (employees.Count == 0)
                     throw new Exception($"No employees found with Job Grade Band {jobGradeBandFilter}");
@@ -377,16 +413,16 @@ namespace TKProcessor.Services
                         throw new Exception($"Filtered employees have no records to process");
                 }
 
-                var rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Date <= end &&
+                List<RawData> rawdata = Context.RawData.Where(i => i.ScheduleDate >= start.AddDays(-1) && i.ScheduleDate.Date <= end &&
                                                             employees.Any(emp => emp.BiometricsId == i.BiometricsId)).ToList();
 
                 if (workschedules.Count == 0)
                     throw new Exception($"No Raw Data was found");
 
-                var globalSettings = Context.GlobalSetting.FirstOrDefault();
+                GlobalSetting globalSettings = Context.GlobalSetting.FirstOrDefault();
 
 
-                foreach (var employee in employees)
+                foreach (Employee employee in employees)
                 {
                     iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName}...");
 
@@ -398,9 +434,9 @@ namespace TKProcessor.Services
                     {
                         if (!firstIteration)
                         {
-                            var existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == dateIterator);
+                            IQueryable<DailyTransactionRecord> existing = Context.DailyTransactionRecord.Where(i => i.Employee == employee && i.TransactionDate.Value.Date == dateIterator);
 
-                            foreach (var item in existing)
+                            foreach (DailyTransactionRecord item in existing)
                             {
                                 Context.DailyTransactionRecord.Remove(item);
                             }
@@ -408,9 +444,9 @@ namespace TKProcessor.Services
 
                         IEnumerable<Holiday> holidays = holidayService.GetHolidays(dateIterator);
 
-                        var isLegalHoliday = false;
-                        var isSpecialHoliday = false;
-                        foreach (var holiday in holidays)
+                        bool isLegalHoliday = false;
+                        bool isSpecialHoliday = false;
+                        foreach (Holiday holiday in holidays)
                         {
                             if (holiday.Type == (int)HolidayType.Legal)
                             {
@@ -437,9 +473,9 @@ namespace TKProcessor.Services
                         IList<RawData> rawDataTimeIn = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType == (int)TransactionType.TimeIn).OrderBy(raw => raw.TransactionDateTime).ToList();
                         IList<RawData> rawDataTimeOut = rawdata.Where(raw => raw.ScheduleDate == dateIterator && raw.BiometricsId == employee.BiometricsId && raw.TransactionType == (int)TransactionType.TimeOut).OrderBy(raw => raw.TransactionDateTime).ToList();
 
-                        var workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == dateIterator).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
+                        IOrderedEnumerable<WorkSchedule> workSchedules = workschedules.Where(ws => ws.Employee == employee && ws.ScheduleDate == dateIterator).OrderBy(ws => ws.Shift.ScheduleIn); //for standard, need to change for flex
 
-                        foreach (var workSchedule in workSchedules)
+                        foreach (WorkSchedule workSchedule in workSchedules)
                         {
                             DailyTransactionRecord DTR = new DailyTransactionRecord(); //DTR for this work schedule
 
@@ -448,20 +484,20 @@ namespace TKProcessor.Services
                             DTR.TransactionDate = dateIterator;
 
                             //standard
-                            var _schedIn = dateIterator.Add(workSchedule.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
-                            var _schedOut = dateIterator.Add(workSchedule.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
+                            DateTime _schedIn = dateIterator.Add(workSchedule.Shift.ScheduleIn.Value.TimeOfDay).RemoveSeconds();
+                            DateTime _schedOut = dateIterator.Add(workSchedule.Shift.ScheduleOut.Value.TimeOfDay).RemoveSeconds();
 
                             if (_schedOut < _schedIn)
                             {
                                 _schedOut = _schedOut.AddDays(1);
                             }
 
-                            var timeIn = rawDataTimeIn.FirstOrDefault(raw => raw.TransactionDateTime < _schedOut); //for standard, need to change for flex
+                            RawData timeIn = rawDataTimeIn.FirstOrDefault(raw => raw.TransactionDateTime < _schedOut); //for standard, need to change for flex
                             if (timeIn != null)
                             {
                                 DTR.TimeIn = timeIn.TransactionDateTime;
                                 rawDataTimeIn.Remove(timeIn);
-                                var timeOut = rawDataTimeOut.FirstOrDefault(raw => raw.TransactionDateTime > _schedIn);
+                                RawData timeOut = rawDataTimeOut.FirstOrDefault(raw => raw.TransactionDateTime > _schedIn);
                                 if (timeOut != null)
                                 {
                                     DTR.TimeOut = timeOut.TransactionDateTime;
@@ -499,9 +535,9 @@ namespace TKProcessor.Services
 
                                 if (((DTRProcessorBase)processor).IsSplittable)
                                 {
-                                    var splitDTR = ((DTRProcessorBase)processor).Split(DTR);
+                                    Tuple<DailyTransactionRecord, DailyTransactionRecord> splitDTR = ((DTRProcessorBase)processor).Split(DTR);
 
-                                    var tail = splitDTR.Item2; //add values to hanging DTR
+                                    DailyTransactionRecord tail = splitDTR.Item2; //add values to hanging DTR
                                     hangingDTR.Merge(tail);
                                 }
                             }
@@ -509,10 +545,10 @@ namespace TKProcessor.Services
                             {
                                 if (((DTRProcessorBase)processor).IsSplittable)
                                 {
-                                    var splitDTR = ((DTRProcessorBase)processor).Split(DTR);
+                                    Tuple<DailyTransactionRecord, DailyTransactionRecord> splitDTR = ((DTRProcessorBase)processor).Split(DTR);
 
-                                    var head = splitDTR.Item1; //add values to current day, consider holidays and restday
-                                    var tail = splitDTR.Item2; //add values to hanging DTR
+                                    DailyTransactionRecord head = splitDTR.Item1; //add values to current day, consider holidays and restday
+                                    DailyTransactionRecord tail = splitDTR.Item2; //add values to hanging DTR
 
                                     currentDayDTR.Merge(head);
                                     hangingDTR.Merge(tail);
@@ -574,23 +610,23 @@ namespace TKProcessor.Services
                     throw new Exception("Please setup mappings in Global Settings first");
                 }
 
-                foreach (var jobGradeBand in jobGradeBandFilter)
+                foreach (string jobGradeBand in jobGradeBandFilter)
                 {
                     iterationCallback?.Invoke($"Exporting employees with job grade band {jobGradeBand}...");
 
-                    var dtrGroups = List(start, end, jobGradeBandFilter, employeesFilter).Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
+                    IEnumerable<IGrouping<Employee, DailyTransactionRecord>> dtrGroups = List(start, end, jobGradeBandFilter, employeesFilter).Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
                                                                                          .ToList().GroupBy(i => i.Employee);
 
                     if (dtrGroups.Count() == 0)
                         throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
                                             $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
 
-                    var payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
+                    PayPackage payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
 
                     if (payPackage == null)
                         throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
 
-                    var payFreqCalendar = dPContext.PayPackagePayFreqCalendars
+                    PayFreqCalendar payFreqCalendar = dPContext.PayPackagePayFreqCalendars
                                                    .Include(i => i.PayPackageSeq)
                                                    .Include(i => i.PayFreqCalendarSeq)
                                                    .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
@@ -598,7 +634,7 @@ namespace TKProcessor.Services
                     if (payFreqCalendar == null)
                         throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
 
-                    var maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
+                    long maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
 
                     PayrollTrx trx = new PayrollTrx()
                     {
@@ -615,17 +651,17 @@ namespace TKProcessor.Services
                     };
 
 
-                    foreach (var group in dtrGroups)
+                    foreach (IGrouping<Employee, DailyTransactionRecord> group in dtrGroups)
                     {
                         iterationCallback?.Invoke($"Exporting {group.Key}...");
 
                         short displayOrder = 1;
 
-                        foreach (var mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
+                        foreach (Mapping mapping in globalSettings.PayrollCodeMappings.Where(i => !string.IsNullOrEmpty(i.Source)))
                         {
                             decimal fieldValue = 0;
 
-                            foreach (var groupItem in group)
+                            foreach (DailyTransactionRecord groupItem in group)
                             {
                                 fieldValue += (decimal)typeof(DailyTransactionRecord).GetProperty(mapping.Target).GetValue(groupItem);
                             }
@@ -633,7 +669,7 @@ namespace TKProcessor.Services
                             if (fieldValue == 0)
                                 continue;
 
-                            var line = new PayrollTrxLines()
+                            PayrollTrxLines line = new PayrollTrxLines()
                             {
                                 DisplayOrder = displayOrder++,
                                 EmployeeCode = group.Key.EmployeeCode,
@@ -673,7 +709,7 @@ namespace TKProcessor.Services
             // Update work schedule
             using (WorkScheduleService wsService = new WorkScheduleService(CurrentUser.Id))
             {
-                var ws = wsService.List().FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == transactionDate);
+                WorkSchedule ws = wsService.List().FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == transactionDate);
 
                 wsService.Save(new WorkSchedule()
                 {
@@ -694,9 +730,9 @@ namespace TKProcessor.Services
             // Update Raw Data
             using (RawDataService service = new RawDataService(CurrentUser.Id))
             {
-                var rawData = service.List().Where(i => i.BiometricsId == employee.BiometricsId && i.ScheduleDate == transactionDate).OrderBy(i => i.TransactionType).ToArray();
+                RawData[] rawData = service.List().Where(i => i.BiometricsId == employee.BiometricsId && i.ScheduleDate == transactionDate).OrderBy(i => i.TransactionType).ToArray();
 
-                var rawDataIn = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeIn);
+                RawData rawDataIn = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeIn);
 
                 if (rawDataIn == default(RawData))
                 {
@@ -716,7 +752,7 @@ namespace TKProcessor.Services
                     service.Save(rawDataIn);
                 }
 
-                var rawDataOut = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeOut);
+                RawData rawDataOut = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeOut);
 
                 if (rawDataOut == default(RawData))
                 {
@@ -748,14 +784,14 @@ namespace TKProcessor.Services
         {
             try
             {
-                var data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBandFilter, employeesFilter));
+                DataTable data = DataTableHelpers.ToStringDataTable(List(start, end, jobGradeBandFilter, employeesFilter));
 
-                foreach (var propInfo in typeof(IEntity).GetProperties())
+                foreach (System.Reflection.PropertyInfo propInfo in typeof(IEntity).GetProperties())
                 {
                     data.Columns.Remove(propInfo.Name);
                 }
 
-                foreach (var propInfo in typeof(IModel).GetProperties())
+                foreach (System.Reflection.PropertyInfo propInfo in typeof(IModel).GetProperties())
                 {
                     data.Columns.Remove(propInfo.Name);
                 }

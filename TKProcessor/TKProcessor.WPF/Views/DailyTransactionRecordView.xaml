@@ -120,7 +120,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat=D}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat={}{0:MMMM dd\, yyyy \- dddd}}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
