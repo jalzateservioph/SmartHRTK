@@ -148,7 +148,11 @@ namespace TKProcessor.Services
                         {
                             iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
 
-                            var shift = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate)?.Shift;
+                            var empWorkSched = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
+
+                            var shift = empWorkSched?.Shift;
+
+                            var worksite = empWorkSched?.WorkSite;
 
                             var timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
                                                                         (i.ScheduleDate.Date == scheduleDate.Date) &&
@@ -201,6 +205,9 @@ namespace TKProcessor.Services
                                 continue;
                             }
 
+                            if (worksite != null)
+                                DTR.AddRemarks(worksite.Name);
+
                             IEnumerable<Holiday> holidays = null;
                             IEnumerable<Leave> leaves = null;
 
@@ -209,13 +216,13 @@ namespace TKProcessor.Services
                                 //holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
                                 holidays = holidayService.GetHolidays(DTR.TimeIn ?? scheduleDate);
                                 //leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
-                                leaves = leaveService.GetLeaves(employee.EmployeeCode,DTR.TimeIn ?? scheduleDate);
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? scheduleDate);
 
                             }
                             else if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleOut)
                             {
                                 DateTime date = scheduleDate;
-                                if(DTR.Shift?.ScheduleOut < DTR.Shift?.ScheduleIn)
+                                if (DTR.Shift?.ScheduleOut < DTR.Shift?.ScheduleIn)
                                 {
                                     date = date.AddDays(1);
                                 }

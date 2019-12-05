@@ -175,6 +175,11 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
+        public void OpenRecord(Holiday holiday)
+        {
+
+        }
+
         public void DownloadTemplate()
         {
             if (saveFileDialog.ShowDialog() == true)
