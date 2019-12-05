@@ -5,10 +5,12 @@ namespace TKProcessor.Models.TK
 {
     public partial class RawData : Entity
     {
+        private DateTime scheduleDate;
+
         public string BiometricsId { get; set; }
         public int TransactionType { get; set; }
         public DateTime TransactionDateTime { get; set; }
-        public DateTime ScheduleDate { get; set; }
+        public DateTime ScheduleDate { get => scheduleDate; set => scheduleDate = value.Date; }
     }
 
     public enum TransactionType

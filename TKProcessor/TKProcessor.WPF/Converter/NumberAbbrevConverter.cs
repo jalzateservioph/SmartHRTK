@@ -26,10 +26,10 @@ namespace TKProcessor.WPF.Converter
         static string FormatInt(int num)
         {
             if (num >= 100000)
-                return FormatInt(num / 1000) + "K";
+                return FormatInt(num / 1000).Trim('K') + "K";
             if (num >= 10000)
             {
-                return (num / 1000D).ToString("0.#") + "K";
+                return (num / 1000D).ToString("0.#").Trim('K') + "K";
             }
             return num.ToString("#,0");
         }
@@ -37,12 +37,12 @@ namespace TKProcessor.WPF.Converter
         static string FormatDecimal(decimal num)
         {
             if (num >= 100000)
-                return FormatDecimal(num / 1000) + "K";
+                return FormatDecimal(num / 1000).Trim('K') + "K";
             if (num >= 10000)
             {
-                return (num / 1000M).ToString("0.#") + "K";
+                return (num / 1000M).ToString("0.#").Trim('K') + "K";
             }
-            return num.ToString("#,0");
+            return num.ToString("#,0").Trim('K');
         }
     }
 }

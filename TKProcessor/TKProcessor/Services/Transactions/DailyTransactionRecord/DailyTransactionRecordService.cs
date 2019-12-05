@@ -255,13 +255,16 @@ namespace TKProcessor.Services
 
                             var requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
-                            if (timein == null && timeout == null && (!shift.IsRestDay.HasValue || shift.IsRestDay.Value == false))
+                            if (timein == null && timeout == null && !shift.IsRestDay.HasValue)
                             {
-
                                 if (holidays != null && holidays.Count() > 0)
                                     DTR.RegularWorkHours = requiredWorkHours;
                                 else
                                     DTR.AbsentHours = requiredWorkHours;
+                            }
+                            if (timein == null && timeout == null && (shift.IsRestDay.HasValue || shift.IsRestDay.Value == true))
+                            {
+                                DTR.AddRemarks("Rest Day");
                             }
                             else
                             {
