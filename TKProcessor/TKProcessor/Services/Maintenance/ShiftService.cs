@@ -79,7 +79,7 @@ namespace TKProcessor.Services.Maintenance
 
                         var value = row[col].ToString();
 
-                        if (value.ToString() == "" || value == "NULL")
+                        if (string.IsNullOrEmpty(value.ToString()) || string.Compare(value.ToString(), "NULL", true) == 0)
                         {
                             prop.SetValue(tempShift, ObjectHelpers.GetDefault(prop.PropertyType));
                         }
@@ -96,7 +96,7 @@ namespace TKProcessor.Services.Maintenance
                         }
                         else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                         {
-                            prop.SetValue(tempShift, value.ToString() == "1" || value.ToString() == "y" || value.ToString() == "yes");
+                            prop.SetValue(tempShift, string.Compare(value.ToString(), "1", true) == 0 || string.Compare(value.ToString(), "y", true) == 0 || string.Compare(value.ToString(), "yes", true) == 0);
                         }
                         else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
                         {
