@@ -30,7 +30,7 @@ namespace BiometricsIntegrationWebAPI.Controllers
             {
                 service.PushRawData(rawData);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new BadRequestResult();
             }

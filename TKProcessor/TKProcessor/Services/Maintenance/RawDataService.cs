@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TKProcessor.Common;
 using TKProcessor.Models;
 using TKProcessor.Models.TK;
+using TKProcessor.Contexts;
 
 namespace TKProcessor.Services.Maintenance
 {
@@ -15,6 +16,17 @@ namespace TKProcessor.Services.Maintenance
     {
         readonly string[] columns;
         private WorkScheduleService workScheduleService;
+
+        public RawDataService(Guid id, TKContext context) : base(id, context)
+        {
+            var exclude1 = typeof(IEntity).GetProperties().Select(i => i.Name);
+            var exclude2 = typeof(IModel).GetProperties().Select(i => i.Name);
+            var shift = typeof(RawData).GetProperties().Select(i => i.Name);
+            var include = shift.Where(s => !exclude1.Any(e => e == s) && !exclude2.Any(e => e == s));
+
+            columns = include.ToArray();
+            workScheduleService = new WorkScheduleService(id, context);
+        }
 
         public RawDataService(Guid id) : base(id)
         {

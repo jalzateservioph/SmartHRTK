@@ -33,6 +33,7 @@ namespace BiometricsIntegrationWebAPI
             //services.AddDbContext<ApplicationContext>(item => item.UseSqlServer(Configuration.GetConnectionString("con")));
             services.AddDbContext<TKProcessor.Contexts.TKContext>(item => item.UseSqlServer(Configuration.GetConnectionString("tk")));
             services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
+            services.AddScoped<TKAuthService, TKAuthService>();
             services.AddScoped<EmployeeService, EmployeeService>();
             services.AddScoped<WorkSiteService, WorkSiteService>();
             services.AddScoped<RawDataService, RawDataService>();
@@ -64,12 +65,6 @@ namespace BiometricsIntegrationWebAPI
             {
                 endpoints.MapControllers();
             });
-
-            if (!TKAuthHelper.LoginUser(Configuration.GetSection("TKAuth")["username"], Configuration.GetSection("TKAuth")["password"], app.ApplicationServices.GetService<TKProcessor.Contexts.TKContext>()))
-            {
-                throw new System.Exception("Invalid TK credentials");
-            }
-            //UpdateDatabase<ApplicationContext>(app);
         }
         
         private static void UpdateDatabase<T>(IApplicationBuilder app)

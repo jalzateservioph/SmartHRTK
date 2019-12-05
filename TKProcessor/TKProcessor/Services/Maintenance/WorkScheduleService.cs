@@ -45,6 +45,31 @@ namespace TKProcessor.Services.Maintenance
             };
         }
 
+        public WorkScheduleService(Guid userId, TKContext context) : base(userId, context)
+        {
+            headerDef = new List<List<string>>()
+            {
+                new List<string>()
+                {
+                    "Employee Code",
+                    "Schedule Date",
+                    "Shift Code"
+                },
+                new List<string>()
+                {
+                    "Employee Code",
+                    "From",
+                    "To",
+                    "M", "T", "W", "Th", "F", "Sa", "Su"
+                },
+                new List<string>()
+                {
+                    "Employee Code",
+                    "{datetime}"
+                }
+            };
+        }
+
         public override void Save(WorkSchedule entity)
         {
             var existing = Context.WorkSchedule.Find(entity.Id);
