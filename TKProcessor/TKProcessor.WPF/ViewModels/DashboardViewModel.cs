@@ -24,25 +24,36 @@ namespace TKProcessor.WPF.ViewModels
 
             dtrService = new DailyTransactionRecordService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
-            StartDate = DateTime.Today.AddDays(-DateTime.Today.Day);
+            StartDate = DateTime.Today.AddDays(-DateTime.Today.Day).AddDays(1);
 
-            EndDate = DateTime.Today.AddDays(-DateTime.Today.Day).AddMonths(1).AddDays(-1);
+            EndDate = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
 
             PropertyChanged += DashboardViewModel_PropertyChanged;
+
+            Populate();
         }
 
         private void DashboardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if((e.PropertyName == nameof(StartDate) || e.PropertyName == nameof(EndDate)) &&
-                StartDate > EndDate)
+            if ((e.PropertyName == nameof(StartDate) || e.PropertyName == nameof(EndDate)))
             {
-                EndDate = StartDate;
+                if (StartDate > EndDate)
+                    EndDate = StartDate;
             }
         }
 
         public void Populate()
         {
-            NotifyOfPropertyChange(() => EmployeeCount);
+            Task.Run(() =>
+            {
+                EmployeeCount = employeeService.List().Where(emp => !emp.TerminationDate.HasValue || (emp.TerminationDate.HasValue && emp.TerminationDate.Value.Date > startDate.Date)).Count();
+                //ActiveEmployeeCount = employeeService.List().Where(i => i.TerminationDate == null).Count();
+                ActualHoursWorked = dtrService.List().Where(dtr => dtr.TransactionDate >= startDate && dtr.TransactionDate <= endDate).Sum(dtr => dtr.WorkHours);
+                RegularHoursWorked = dtrService.List().Where(dtr => dtr.TransactionDate >= startDate && dtr.TransactionDate <= endDate).Sum(dtr => dtr.RegularWorkHours);
+                AbsentHoursCount = dtrService.List().Where(dtr => dtr.TransactionDate >= startDate && dtr.TransactionDate <= endDate).Sum(dtr => dtr.AbsentHours);
+
+                App.Current.Dispatcher.Invoke(() => NotifyOfPropertyChange(""));
+            });
         }
 
         public DateTime StartDate
@@ -65,14 +76,14 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public int EmployeeCount { get => employeeService.List().Count(); }
+        public int EmployeeCount { get; set; }
 
-        public int ActiveEmployeeCount { get => employeeService.List().Where(i => i.TerminationDate == null).Count(); }
+        public int ActiveEmployeeCount { get; set; }
 
-        public decimal HoursWorked { get => dtrService.List().Sum(i => i.RegularWorkHours); }
+        public decimal ActualHoursWorked { get; set; }
 
-        public int AbsentEmployeeCount { get; }
+        public decimal RegularHoursWorked { get; set; }
 
-        public decimal AbsentHoursCount { get; }
+        public decimal AbsentHoursCount { get; set; }
     }
 }

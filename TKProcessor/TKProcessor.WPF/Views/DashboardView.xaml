@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <converters:NumberAbbrevConverter x:Key="NumberAbbrevConverter"/>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -20,7 +20,6 @@
         </Grid.RowDefinitions>
 
         <Label Content="Dashboard" FontSize="30" FontFamily="Segoe UI Light" Background="{DynamicResource HeaderBackground}" Foreground="{DynamicResource OverlayBackground1}"/>
-        <Button x:Name="Populate" Content="Button" Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0" Visibility="Hidden"/>
 
         <Grid Grid.Row="2" Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
@@ -30,6 +29,9 @@
 
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -41,95 +43,103 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="0" Grid.Column="0">
+                <Label Content="From" Grid.Row="0" Grid.Column="0"/>
+                <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="0" Grid.Column="1" Margin="0,0,3,0"/>
+
+                <Label Content="To" Grid.Row="1" Grid.Column="0"/>
+                <DatePicker SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" Margin="0,0,3,0"/>
+
+                <Button x:Name="Populate" Content="↻ Refresh Dashboard Totals" Grid.Row="2" Grid.ColumnSpan="2" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF7E7E7E" FontFamily="Segoe UI Semibold"/>
+
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="{Binding EmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding EmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Employees" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Employees" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="1" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="{Binding ActiveEmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding ActiveEmployeeCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Employee Count" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Employee Count" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="2" Grid.Column="0">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="{Binding HoursWorked, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding ActualHoursWorked, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Actual Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0" Visibility="Hidden">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="5" Grid.Column="0" Visibility="Visible" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding RegularHoursWorked, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="3" Grid.Column="0" Visibility="Hidden">
+                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="6" Grid.Column="0" Visibility="Visible" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding AbsentHoursCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Absent Hours" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
                 </Grid>
 
-                <Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0" Visibility="Hidden">
+                <!--<Grid Margin="0,3,3,3" Background="{DynamicResource CardBackground}" Grid.Row="4" Grid.Column="0" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="100*"/>
                         <RowDefinition Height="35*"/>
                     </Grid.RowDefinitions>
 
                     <Viewbox>
-                        <Label Content="999" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource CardForeground}"/>
+                        <Label Content="{Binding AbsentHoursCount, Converter={StaticResource NumberAbbrevConverter}}" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="55" Foreground="{DynamicResource CardForeground}" FontFamily="Segoe UI"/>
                     </Viewbox>
 
                     <Viewbox Grid.Row="1" Margin="15,0">
-                        <Label Content="Total Hours Worked" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Foreground="#FFF9F9F9"/>
+                        <Label Content="Total Absent Hours" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontWeight="SemiBold" Foreground="#FFF9F9F9"/>
                     </Viewbox>
-                </Grid>
+                </Grid>-->
             </Grid>
         </Grid>
     </Grid>
