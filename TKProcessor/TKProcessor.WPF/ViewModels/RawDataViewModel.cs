@@ -109,13 +109,20 @@ namespace TKProcessor.WPF.ViewModels
             {
                 StartProcessing();
 
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting records...", 0));
+
                 try
                 {
                     int count = 0;
 
-                    foreach (var item in Items.Where(i => i.IsSelected))
+                    var forDelete = Items.Where(i => i.IsSelected).ToArray();
+
+                    foreach (var item in forDelete)
                     {
                         service.DeleteHard(mapper.Map<TK.RawData>(item));
+
+                        Items.Remove(item);
+
                         count++;
                     }
 
@@ -144,9 +151,10 @@ namespace TKProcessor.WPF.ViewModels
 
                     if (result == true)
                     {
-                        service.Import(openFileDialog.FileName, null);
-
-                        Populate();
+                        service.Import(openFileDialog.FileName, data => {
+                            RaiseMessage($"Import {data.BiometricsId} - {data.ScheduleDate.ToShortDateString()} - {data.TransactionDateTime.ToShortTimeString()}");
+                            Items.Add(mapper.Map<RawData>(data)); 
+                        });
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Successfully imported {Path.GetFileName(openFileDialog.FileName)}", MessageType.Success));
                     }
@@ -226,44 +234,86 @@ namespace TKProcessor.WPF.ViewModels
 
                     var transType = Enum.GetValues(typeof(TK.TransactionType)).Cast<TK.TransactionType>();
 
-                    foreach (DataRow row in InputData.Rows)
+                    var rows = InputData.Rows.Cast<DataRow>().ToArray();
+
+                    for (int ctr = 0; ctr < rows.Length; ctr++)
                     {
-                        var rawData = new RawData();
+                        RawData rawData = null;
 
-                        for (int a = 0; a < mappingSetup.Length; a++)
+                        try
                         {
-                            var mapping = mappingSetup[a];
+                            var row = rows[ctr];
 
-                            var rowValue = row[mapping.Source].ToString();
+                            if (row[0] == null || string.IsNullOrEmpty(row[0].ToString()))
+                                continue;
+                            if (row[1] == null || string.IsNullOrEmpty(row[1].ToString()))
+                                continue;
+                            if (row[2] == null || string.IsNullOrEmpty(row[2].ToString()))
+                                continue;
+                            if (row[3] == null || string.IsNullOrEmpty(row[3].ToString()))
+                                continue;
 
-                            rowValue = mapping[rowValue];
+                            var biometricsId = row[mappingSetup.First(i => i.Target.Replace(" ", "") == "BiometricsId").Source].ToString();
+                            var transactionType = row[mappingSetup.First(i => i.Target.Replace(" ", "") == "TransactionType").Source].ToString().FindFrom("in", "out", "c\\in", "c\\out").Contains("in") ? 1 : 2;
+                            var transactionDateTime = DateTimeHelpers.Parse(row[mappingSetup.First(i => i.Target.Replace(" ", "").Replace("/", "") == "TransactionDateTime").Source].ToString()).Value;
+                            var scheduleDate = DateTimeHelpers.Parse(row[mappingSetup.First(i => i.Target.Replace(" ", "") == "ScheduleDate").Source].ToString()).Value;
 
-                            var targetField = mapping.Target.Replace(" ", "").Replace("/", "");
 
-                            var propInfo = typeof(RawData).GetProperty(targetField);
 
-                            if (propInfo.PropertyType == typeof(int))
+                            rawData = new RawData()
                             {
-                                var value = 0;
+                                BiometricsId = biometricsId,
+                                TransactionType = transactionType,
+                                TransactionDateTime = transactionDateTime,
+                                ScheduleDate = scheduleDate
+                            };
 
-                                if (string.Compare(rowValue, "in", true) == 0)
-                                    value = 1;
-                                else if (string.Compare(rowValue, "out", true) == 0)
-                                    value = 2;
+                            //for (int a = 0; a < mappingSetup.Length; a++)
+                            //{
+                            //    var mapping = mappingSetup[a];
 
-                                propInfo.SetValue(rawData, Convert.ToInt16(value));
-                            }
-                            else if (propInfo.PropertyType == typeof(DateTime))
-                            {
-                                propInfo.SetValue(rawData, DateTime.Parse(rowValue));
-                            }
-                            else
-                            {
-                                propInfo.SetValue(rawData, rowValue);
-                            }
+                            //    var rowValue = row[mapping.Source].ToString();
+
+                            //    rowValue = mapping[rowValue];
+
+                            //    var targetField = mapping.Target.Replace(" ", "").Replace("/", "");
+
+                            //    var propInfo = typeof(RawData).GetProperty(targetField);
+
+                            //    if (propInfo.PropertyType == typeof(int))
+                            //    {
+                            //        var value = 0;
+
+                            //        if (string.Compare(rowValue, "in", true) == 0)
+                            //            value = 1;
+                            //        else if (string.Compare(rowValue, "out", true) == 0)
+                            //            value = 2;
+
+                            //        propInfo.SetValue(rawData, Convert.ToInt16(value));
+                            //    }
+                            //    else if (propInfo.PropertyType == typeof(DateTime))
+                            //    {
+                            //        if (DateTime.TryParse(rowValue, out DateTime dt))
+                            //        {
+                            //            propInfo.SetValue(rawData, dt);
+                            //        }
+                            //        else
+                            //        {
+                            //            propInfo.SetValue(rawData, DateTime.FromOADate(double.Parse(rowValue)));
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        propInfo.SetValue(rawData, rowValue);
+                            //    }
+                            //}
+
+                            OutputData.Add(rawData);
                         }
-
-                        OutputData.Add(rawData);
+                        catch (Exception ex)
+                        {
+                            HandleError($"Error in row {ctr + 1} - {rawData.BiometricsId} - {rawData.ScheduleDate.ToShortDateString()} - {ex.Message}");
+                        }
                     }
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Input file mapped. Please see output tab for results", MessageType.Success));
@@ -289,6 +339,8 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving mapped data...", MessageType.Information));
 
+                    int total = outputData.Count;
+
                     for (int i = 0; i < outputData.Count; i++)
                     {
                         RawData rawData = outputData[i];
@@ -296,7 +348,7 @@ namespace TKProcessor.WPF.ViewModels
                         try
                         {
                             eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {rawData.BiometricsId} - " +
-                                                                                  $"{rawData.ScheduleDate.ToShortDateString()}...", MessageType.Information));
+                                                                                  $"{rawData.ScheduleDate.ToShortDateString()} ({i + 1}/{total})...", MessageType.Information));
                             service.Save(mapper.Map<TK.RawData>(rawData));
                         }
                         catch (Exception ex)
@@ -319,7 +371,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 EndProcessing();
 
-                
+
             });
         }
 

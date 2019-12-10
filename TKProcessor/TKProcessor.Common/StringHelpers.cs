@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TKProcessor.Common
 {
@@ -13,6 +15,26 @@ namespace TKProcessor.Common
             var suffix = encloseWith.Substring(encloseWith.Length / 2);
 
             return prefix + target + suffix;
+        }
+
+        public static string FindFrom(this string target, IEnumerable<string> collection, bool ignoreCase = true)
+        {
+            return collection.FirstOrDefault(i => string.Compare(i, target, ignoreCase) == 0);
+        }
+
+        public static string FindFrom(this string target, params string[] collection)
+        {
+            return collection.FirstOrDefault(i => string.Compare(i, target, true) == 0);
+        }
+
+        public static bool In(this string target, IEnumerable<string> collection, bool ignoreCase = true)
+        {
+            return collection.Any(i => string.Compare(i, target, ignoreCase) == 0);
+        }
+
+        public static bool In(this string target, params string[] collection)
+        {
+            return collection.Any(i => string.Compare(i, target, true) == 0);
         }
     }
 }

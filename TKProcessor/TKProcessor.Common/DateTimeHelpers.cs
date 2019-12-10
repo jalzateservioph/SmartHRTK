@@ -25,5 +25,26 @@ namespace TKProcessor.Common
         {
             return new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute, 0, 0);
         }
+
+        public static DateTime ConstructDate(DateTime datePart, DateTime timePart)
+        {
+            return new DateTime(datePart.Year, datePart.Month, datePart.Day, timePart.TimeOfDay.Hours, timePart.TimeOfDay.Minutes, timePart.TimeOfDay.Seconds);
+        }
+
+        public static DateTime? Parse(object value)
+        {
+            var rowValue = value.ToString();
+
+            if (DateTime.TryParse(rowValue, out DateTime dt))
+            {
+                return dt;
+            }
+            else
+            {
+                return DateTime.FromOADate(double.Parse(rowValue));
+            }
+
+            return null;
+        }
     }
 }
