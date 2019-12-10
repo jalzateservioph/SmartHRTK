@@ -125,6 +125,10 @@ namespace TKProcessor.WPF.ViewModels
                 t.Stop();
                 t.Start();
             }
+            else
+            {
+                t.Stop();
+            }
         }
 
         public void ShowEmployees()
