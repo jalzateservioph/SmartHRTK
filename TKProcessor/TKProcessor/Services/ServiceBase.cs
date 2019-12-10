@@ -74,31 +74,24 @@ namespace TKProcessor.Services
             CurrentUser = Context.User.First(i => i.Id == userId);
         }
 
-
         public virtual void Delete(T entity)
         {
             var existing = Context.Set<T>().Find(entity.Id);
 
             if (existing != default(T))
             {
-                entity.IsActive = false;
+                existing.IsActive = false;
 
-                entity.Id = existing.Id;
-                entity.LastModifiedBy = CurrentUser;
-                entity.LastModifiedOn = DateTime.Now;
-
-                CreateAuditLog(entity, existing);
-
-                Context.Entry(existing).CurrentValues.SetValues(entity);
+                if (AutoSaveChanges)
+                    SaveChanges();
             }
-
-            if (AutoSaveChanges)
-                SaveChanges();
         }
 
         public virtual void DeleteHard(T entity)
         {
-            Context.Set<T>().Remove(entity);
+            var existing = Context.Set<T>().Find(entity.Id);
+
+            Context.Set<T>().Remove(existing);
 
             if (AutoSaveChanges)
                 SaveChanges();
@@ -113,6 +106,38 @@ namespace TKProcessor.Services
         {
             var existing = Context.Set<T>().Find(entity.Id);
 
+            CurrentUser = Context.User.Find(CurrentUser.Id);
+
+            if (existing == default(T))
+            {
+                entity.IsActive = true;
+                entity.CreatedBy = CurrentUser;
+                entity.CreatedOn = DateTime.Now;
+                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedOn = DateTime.Now;
+
+                CreateAuditLog(entity);
+
+                Context.Set<T>().Add(entity);
+            }
+            else
+            {
+                entity.Id = existing.Id;
+                entity.IsActive = true;
+                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedOn = DateTime.Now;
+
+                CreateAuditLog(entity, existing);
+
+                Context.Entry(existing).CurrentValues.SetValues(entity);
+            }
+
+            if (AutoSaveChanges)
+                SaveChanges();
+        }
+
+        public virtual void Save(T existing, T entity)
+        {
             CurrentUser = Context.User.Find(CurrentUser.Id);
 
             if (existing == default(T))
