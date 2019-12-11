@@ -388,7 +388,12 @@ namespace TKProcessor.Services
                 {
                     approvedPreShiftOvertime = DTR.Shift.MaximumPreShiftOt.Value;
                 }
-                totalOvertime += preShiftOvertime;
+
+                if (DTR.Shift.RoundPreShiftOt.HasValue && DTR.Shift.RoundPreShiftOt > 1)
+                {
+                    approvedPreShiftOvertime = approvedPreShiftOvertime - (approvedPreShiftOvertime % DTR.Shift.RoundPreShiftOt.Value);
+                }
+
                 approvedOvertime += approvedPreShiftOvertime;
             }
 
@@ -435,6 +440,11 @@ namespace TKProcessor.Services
                 if (DTR.Shift.MaximumPostShiftOt.HasValue && DTR.Shift.MaximumPostShiftOt.Value < postShiftOvertime)
                 {
                     approvedPostShiftOvertime = DTR.Shift.MaximumPostShiftOt.Value;
+                }
+
+                if (DTR.Shift.RoundPostShiftOt.HasValue && DTR.Shift.RoundPostShiftOt > 1)
+                {
+                    approvedPostShiftOvertime = approvedPostShiftOvertime - (approvedPostShiftOvertime % DTR.Shift.RoundPostShiftOt.Value);
                 }
 
                 approvedOvertime += approvedPostShiftOvertime;
