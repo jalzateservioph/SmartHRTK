@@ -153,6 +153,7 @@ namespace TKProcessor.Services
             actualTimeIn = DateTimeHelpers.RemoveSeconds(DTR.TimeIn.Value);
             actualTimeOut = DateTimeHelpers.RemoveSeconds(DTR.TimeOut.Value);
 
+
             if (actualTimeOut.Date > actualTimeIn.Date)
             {
                 IsSplittable = true;

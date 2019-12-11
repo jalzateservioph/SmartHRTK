@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using zkemkeeper;
-
+using TK = TKProcessor.Models.TK;
 namespace IntegrationClient.DAL.Services
 {
     public class ZKTEcoDeviceService : IDeviceService
@@ -26,6 +26,8 @@ namespace IntegrationClient.DAL.Services
 
         public IEnumerable<RawData> GetRawData(DateTime? from, DateTime? to)
         {
+            if(from.HasValue && to.HasValue) _loggingService.Log($"Fetching raw data from {from.Value.ToString("yyyy-MM-dd")} to {to.Value.ToString("yyyy-MM-dd")}", Enums.LogLevel.Info);
+            else _loggingService.Log("Fetching ALL raw data", Enums.LogLevel.Info);
             ConnectToDevices();
             List<RawData> rawData = new List<RawData>();
             foreach (var device in deviceList)
@@ -53,10 +55,33 @@ namespace IntegrationClient.DAL.Services
                     {
                         while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
                         {
+                            int transactionType = 0;
+                            switch (idwInOutMode) 
+                            {
+                                case 0:
+                                    transactionType = (int)TK.TransactionType.TimeIn;
+                                    break;
+                                case 1:
+                                    transactionType = (int)TK.TransactionType.TimeOut;
+                                    break;
+                                case 2: //Overtime in
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                                case 3: //Overtime out
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                                case 4: //Break out
+                                    //transactionType = (int)TransactionType.Break;
+                                    break;
+                                case 5: //Break in
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                            };
                             RawData raw = new RawData()
                             {
                                 EmployeeBiometricsID = sdwEnrollNumber,
-                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
+                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond),
+                                TransactionType = transactionType
                             };
 
                             rawData.Add(raw);
@@ -71,11 +96,33 @@ namespace IntegrationClient.DAL.Services
 
                         while (device.SSR_GetGeneralLogData(machineNumber, out sdwEnrollNumber, out idwVerifyMode, out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
                         {
+                            int transactionType = 0;
+                            switch (idwInOutMode)
+                            {
+                                case 0:
+                                    transactionType = (int)TK.TransactionType.TimeIn;
+                                    break;
+                                case 1:
+                                    transactionType = (int)TK.TransactionType.TimeOut;
+                                    break;
+                                case 2: //Overtime in
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                                case 3: //Overtime out
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                                case 4: //Break out
+                                    //transactionType = (int)TransactionType.Break;
+                                    break;
+                                case 5: //Break in
+                                    //transactionType = (int)TransactionType.TimeIn;
+                                    break;
+                            };
                             RawData raw = new RawData()
                             {
                                 EmployeeBiometricsID = sdwEnrollNumber,
-                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond)
-                                //Map Transaction Type
+                                TransactionDateTime = new DateTime(idwYear, idwMonth, idwDay, idwHour, idwMinute, idwSecond),
+                                TransactionType = transactionType
                             };
 
                             rawData.Add(raw);

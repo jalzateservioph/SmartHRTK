@@ -51,12 +51,13 @@ namespace IntegrationClient.DAL.Services
             throw new Exception($"Get employees failed\n{response.Content.ToString()}");
         }
 
-        async public void PushRawData(IEnumerable<RawData> rawData)
+        public void PushRawData(IEnumerable<RawData> rawData)
         {
+            _loggingService.Log("Raw data count:", Enums.LogLevel.Info);
             string endpoint = _configuration.GetSection("TK_WebAPI")["PostRawDataEndpoint"];
             var jsonObject = JsonConvert.SerializeObject(rawData);
             var content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(endpoint, content);
+            HttpResponseMessage response = httpClient.PostAsync(endpoint, content).Result;
 
             if (response.IsSuccessStatusCode)
             {

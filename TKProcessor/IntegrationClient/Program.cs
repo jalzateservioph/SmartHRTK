@@ -60,7 +60,7 @@ namespace IntegrationClient
                     else if (parsedInput == 2) //Push raw data
                     {
                     Start2:
-                        Console.WriteLine("Please input date range. First date value is from and second is to. Separate values using comma(,). If no range is supplied all records will be pushed to TK, \nFormat: yyyy-MM-dd");
+                        Console.WriteLine("Please input date range. First date value is from and second is to. Separate values using comma(,). If no range is supplied, only records from the last successful run to the current day will be processed\nFormat: yyyy-MM-dd");
                         input = Console.ReadLine();
 
                         string[] _input = input.Split(',');
@@ -86,7 +86,7 @@ namespace IntegrationClient
                             {
                                 IEnumerable<RawData> rawData = deviceService.GetRawData(from, to);
                                 tkService.PushRawData(rawData);
-                                lastRun.lastSuccessfulPush = DateTime.Now;
+                                lastRun.lastSuccessfulPush = to;
                                 updateLastRun = true;
                             }
                             catch (Exception ex)
@@ -236,7 +236,7 @@ namespace IntegrationClient
 
             if (updateLastRun) WriteLastSuccessfulRun();
             DisposeServices();
-        }
+         }
 
         private static void BuildConfiguration()
         {

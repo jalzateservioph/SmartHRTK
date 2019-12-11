@@ -58,7 +58,7 @@ namespace TKProcessor.Services
                 }
             }
 
-            if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value;
+            //if (DTR.Shift.IsRestDay.HasValue) isRestDay = DTR.Shift.IsRestDay.Value; Not used at all
         }
 
         public void Compute()
@@ -159,6 +159,7 @@ namespace TKProcessor.Services
             }
             else
             {
+                //No TimeIn and TimeOut.. Handle absent hours here [abs]
                 if ((!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false) &&  (Holidays == null || Holidays.Count() == 0))
                 {
                     absentHours = requiredWorkHours * 60;
