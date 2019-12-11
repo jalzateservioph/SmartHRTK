@@ -73,7 +73,7 @@ namespace TKProcessor.Services.Maintenance
 
         public override void Save(RawData entity)
         {
-            Context = new TKContext();
+            //Context = new TKContext();
 
             var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
                                                     i.TransactionType == entity.TransactionType &&
