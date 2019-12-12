@@ -155,13 +155,13 @@ namespace TKProcessor.Services
 
                 IQueryable<DailyTransactionRecord> dtrRecords = Context.DailyTransactionRecord.Where(i => i.TransactionDate.Value.Date >= start && i.TransactionDate.Value.Date <= end);
 
+                AutoSaveChanges = false;
+
+                Context.ChangeTracker.AutoDetectChangesEnabled = false;
+
                 for (int loopCounter = 0; loopCounter < employees.Length; loopCounter++)
                 {
-                    WriteToConsole("Retrieving employee..");
-
-                    var employee = employees[0];
-
-                    WriteToConsole("Retrieved employee");
+                    var employee = employees[loopCounter];
 
                     List<RawData> rawdata = rawDataList.Where(i => i.ScheduleDate >= start &&
                                                                    i.ScheduleDate.Date <= end &&
@@ -174,10 +174,12 @@ namespace TKProcessor.Services
                         Context.DailyTransactionRecord.RemoveRange(existing);
                     }
 
-                    DateTime scheduleDate = start;
+                    DateTime scheduleDate = start.AddDays(-1);
 
                     while (scheduleDate <= end)
                     {
+                        scheduleDate = scheduleDate.AddDays(1);
+
                         try
                         {
                             iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
@@ -185,6 +187,12 @@ namespace TKProcessor.Services
                             empWorkSched = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
 
                             shift = empWorkSched?.Shift;
+
+                            if (shift == null)
+                            {
+                                iterationCallback?.Invoke($"Skipping {employee} - {scheduleDate.ToLongDateString()}");
+                                continue;
+                            }
 
                             worksite = empWorkSched?.WorkSite;
 
@@ -282,23 +290,28 @@ namespace TKProcessor.Services
                                     {
                                         isSpecialHoliday = true;
 
-                                        DTR.AddRemarks("Special Holiday, ");
+                                        DTR.AddRemarks("Special Holiday");
                                     }
                                 }
                             }
 
                             decimal requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
-                            if (timein == null && timeout == null && !shift.IsRestDay.HasValue)
+                            if (timein == null && timeout == null && holidays != null && holidays.Count() > 0)
                             {
-                                if (holidays != null && holidays.Count() > 0)
+                                if (holidays.Any(i => i.Type == (int)HolidayType.Legal))
+                                {
                                     DTR.RegularWorkHours = requiredWorkHours;
-                                else
-                                    DTR.AbsentHours = requiredWorkHours;
+                                    DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
+                                }
                             }
-                            if (timein == null && timeout == null && (shift.IsRestDay.HasValue || shift.IsRestDay.Value == true))
+                            else if (timein == null && timeout == null && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
                             {
                                 DTR.AddRemarks("Rest Day");
+                            }
+                            else if (timein == null && timeout == null)
+                            {
+                                DTR.AbsentHours = requiredWorkHours;
                             }
                             else
                             {
@@ -360,24 +373,46 @@ namespace TKProcessor.Services
                         }
                         catch (Exception ex)
                         {
-                            Context.ErrorLog.Add(new ErrorLog(ex));
-                            Context.SaveChanges();
+                            using (TKContext ctx = new TKContext())
+                            {
+                                ctx.ErrorLog.Add(new ErrorLog(ex.InnerException == null ? ex : ex.InnerException));
+
+                                ctx.SaveChanges();
+
+                                WriteToConsole((ex.InnerException == null ? ex : ex.InnerException).Message);
+                            }
 
                             throw ex;
                         }
+                    }
 
-                        scheduleDate = scheduleDate.AddDays(1);
+                    if (!AutoSaveChanges)
+                    {
+                        WriteToConsole($"Saving {employee} ({loopCounter + 1}/{employees.Length})...");
+
+                        iterationCallback?.Invoke($"Saving {employee} ({loopCounter + 1}/{employees.Length})...");
+
+                        SaveChanges();
+
+                        iterationCallback?.Invoke($"Saved {employee} ({loopCounter + 1}/{employees.Length})...");
+
+                        WriteToConsole($"Saved {employee} ({loopCounter + 1}/{employees.Length})");
                     }
                 }
+
             }
             catch (Exception ex)
             {
-                CreateErrorLog(ex);
+                CreateErrorLog(ex.InnerException == null ? ex : ex.InnerException);
 
-                throw ex;
+                throw ex.InnerException == null ? ex : ex.InnerException;
             }
 
             sw.Stop();
+
+            AutoSaveChanges = false;
+
+            Context.ChangeTracker.AutoDetectChangesEnabled = true;
         }
 
         public void ProcessSplit(DateTime start, DateTime end, IList<string> jobGradeBandFilter, IEnumerable<Employee> employeesFilter = null,
@@ -615,13 +650,13 @@ namespace TKProcessor.Services
                     iterationCallback?.Invoke($"Exporting employees with job grade band {jobGradeBand}...");
 
                     IEnumerable<IGrouping<Employee, DailyTransactionRecord>> dtrGroups = List(start, end, jobGradeBandFilter, employeesFilter).Where(i => i.TransactionDate >= start && i.TransactionDate <= end)
-                                                                                         .ToList().GroupBy(i => i.Employee);
+                                                                                         .ToArray().GroupBy(i => i.Employee).ToArray();
 
                     if (dtrGroups.Count() == 0)
                         throw new Exception($"No DTR records has been found from {start.ToLongDateString()} " +
                                             $"to {end.ToLongDateString()} with Pay package code '{jobGradeBand}'");
 
-                    PayPackage payPackage = dPContext.PayPackage.First(i => i.Code == globalSettings.PayPackageMappings.First(ii => ii.Target == jobGradeBand).Source);
+                    PayPackage payPackage = dPContext.PayPackage.AsEnumerable().First(i => i.Code == globalSettings.PayPackageMappings.AsEnumerable().First(ii => ii.Target == jobGradeBand).Source);
 
                     if (payPackage == null)
                         throw new Exception($"Please setup pay package mapping for Job Grade Band '{jobGradeBand}' in the Settings");
@@ -629,20 +664,21 @@ namespace TKProcessor.Services
                     PayFreqCalendar payFreqCalendar = dPContext.PayPackagePayFreqCalendars
                                                    .Include(i => i.PayPackageSeq)
                                                    .Include(i => i.PayFreqCalendarSeq)
+                                                   .AsEnumerable()
                                                    .First(i => i.PayPackageSeqId == payPackage.SeqId)?.PayFreqCalendarSeq;
 
                     if (payFreqCalendar == null)
                         throw new Exception($"Please setup Pay Frequency Calendar that corresponds to Job Grade Band '{jobGradeBand}'");
 
-                    long maxTrxNo = dPContext.Company.First().NextPayrollTrxNo++;
+                    long maxTrxNo = dPContext.Company.AsEnumerable().First().NextPayrollTrxNo++;
 
                     PayrollTrx trx = new PayrollTrx()
                     {
-                        CountryId = dPContext.Country.FirstOrDefault()?.CountryId,
+                        CountryId = dPContext.Country.AsEnumerable().FirstOrDefault()?.CountryId,
                         Type = 1,
                         TrxNo = maxTrxNo,
-                        Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
-                        Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()}",
+                        Label = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
+                        Description = $"Imported from Servio SmartHR Timekeeping {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
                         RefDate = DateTime.Now,
                         CreatedOn = DateTime.Now,
                         CreatedBy = Guid.Empty,

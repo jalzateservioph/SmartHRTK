@@ -425,6 +425,12 @@ namespace TKProcessor.Services
         {
             DTR.WorkHours = Math.Round(workHours / 60, 2) + 0.00m;
 
+            DTR.ActualPreOvertime = Math.Round(preShiftOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedPreOvertime = Math.Round(approvedPreShiftOvertime / 60, 2) + 0.00m;
+
+            DTR.ActualPostOvertime = Math.Round(postShiftOvertime / 60, 2) + 0.00m;
+            DTR.ApprovedPostOvertime = Math.Round(approvedPostShiftOvertime / 60, 2) + 0.00m;
+
             if (DTR.Shift.IsRestDay.HasValue && DTR.Shift.IsRestDay.Value)
             {
                 DTR.ActualRestDay = Math.Round(regularWorkHours / 60, 2) + 0.00m;
@@ -435,22 +441,56 @@ namespace TKProcessor.Services
                 //DTR.ApprovedNDRD
                 DTR.ActualNDRDot = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
                 //DTR.ApprovedNDRDot
+
+
+                DTR.ActualRestDay = Math.Round(workHours / 60, 2) + 0.00m;
+                DTR.ApprovedRestDay = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+
+                DTR.ActualRestDayOt = Math.Round(totalOvertime / 60, 2) + 0.00m;
+                DTR.ApprovedRestDayOt = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
+                DTR.ActualNDRD = Math.Round(nightDifferential / 60, 2) + 0.00m;
+                DTR.ApprovedNDRD = Math.Round(nightDifferential / 60, 2) + 0.00m;
+
+                DTR.ActualNDRDot = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
+                DTR.ApprovedNDRDot = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
             }
             else
             {
                 DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+
+                DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+                DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
+                //DTR.ActualPreOvertime = Math.Round(preShiftOvertime / 60, 2) + 0.00m;
+                //DTR.ApprovedPreOvertime = Math.Round(approvedPreShiftOvertime / 60, 2) + 0.00m;
+
+                //DTR.ActualPostOvertime = Math.Round(postShiftOvertime / 60, 2) + 0.00m;
+                //DTR.ApprovedPostOvertime = Math.Round(approvedPostShiftOvertime / 60, 2) + 0.00m;
+
+                DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
+                DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
+
+                //    DTR.RegularWorkHours = Math.Round(regularWorkHours / 60, 2) + 0.00m;
+
+                //    DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
+                //    DTR.ApprovedLate = Math.Round(approvedLate / 60, 2) + 0.00m;
+
+                //    DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
+                //    DTR.ApprovedUndertime = Math.Round(approvedUndertime / 60, 2) + 0.00m;
+
+                //    DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
+                //    DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
+
+                //    DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
+                //    DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
+                //}
 
                 DTR.ActualLate = Math.Round(late / 60, 2) + 0.00m;
                 DTR.ApprovedLate = Math.Round(approvedLate / 60, 2) + 0.00m;
 
                 DTR.ActualUndertime = Math.Round(undertime / 60, 2) + 0.00m;
                 DTR.ApprovedUndertime = Math.Round(approvedUndertime / 60, 2) + 0.00m;
-
-                DTR.ActualOvertime = Math.Round(totalOvertime / 60, 2) + 0.00m;
-                DTR.ApprovedOvertime = Math.Round(approvedOvertime / 60, 2) + 0.00m;
-
-                DTR.NightDifferential = Math.Round(nightDifferential / 60, 2) + 0.00m;
-                DTR.NightDifferentialOt = Math.Round(nightDifferentialOvertime / 60, 2) + 0.00m;
             }
         }
 

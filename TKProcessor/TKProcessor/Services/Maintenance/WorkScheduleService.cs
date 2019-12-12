@@ -80,7 +80,9 @@ namespace TKProcessor.Services.Maintenance
                                                                     i.ScheduleDate == entity.ScheduleDate);
             }
 
-            if (existing == default(WorkSchedule))
+            CurrentUser = Context.User.First(i => i.Id == CurrentUser.Id);
+
+            if (existing == null)
             {
                 entity.IsActive = true;
                 entity.CreatedBy = CurrentUser;
@@ -88,25 +90,26 @@ namespace TKProcessor.Services.Maintenance
                 entity.LastModifiedBy = CurrentUser;
                 entity.LastModifiedOn = DateTime.Now;
 
+                entity.Employee = Context.Employee.First(i => i.Id == entity.Employee.Id);
+
+                entity.Shift = Context.Shift.First(i => i.Id == entity.Shift.Id);
+
                 CreateAuditLog(entity);
 
                 Context.WorkSchedule.Add(entity);
-
-                Context.Entry(entity.Employee).State = EntityState.Unchanged;
-                Context.Entry(entity.Shift).State = EntityState.Unchanged;
             }
             else
             {
                 existing.LastModifiedBy = CurrentUser;
                 existing.LastModifiedOn = DateTime.Now;
 
-                CreateAuditLog(entity, existing);
-
                 existing.Employee = Context.Employee.First(i => i.Id == entity.Employee.Id);
 
                 existing.ScheduleDate = entity.ScheduleDate;
 
                 existing.Shift = Context.Shift.First(i => i.Id == entity.Shift.Id);
+
+                CreateAuditLog(entity, existing);
             }
 
             if (AutoSaveChanges)

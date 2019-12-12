@@ -104,19 +104,27 @@ namespace TKProcessor.Services.Maintenance
                         var cols = data.Columns.Cast<DataColumn>().Select(i => i.ColumnName).ToArray();
 
                         if (cols.Count() != columnSetup.Count())
-                                continue;
+                            continue;
+
+                        bool isValid = true;
 
                         for (int a = 0; a < cols.Count(); a++)
                         {
                             if (cols[a] != columnSetup[a])
-                                continue;
+                            {
+                                isValid = false;
+                                break;
+                            }
                         }
+
+                        if (!isValid)
+                            continue;
 
                         columns = columnSetup;
                         break;
                     }
 
-                    if(columns == null)
+                    if (columns == null)
                         throw new FormatException("Invalid biometrics raw data file format");
 
                     var validBiometricsId = Context.Employee.Select(i => i.BiometricsId).ToList();
@@ -125,6 +133,8 @@ namespace TKProcessor.Services.Maintenance
 
                     var types = Enum.GetValues(typeof(HolidayType)).Cast<HolidayType>()
                                     .Select(i => i.ToString().ToLower()).ToList();
+
+                    AutoSaveChanges = false;
 
                     for (int rowCounter = 0; rowCounter < data.Rows.Count; rowCounter++)
                     {
@@ -137,7 +147,16 @@ namespace TKProcessor.Services.Maintenance
                             else
                                 ImportInOutFormat(row, columns, iterationCallback);
                         }
+
+                        if (rowCounter % 1000 == 0)
+                        {
+                            SaveChanges();
+                        }
                     }
+
+                    SaveChanges();
+
+                    AutoSaveChanges = true;
                 }
             }
             catch (Exception ex)
@@ -209,6 +228,7 @@ namespace TKProcessor.Services.Maintenance
                         BiometricsId = row[columns[0]].ToString(),
                         TransactionType = 1,
                         ScheduleDate = schedDate.Value,
+                        TransactionDateTime = timein.Value
                     };
 
                     Save(rawDataIn);

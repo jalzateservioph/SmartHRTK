@@ -173,8 +173,8 @@ namespace TKProcessor.Services
             }
 
 
-            MapFieldsToDTR();
-            //MapFields();
+            //MapFieldsToDTR();
+            MapFields();
         }
 
         public void ComputeRegular()
@@ -389,7 +389,7 @@ namespace TKProcessor.Services
                     approvedPreShiftOvertime = DTR.Shift.MaximumPreShiftOt.Value;
                 }
 
-                if (DTR.Shift.RoundPreShiftOt.HasValue && DTR.Shift.RoundPreShiftOt > 1)
+                if (DTR.Shift.RoundPreShiftOt.HasValue && approvedPreShiftOvertime < DTR.Shift.RoundPreShiftOt.Value && DTR.Shift.RoundPreShiftOt > 1)
                 {
                     approvedPreShiftOvertime = approvedPreShiftOvertime - (approvedPreShiftOvertime % DTR.Shift.RoundPreShiftOt.Value);
                 }
@@ -442,7 +442,7 @@ namespace TKProcessor.Services
                     approvedPostShiftOvertime = DTR.Shift.MaximumPostShiftOt.Value;
                 }
 
-                if (DTR.Shift.RoundPostShiftOt.HasValue && DTR.Shift.RoundPostShiftOt > 1)
+                if (DTR.Shift.RoundPostShiftOt.HasValue && approvedPostShiftOvertime > DTR.Shift.RoundPostShiftOt.Value && DTR.Shift.RoundPostShiftOt > 1)
                 {
                     approvedPostShiftOvertime = approvedPostShiftOvertime - (approvedPostShiftOvertime % DTR.Shift.RoundPostShiftOt.Value);
                 }
