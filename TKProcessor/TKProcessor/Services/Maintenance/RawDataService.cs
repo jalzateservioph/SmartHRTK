@@ -85,6 +85,17 @@ namespace TKProcessor.Services.Maintenance
             base.Save(existing, entity);
         }
 
+        public void SaveNoAdjustment(RawData entity)
+        {
+            //Context = new TKContext();
+
+            var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
+                                                    i.TransactionType == entity.TransactionType &&
+                                                    i.ScheduleDate == entity.ScheduleDate);
+
+            base.Save(existing, entity);
+        }
+
         public void Import(string filename, Action<RawData> iterationCallback)
         {
             if (!File.Exists(filename))
