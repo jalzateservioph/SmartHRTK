@@ -317,8 +317,8 @@ namespace TKProcessor.Services
                             {
                                 if (timein != null && timeout != null && timein.TransactionDateTime == timeout.TransactionDateTime)
                                 {
-                                    DTR.RegularWorkHours = requiredWorkHours;
-                                    DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
+                                    //DTR.RegularWorkHours = requiredWorkHours;
+                                    //DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                 }
                                 else
                                 {
@@ -762,52 +762,53 @@ namespace TKProcessor.Services
             }
             // Work schedule
 
-
             // Update Raw Data
             using (RawDataService service = new RawDataService(CurrentUser.Id))
             {
                 RawData[] rawData = service.List().Where(i => i.BiometricsId == employee.BiometricsId && i.ScheduleDate == transactionDate).OrderBy(i => i.TransactionType).ToArray();
 
-                RawData rawDataIn = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeIn);
-
-                if (rawDataIn == default(RawData))
+                if (timein.HasValue)
                 {
-                    rawDataIn = new RawData()
+                    RawData rawDataIn = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeIn);
+
+                    if (rawDataIn == default(RawData))
                     {
-                        BiometricsId = employee.BiometricsId,
-                        IsActive = true,
-                        TransactionType = (int)TransactionType.TimeIn,
-                        ScheduleDate = transactionDate
-                    };
-                }
+                        rawDataIn = new RawData()
+                        {
+                            BiometricsId = employee.BiometricsId,
+                            IsActive = true,
+                            TransactionType = (int)TransactionType.TimeIn,
+                            ScheduleDate = transactionDate
+                        };
+                    }
 
-                if (rawDataIn.TransactionDateTime != timein.Value)
-                {
                     rawDataIn.TransactionDateTime = timein.Value;
 
-                    service.Save(rawDataIn);
+                    service.SaveNoAdjustment(rawDataIn);
                 }
 
-                RawData rawDataOut = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeOut);
-
-                if (rawDataOut == default(RawData))
+                if (timeout.HasValue)
                 {
-                    rawDataOut = new RawData()
+                    RawData rawDataOut = rawData.FirstOrDefault(i => i.TransactionType == (int)TransactionType.TimeOut);
+
+                    if (rawDataOut == default(RawData))
                     {
-                        BiometricsId = employee.BiometricsId,
-                        IsActive = true,
-                        TransactionType = (int)TransactionType.TimeOut,
-                        ScheduleDate = transactionDate
-                    };
-                }
+                        rawDataOut = new RawData()
+                        {
+                            BiometricsId = employee.BiometricsId,
+                            IsActive = true,
+                            TransactionType = (int)TransactionType.TimeOut,
+                            ScheduleDate = transactionDate
+                        };
+                    }
 
-                if (rawDataOut.TransactionDateTime != timeout.Value)
-                {
+                    if (timein.HasValue && timein.Value.TimeOfDay > timeout.Value.TimeOfDay)
+                        timeout = DateTimeHelpers.ConstructDate(transactionDate,  timeout.Value).AddDays(1);
+
                     rawDataOut.TransactionDateTime = timeout.Value;
 
-                    service.Save(rawDataOut);
+                    service.SaveNoAdjustment(rawDataOut);
                 }
-
             }
             // Raw data
 
