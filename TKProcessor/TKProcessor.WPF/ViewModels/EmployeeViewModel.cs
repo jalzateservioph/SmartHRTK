@@ -102,6 +102,12 @@ namespace TKProcessor.WPF.ViewModels
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing {employee.ToString()}..."));
                     });
 
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
+
+                    new LeaveService().Sync();
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
+
                     eventAggregator.PublishOnUIThread(new NewMessageEvent("Employee Sync Complete!"));
                 }
                 catch (Exception ex)
