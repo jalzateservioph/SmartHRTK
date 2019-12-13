@@ -34,7 +34,7 @@
             <Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Process" Content="Process" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="ExportToDP" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
-            <Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <!--<Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>-->
         </StackPanel>
 
         <Grid x:Name="gridFilters" Margin="0,5,0,0" Grid.Row="2" IsEnabled="{Binding IsEnabled}">
@@ -124,7 +124,30 @@
                 <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Regular Work Hours" Width="auto" IsReadOnly="True"/>
+                <!--<DataGridTextColumn Binding="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Regular Work Hours" Width="auto" IsReadOnly="False"/>-->
+                <DataGridTemplateColumn Header="Regular Work Hours" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding RegularWorkHours, Converter={StaticResource DecimalToHourPartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" hrs" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding RegularWorkHours, Converter={StaticResource DecimalToMinutePartConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text=" mins"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding AbsentHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualLate, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False">
@@ -877,7 +900,25 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Remarks}" Header="Remarks" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>
+                <!--<DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>-->
+                <DataGridTemplateColumn Header="Leave Type" Width="auto" IsReadOnly="False">
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding LeaveType, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Background="Yellow" Text="{Binding LeaveType}" >
+                                <TextBlock.Style>
+                                    <Style>
+                                        <Setter Value="Black" Property="TextBlock.Foreground"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 

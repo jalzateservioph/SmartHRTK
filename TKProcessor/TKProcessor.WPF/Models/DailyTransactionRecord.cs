@@ -76,6 +76,8 @@ namespace TKProcessor.WPF.Models
         private decimal _approvedNDLegSpeHolRD;
         private decimal _actualNDLegSpeHolRDot;
         private decimal _approvedNDLegSpeHolRDot;
+        private decimal regularWorkHours;
+        private string leaveType;
 
         public DailyTransactionRecord()
         {
@@ -100,6 +102,9 @@ namespace TKProcessor.WPF.Models
 
                 IsDirty = true;
             }
+
+            if(e.PropertyName == nameof(RegularWorkHours) || e.PropertyName == nameof(LeaveType))
+                IsDirty = true;
         }
 
         public override string ToString()
@@ -112,7 +117,15 @@ namespace TKProcessor.WPF.Models
         public DateTime? TransactionDate { get; set; }
         public DateTime? TimeIn { get; set; }
         public DateTime? TimeOut { get; set; }
-        public decimal RegularWorkHours { get;set; }
+        public decimal RegularWorkHours
+        {
+            get => regularWorkHours;
+            set
+            {
+                regularWorkHours = value;
+                NotifyOfPropertyChange();
+            }
+        }
         public decimal WorkHours { get; set; }
         public decimal AbsentHours { get; set; }
         public decimal ActualLate
@@ -724,7 +737,15 @@ namespace TKProcessor.WPF.Models
             }
         }
         public string Remarks { get; set; }
-        public string LeaveType { get; set; }
+        public string LeaveType
+        {
+            get => leaveType;
+            set
+            {
+                leaveType = value;
+                NotifyOfPropertyChange();
+            }
+        }
     }
 
     public class DTRAdjustmentModel : PropertyChangedBase
