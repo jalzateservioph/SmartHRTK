@@ -46,15 +46,18 @@ namespace TKProcessor.WPF.ViewModels
 
             Task.Run(() =>
             {
+                bool verifyingLoopFlag = true;
+
                 try
                 {
+
                     string customStartupMessage = "";
 
                     HasStartupMessage = true;
 
                     var t = Task.Run(() =>
                     {
-                        while (verifying)
+                        while (verifying && verifyingLoopFlag)
                         {
                             if (string.IsNullOrEmpty(StartupMessage) || StartupMessage.Contains("...")) StartupMessage = customStartupMessage;
                             else if (StartupMessage.Contains("..")) StartupMessage = $"{customStartupMessage}...";
@@ -87,9 +90,15 @@ namespace TKProcessor.WPF.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    HasStartupMessage = true;
+
+                    StartupMessage = (ex.InnerException ?? ex).Message;
+                }
+                finally
+                {
                     verifying = false;
 
-                    StartupMessage = ex.Message;
+                    verifyingLoopFlag = false;
                 }
             });
 
