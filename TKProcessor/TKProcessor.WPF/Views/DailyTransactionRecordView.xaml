@@ -108,9 +108,9 @@
 
         <DataGrid CanUserAddRows="False" CanUserDeleteRows="False"  Margin="0,5,0,0" Grid.Row="4" IsEnabled="{Binding IsEnabled}"
                   ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">
+                  ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3" FrozenColumnCount="5">
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Employee Code" Width="auto" IsReadOnly="True">
+                <DataGridTemplateColumn Header="Employee Code" Width="auto" IsReadOnly="True" SortMemberPath="Employee">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
@@ -125,7 +125,7 @@
                 <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
                 <!--<DataGridTextColumn Binding="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Regular Work Hours" Width="auto" IsReadOnly="False"/>-->
-                <DataGridTemplateColumn Header="Regular Work Hours" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Regular Work Hours" Width="auto" IsReadOnly="False" SortMemberPath="RegularWorkHours">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -150,7 +150,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding AbsentHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Absent Hours" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualLate, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Late" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved Late" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLate">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -174,7 +174,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualUndertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Undertime" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Undertime" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved Undertime" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedUndertime">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -198,7 +198,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualOvertime, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Overtime" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Overtime" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved Overtime" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedOvertime">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedOvertime, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -228,7 +228,7 @@
                 <DataGridTextColumn Binding="{Binding NightDifferential, Converter={StaticResource DecimalToTimeConverter}}" Header="ND" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding NightDifferentialOt, Converter={StaticResource DecimalToTimeConverter}}" Header="NDOT" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding ActualRestDay, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Rest Day" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Rest Day" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved Rest Day" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedRestDay">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedRestDay, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -252,7 +252,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualRestDayOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Rest Day OT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved Rest Day OT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved Rest Day OT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedRestDayOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedRestDayOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -276,7 +276,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -300,7 +300,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -324,7 +324,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -348,7 +348,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -372,7 +372,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved SpeHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved SpeHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedSpeHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -396,7 +396,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved SpeHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved SpeHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedSpeHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -420,7 +420,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegSpeHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegSpeHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegSpeHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -444,7 +444,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegSpeHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegSpeHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegSpeHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -468,7 +468,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -492,7 +492,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -516,7 +516,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved SpeHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved SpeHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedSpeHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -540,7 +540,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual SpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved SpeHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved SpeHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedSpeHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -564,7 +564,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegSpeHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegSpeHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegSpeHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -588,7 +588,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual LegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved LegSpeHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved LegSpeHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedLegSpeHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -612,7 +612,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -636,7 +636,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -660,7 +660,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDSpeHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDSpeHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDSpeHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -684,7 +684,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDSpeHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDSpeHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDSpeHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -708,7 +708,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHol" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegSpeHol" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegSpeHol" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegSpeHol">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHol, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -732,7 +732,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegSpeHolOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegSpeHolOt">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolOt, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -756,7 +756,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -780,7 +780,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -804,7 +804,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDSpeHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDSpeHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDSpeHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -828,7 +828,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDSpeHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDSpeHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDSpeHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -852,7 +852,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolRD" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegSpeHolRD" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolRD" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegSpeHolRD">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRD, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -876,7 +876,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding ActualNDLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual NDLegSpeHolRDOT" Width="auto" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Approved NDLegSpeHolRDOT" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Approved NDLegSpeHolRDOT" Width="auto" IsReadOnly="False" SortMemberPath="ApprovedNDLegSpeHolRDot">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Background="Yellow" Text="{Binding ApprovedNDLegSpeHolRDot, Converter={StaticResource DecimalToTimeConverter}}" >
@@ -901,7 +901,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Remarks}" Header="Remarks" Width="auto" IsReadOnly="True"/>
                 <!--<DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>-->
-                <DataGridTemplateColumn Header="Leave Type" Width="auto" IsReadOnly="False">
+                <DataGridTemplateColumn Header="Leave Type" Width="auto" IsReadOnly="False" SortMemberPath="LeaveType">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <TextBox Text="{Binding LeaveType, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Foreground="Black"/>
@@ -1017,8 +1017,9 @@
                     <Border  Grid.ColumnSpan="2" BorderBrush="#FFA2A2A2"  BorderThickness="0,0,0,1">
                         <Label FontFamily="Segoe UI Semibold" Background="#FFE0E0E0">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Editing "/>
-                                <TextBlock Text="{Binding CurrentItem}"/>
+                                <TextBlock Text="{Binding CurrentItem.Employee}"/>
+                                <TextBlock Text=" - "/>
+                                <TextBlock Text="{Binding CurrentItem.TransactionDate, StringFormat=d}"/>
                             </StackPanel>
                         </Label>
                     </Border>
