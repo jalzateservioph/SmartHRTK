@@ -237,9 +237,9 @@ namespace TKProcessor.Services.Maintenance
                     var rawDataIn = new RawData()
                     {
                         BiometricsId = row[columns[0]].ToString(),
-                        TransactionType = 1,
+                        TransactionType = (int)TransactionType.TimeIn,
                         ScheduleDate = schedDate.Value,
-                        TransactionDateTime = timein.Value
+                        TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value, timein.Value)
                     };
 
                     Save(rawDataIn);
@@ -250,10 +250,11 @@ namespace TKProcessor.Services.Maintenance
                     var rawDataOut = new RawData()
                     {
                         BiometricsId = row[columns[0]].ToString(),
-                        TransactionType = 1
+                        TransactionType = (int)TransactionType.TimeOut,
+                        ScheduleDate = schedDate.Value
                     };
 
-                    if (timein.HasValue && timeout.Value > timein.Value)
+                    if (timein.HasValue && timeout.Value < timein.Value)
                         rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value.AddDays(1), timeout.Value);
                     else
                         rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value, timeout.Value);
@@ -264,6 +265,7 @@ namespace TKProcessor.Services.Maintenance
             catch (Exception ex)
             {
                 throw new Exception("Invalid format template");
+
             }
         }
 
