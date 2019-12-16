@@ -51,8 +51,7 @@
         <Grid Grid.Row="2" Background="#FFF0F0F0" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid Margin="10,0">
 
-                <StackPanel Orientation="Horizontal">
-
+                <StackPanel Orientation="Horizontal" Visibility="Hidden">
                     <TextBlock Text="Connected To: " FontFamily="Segoe UI Semibold" Foreground="#FF22A23A" />
                     <TextBlock Text="{Binding CurrentUser.Name, Source={x:Static common:Session.Default}}" FontFamily="Segoe UI Semibold" Foreground="#FF22A23A" />
                     <TextBlock Text=" - " FontFamily="Segoe UI Semibold"/>
