@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient", "Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient.DAL", "IntegrationClient.DAL\IntegrationClient.DAL.csproj", "{46662883-F791-42D8-97ED-90BB98371753}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKProcessor.DBGenerator", "TKProcessor.DBGenerator\TKProcessor.DBGenerator.csproj", "{D98CABBB-B25C-43D1-986C-6832A0BC2101}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,12 @@ Global
 		{46662883-F791-42D8-97ED-90BB98371753}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{46662883-F791-42D8-97ED-90BB98371753}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46662883-F791-42D8-97ED-90BB98371753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
