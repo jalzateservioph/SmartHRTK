@@ -240,6 +240,8 @@ namespace TKProcessor.WPF.ViewModels
                         dtrService.Save(mapper.Map<TK.DailyTransactionRecord>(item));
                     }
 
+                    dtrService.SaveChanges();
+
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updated DTR records", MessageType.Information));
                 }
                 catch (Exception ex)
@@ -318,8 +320,8 @@ namespace TKProcessor.WPF.ViewModels
                         EndDate,
                         (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
                         (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i)).ToList(),
-                        message => RaiseMessage(message)
-                    );
+                        message => eventAggregator.PublishOnUIThread(new NewMessageEvent(message, 0))
+                        );
 
                     Populate();
 
