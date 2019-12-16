@@ -256,9 +256,9 @@ namespace TKProcessor.Services
                             if (DTR.Shift?.FocusDate == null || DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleIn)
                             {
                                 //holidays = holidayService.GetHolidays(DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
-                                holidays = holidayService.GetHolidays(DTR.TimeIn ?? scheduleDate);
+                                holidays = holidayService.GetHolidays(DTR.TimeIn ?? scheduleDate).ToList();
                                 //leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? DTR.Shift.ScheduleIn.Value);
-                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? scheduleDate);
+                                leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeIn ?? scheduleDate).ToList();
 
                             }
                             else if (DTR.Shift?.FocusDate.Value == (int)FocusDate.ScheduleOut)
@@ -302,7 +302,7 @@ namespace TKProcessor.Services
                                 if (holidays.Any(i => i.Type == (int)HolidayType.Legal))
                                 {
                                     DTR.RegularWorkHours = requiredWorkHours;
-                                    DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
+                                    //DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                 }
                             }
                             else if (timein == null && timeout == null && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
