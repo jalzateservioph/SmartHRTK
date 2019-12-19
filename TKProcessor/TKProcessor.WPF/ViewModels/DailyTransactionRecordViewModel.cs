@@ -43,6 +43,7 @@ namespace TKProcessor.WPF.ViewModels
         private bool isFilteringEmployees;
         private DTRAdjustmentModel currentItem;
         private ObservableCollection<Shift> shifts;
+        private bool isDPExportStarted;
 
         public DailyTransactionRecordViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -336,8 +337,22 @@ namespace TKProcessor.WPF.ViewModels
             });
         }
 
+        public void ConfirmExportToDP()
+        {
+            IsDPExportStarted = true;
+
+            PayOutDate = EndDate.Date;
+        }
+
+        public void CloseExportToDP()
+        {
+            IsDPExportStarted = false;
+        }
+
         public void ExportToDP()
         {
+            IsDPExportStarted = false;
+
             Task.Run(() =>
             {
                 StartProcessing();
@@ -346,7 +361,17 @@ namespace TKProcessor.WPF.ViewModels
                 {
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay has been started.", MessageType.Information, 0));
 
-                    Populate();
+                    if (Items.Count == 0)
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieving DTR records...", MessageType.Information, 0));
+                        Populate();
+                    }
+
+                    if (Items.Count == 0)
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"No DTR records retrieved. Reprocessing...", MessageType.Information, 0));
+                        Process();
+                    }
 
                     dtrService.ExportToDP(
                         StartDate,
@@ -358,7 +383,6 @@ namespace TKProcessor.WPF.ViewModels
                     );
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Export to dynamic pay complete.", MessageType.Success));
-
                 }
                 catch (Exception ex)
                 {
@@ -601,6 +625,16 @@ namespace TKProcessor.WPF.ViewModels
             set
             {
                 shifts = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public bool IsDPExportStarted
+        {
+            get => isDPExportStarted;
+            set
+            {
+                isDPExportStarted = value;
                 NotifyOfPropertyChange();
             }
         }

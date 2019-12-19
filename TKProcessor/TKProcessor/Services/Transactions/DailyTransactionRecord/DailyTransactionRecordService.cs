@@ -782,7 +782,7 @@ namespace TKProcessor.Services
                         };
                     }
 
-                    rawDataIn.TransactionDateTime = timein.Value;
+                    rawDataIn.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timein.Value);
 
                     service.SaveNoAdjustment(rawDataIn);
                 }
@@ -803,9 +803,9 @@ namespace TKProcessor.Services
                     }
 
                     if (timein.HasValue && timein.Value.TimeOfDay > timeout.Value.TimeOfDay)
-                        timeout = DateTimeHelpers.ConstructDate(transactionDate,  timeout.Value).AddDays(1);
+                        timeout = timeout.Value.AddDays(1);
 
-                    rawDataOut.TransactionDateTime = timeout.Value;
+                    rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timeout.Value);
 
                     service.SaveNoAdjustment(rawDataOut);
                 }

@@ -230,6 +230,9 @@ namespace TKProcessor.Services
                     if (actualTimeIn > expectedTimeIn.AddMinutes(gracePeriodMinutes))
                     {
                         approvedLate = late;
+
+                        if (DTR.Shift.IsPlusLateInMinutes == false)
+                            approvedLate -= gracePeriodMinutes;
                     }
                     else
                     {
@@ -298,6 +301,9 @@ namespace TKProcessor.Services
                     if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
+
+                        if (DTR.Shift.IsPlusEarlyOutMinutes == false)
+                            approvedUndertime -= gracePeriodMinutes;
                     }
                     else
                     {

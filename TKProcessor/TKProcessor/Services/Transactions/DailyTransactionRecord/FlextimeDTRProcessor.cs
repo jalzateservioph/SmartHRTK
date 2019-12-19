@@ -236,6 +236,9 @@ namespace TKProcessor.Services
                     if (workHours < (requiredWorkHours * 60) - gracePeriodMinutes)
                     {
                         approvedUndertime = undertime;
+
+                        if (DTR.Shift.IsPlusEarlyOutMinutes == false)
+                            approvedUndertime -= gracePeriodMinutes;
                     }
                 }
                 #region Half day
@@ -403,6 +406,9 @@ namespace TKProcessor.Services
                     if (actualTimeIn > latestIn.AddMinutes(gracePeriodMinutes))
                     {
                         approvedLate = late;
+
+                        if (DTR.Shift.IsPlusLateInMinutes == false)
+                            approvedLate -= gracePeriodMinutes;
                     }
                 }
 
@@ -442,6 +448,9 @@ namespace TKProcessor.Services
                     if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
+
+                        if (DTR.Shift.IsPlusEarlyOutMinutes == false)
+                            approvedUndertime -= gracePeriodMinutes;
                     }
                 }
 
@@ -653,6 +662,9 @@ namespace TKProcessor.Services
                         if (actualTimeIn > point.AddMinutes(gracePeriodMinutes))
                         {
                             approvedLate = late;
+
+                            if (DTR.Shift.IsPlusLateInMinutes == false)
+                                approvedLate -= gracePeriodMinutes;
                         }
 
                         #region Half day
@@ -689,6 +701,9 @@ namespace TKProcessor.Services
                     if (actualTimeOut < windowOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
+
+                        if (DTR.Shift.IsPlusEarlyOutMinutes == false)
+                            approvedUndertime -= gracePeriodMinutes;
                     }
                 }
 
