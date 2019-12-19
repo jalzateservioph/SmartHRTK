@@ -22,6 +22,7 @@ namespace TKProcessor.WPF.ViewModels
         readonly IMapper mapper;
         readonly EmployeeService employeeService;
         private Employee currentItem;
+        private BindingList<WorkSite> workSiteList;
 
         public EmployeeViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -31,7 +32,13 @@ namespace TKProcessor.WPF.ViewModels
             {
                 cfg.CreateMap<Employee, TKModels.Employee>();
                 cfg.CreateMap<TKModels.Employee, Employee>()
-                    .AfterMap((empDto, emp) => emp.IsDirty = false);
+                    .AfterMap((empDto, emp) =>
+                    {
+                        emp.IsDirty = false;
+
+                        if (emp.EmployeeWorkSites == null)
+                            emp.EmployeeWorkSites = new System.Collections.ObjectModel.ObservableCollection<EmployeeWorkSite>();
+                    });
 
                 cfg.CreateMap<TKModels.EmployeeWorkSite, EmployeeWorkSite>();
                 cfg.CreateMap<EmployeeWorkSite, TKModels.EmployeeWorkSite>();
@@ -66,6 +73,13 @@ namespace TKProcessor.WPF.ViewModels
                     }
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} employees."));
+
+                    WorkSiteList = new BindingList<WorkSite>();
+
+                    foreach (var item in new WorkSiteService().Get())
+                    {
+                        WorkSiteList.Add(mapper.Map<WorkSite>(item));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -104,7 +118,7 @@ namespace TKProcessor.WPF.ViewModels
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
 
-                    new LeaveService().Sync();
+                    new LeaveService(Session.Default.CurrentUser.Id).Sync();
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
 
@@ -128,6 +142,17 @@ namespace TKProcessor.WPF.ViewModels
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving edited employees..."));
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {CurrentItem}..."));
+
+                foreach(var site in currentItem.EmployeeWorkSites)
+                {
+                    if (site.Id == Guid.Empty)
+                        site.Id = Guid.NewGuid();
+
+                    site.WorkSiteId = site.WorkSite.Id;
+
+                    site.Employee = currentItem;
+                    site.EmployeeId = currentItem.Id;
+                }
 
                 employeeService.Save(mapper.Map<TKModels.Employee>(CurrentItem));
 
@@ -204,6 +229,16 @@ namespace TKProcessor.WPF.ViewModels
             set
             {
                 currentItem = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public BindingList<WorkSite> WorkSiteList
+        {
+            get => workSiteList;
+            set
+            {
+                workSiteList = value;
                 NotifyOfPropertyChange();
             }
         }

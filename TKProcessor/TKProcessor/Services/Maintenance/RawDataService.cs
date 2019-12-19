@@ -85,6 +85,14 @@ namespace TKProcessor.Services.Maintenance
             base.Save(existing, entity);
         }
 
+        public void Delete(string biometricsId, DateTime transactionDate, int type)
+        {
+            var forDelete = Context.RawData.FirstOrDefault(r => r.BiometricsId == biometricsId && r.ScheduleDate.Date == transactionDate.Date && r.TransactionType == type);
+
+            if (forDelete != null)
+                base.DeleteHard(forDelete);
+        }
+
         public void SaveNoAdjustment(RawData entity)
         {
             //Context = new TKContext();

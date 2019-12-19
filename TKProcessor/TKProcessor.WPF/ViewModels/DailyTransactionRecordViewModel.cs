@@ -282,11 +282,11 @@ namespace TKProcessor.WPF.ViewModels
         {
             try
             {
-                if (currentItem.TimeIn == null)
-                    throw new Exception("Time in cannot be empty");
+                //if (currentItem.TimeIn == null)
+                //    throw new Exception("Time in cannot be empty");
 
-                if (currentItem.TimeOut == null)
-                    throw new Exception("Time out cannot be empty");
+                //if (currentItem.TimeOut == null)
+                //    throw new Exception("Time out cannot be empty");
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing adjustment...", 0));
 

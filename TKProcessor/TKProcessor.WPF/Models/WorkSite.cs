@@ -5,6 +5,11 @@ namespace TKProcessor.WPF.Models
 {
     public class WorkSite : BaseModel
     {
+        public override string ToString()
+        {
+            return SiteId + " - " + Name;
+        }
+
         public string SiteId { get; set; }
         public string Name { get; set; }
 
