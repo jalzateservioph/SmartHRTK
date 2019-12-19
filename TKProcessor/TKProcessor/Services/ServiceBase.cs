@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -37,6 +38,49 @@ namespace TKProcessor.Services
                 Context.SaveChanges();
             }
         }
+    }
+
+    public class BasicTKService<T> where T : class
+    {
+        protected void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
+        {
+            using (var ctx = new TKContext())
+            {
+                ctx.ErrorLog.Add(new ErrorLog(ex, source));
+                ctx.SaveChanges();
+            }
+        }
+
+        protected void CreateAuditLog(T newValue)
+        {
+            CreateAuditLog(newValue, null);
+        }
+
+        protected void CreateAuditLog(T newValue, T oldValue)
+        {
+            using (var ctx = new TKContext())
+            {
+                foreach (var prop in typeof(T).GetProperties())
+                {
+                    var oldVal = oldValue == null ? null : prop.GetValue(oldValue)?.ToString();
+                    var newVal = prop.GetValue(newValue)?.ToString();
+
+                    if (oldValue == null || oldVal != newVal)
+                    {
+                        ctx.AuditLog.Add(new AuditLog()
+                        {
+                            Target = $"{typeof(T).Name}.{prop.Name}",
+                            Action = oldValue == null ? "Create" : "Update",
+                            OldValue = JsonConvert.SerializeObject(oldVal),
+                            NewValue = JsonConvert.SerializeObject(newVal),
+                            ModifiedBy = CurrentUser?.Name ?? "admin"
+                        });
+                    }
+                }
+            }
+        }
+
+        protected User CurrentUser { get; set; }
     }
 
     public class TKService<T> : IService<T>, IDisposable
@@ -218,8 +262,11 @@ namespace TKProcessor.Services
         }
 
         protected TKContext Context { get; set; }
+
         protected User CurrentUser { get; set; }
+
         public bool AutoSaveChanges { get; set; }
+
         public bool UseDefaultUser { get; set; }
     }
 
