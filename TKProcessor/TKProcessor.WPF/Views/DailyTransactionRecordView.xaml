@@ -120,8 +120,26 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat={}{0:MMMM dd\, yyyy \- dddd}}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>
+                <!--<DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>-->
+                <DataGridTemplateColumn Header="Time In" Width="auto" IsReadOnly="True" SortMemberPath="TimeIn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
+                                <TextBlock Text="{Binding TimeIn}"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Time Out" Width="auto" IsReadOnly="True" SortMemberPath="TimeIn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
+                                <TextBlock Text="{Binding TimeOut}"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
                 <!--<DataGridTextColumn Binding="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Regular Work Hours" Width="auto" IsReadOnly="False"/>-->
                 <DataGridTemplateColumn Header="Regular Work Hours" Width="auto" IsReadOnly="False" SortMemberPath="RegularWorkHours">
@@ -1090,7 +1108,7 @@
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        
+
                         <Label Grid.Column="0" Grid.Row="0" Content="Line Date:" />
                         <DatePicker Grid.Column="1" Grid.Row="0" SelectedDate="{Binding PayOutDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -1099,7 +1117,7 @@
                     <Button x:Name="ExportToDP" Grid.Row="2" Content="Export to Dynamic Pay" Padding="10,1" Margin="5,0,5,2" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
 
                 </Grid>
-                
+
             </Border>
         </Grid>
 
