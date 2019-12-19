@@ -18,9 +18,12 @@ namespace TKProcessor.WPF.Converter
             if (value is ICollection)
             {
                 foreach (var item in (value as ICollection))
-                    output += item.ToString() + ", ";
+                {
+                    if (item != null)
+                        output += item.ToString() + ", ";
+                }
 
-                if(!string.IsNullOrEmpty(output))
+                if (!string.IsNullOrEmpty(output))
                     output = output.Remove(output.Length - 2);
             }
 
