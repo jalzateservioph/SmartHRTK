@@ -296,22 +296,22 @@
 
                             <!--Row 8-->
 
-                            <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"
-                    Grid.Row="8" Grid.Column="0" Margin="0" MaxWidth="100">
+                            <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"
+                    Grid.Row="8" Grid.Column="2" Margin="0" MaxWidth="140">
                                 <TextBlock TextWrapping="WrapWithOverflow">
-                        Is Plus Late In Minutes
+                        Count Grace Period As Late
                                 </TextBlock>
                             </Label>
-                            <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Collapsed"
-                    Grid.Row="8" Grid.Column="1" IsChecked="{Binding CurrentItem.IsPlusLateInMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Visible"
+                    Grid.Row="8" Grid.Column="3" IsChecked="{Binding CurrentItem.IsPlusLateInMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <Label HorizontalAlignment="Left" VerticalAlignment="Center"
-                    Grid.Row="8" Grid.Column="2" Margin="0" MaxWidth="100">
+                    Grid.Row="8" Grid.Column="4" Margin="0" MaxWidth="140">
                                 <TextBlock TextWrapping="WrapWithOverflow">
                         Max. Minutes Considered As Half Day
                                 </TextBlock>
                             </Label>
-                            <xctk:IntegerUpDown Grid.Row="8" Grid.Column="3"  Margin="0"  VerticalAlignment="Center"
+                            <xctk:IntegerUpDown Grid.Row="8" Grid.Column="5" Margin="0" VerticalAlignment="Center"
                                     Value="{Binding CurrentItem.MaximumMinutesConsideredAsHalfDay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <!--Row 9-->
@@ -358,22 +358,22 @@
 
                             <!--Row 11-->
 
-                            <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"
-                    Grid.Row="11" Grid.Column="0" Margin="0" MaxWidth="100">
+                            <Label HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"
+                    Grid.Row="11" Grid.Column="2" Margin="0" MaxWidth="140">
                                 <TextBlock TextWrapping="WrapWithOverflow">
-                        Is Plus Early Out Minutes
+                        Count Grace Period as Early Out
                                 </TextBlock>
                             </Label>
-                            <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Collapsed"
-                    Grid.Row="11" Grid.Column="1" IsChecked="{Binding CurrentItem.IsPlusEarlyOutMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <CheckBox HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" Visibility="Visible"
+                    Grid.Row="11" Grid.Column="3" IsChecked="{Binding CurrentItem.IsPlusEarlyOutMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <Label HorizontalAlignment="Left" VerticalAlignment="Center"
-                    Grid.Row="11" Grid.Column="2" Margin="0" MaxWidth="100">
+                    Grid.Row="11" Grid.Column="4" Margin="0" MaxWidth="140">
                                 <TextBlock TextWrapping="WrapWithOverflow">
                         Max. Minutes Considered As Half Day
                                 </TextBlock>
                             </Label>
-                            <xctk:IntegerUpDown Grid.Row="11" Grid.Column="3"  Margin="0"  VerticalAlignment="Center"
+                            <xctk:IntegerUpDown Grid.Row="11" Grid.Column="5"  Margin="0"  VerticalAlignment="Center"
                                     Value="{Binding CurrentItem.MaximumMinutesConsideredAsHalfAayEarlyOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <!--Row 12-->

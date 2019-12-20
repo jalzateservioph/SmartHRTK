@@ -17,6 +17,11 @@ namespace TKProcessor.WPF.Models
         private string _jobGradeBand;
         private ObservableCollection<EmployeeWorkSite> employeeWorkSites;
 
+        public override string ToString()
+        {
+            return EmployeeCode + " - " + FullName;
+        }
+
         public string EmployeeCode
         {
             get => _employeeCode;
@@ -89,12 +94,6 @@ namespace TKProcessor.WPF.Models
                 employeeWorkSites = value;
                 NotifyOfPropertyChange();
             }
-        }
-
-
-        public override string ToString()
-        {
-            return EmployeeCode + " - " + FullName;
         }
     }
 }

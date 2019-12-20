@@ -273,6 +273,11 @@ namespace TKProcessor.Services
                                 leaves = leaveService.GetLeaves(employee.EmployeeCode, DTR.TimeOut ?? date);
                             }
 
+                            if (leaves != null && leaves.Count() > 0)
+                            {
+                                DTR.LeaveType = leaves.First().LeaveType;
+                            }
+
                             bool isLegalHoliday = false;
                             bool isSpecialHoliday = false;
 
@@ -304,6 +309,11 @@ namespace TKProcessor.Services
                                     DTR.RegularWorkHours = requiredWorkHours;
                                     //DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                 }
+                            }
+                            else if (timein == null && timeout == null && leaves != null && leaves.Count() > 0)
+                            {
+                                if (leaves.First().LeaveHours == 1m)
+                                    DTR.RegularWorkHours = requiredWorkHours;
                             }
                             else if (timein == null && timeout == null && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
                             {
@@ -782,9 +792,13 @@ namespace TKProcessor.Services
                         };
                     }
 
-                    rawDataIn.TransactionDateTime = timein.Value;
+                    rawDataIn.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timein.Value);
 
                     service.SaveNoAdjustment(rawDataIn);
+                }
+                else
+                {
+                    service.Delete(employee.BiometricsId, transactionDate, (int)TransactionType.TimeIn);
                 }
 
                 if (timeout.HasValue)
@@ -803,12 +817,18 @@ namespace TKProcessor.Services
                     }
 
                     if (timein.HasValue && timein.Value.TimeOfDay > timeout.Value.TimeOfDay)
-                        timeout = DateTimeHelpers.ConstructDate(transactionDate,  timeout.Value).AddDays(1);
+                        timeout = timeout.Value.AddDays(1);
 
-                    rawDataOut.TransactionDateTime = timeout.Value;
+                    rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timeout.Value);
 
                     service.SaveNoAdjustment(rawDataOut);
                 }
+                else
+                {
+                    service.Delete(employee.BiometricsId, transactionDate, (int)TransactionType.TimeOut);
+                }
+
+                service.SaveChanges();
             }
             // Raw data
 

@@ -63,11 +63,7 @@ namespace TKProcessor.Services
 
         public void Compute()
         {
-            if (leaveDuration == 1M || leaveDuration == 0.5M)
-            {
-                workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
-            }
-            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
 
@@ -152,15 +148,28 @@ namespace TKProcessor.Services
                 }
 
                 ComputeLate();
-                ComputeUndertime();
-                ComputeOvertime();
-                ComputeNightDifferential();
 
+                ComputeUndertime();
+
+                if (leaveDuration > 0)
+                {
+                    if (regularWorkHours + requiredWorkHours * leaveDuration * 60 >= requiredWorkHours * 60)
+                        regularWorkHours = requiredWorkHours * 60;
+                    else
+                        regularWorkHours += requiredWorkHours * leaveDuration * 60;
+                }
+                else
+                {
+                    if (regularWorkHours >= requiredWorkHours * 60)
+                        ComputeOvertime();
+                }
+
+                ComputeNightDifferential();
             }
             else
             {
                 //No TimeIn and TimeOut.. Handle absent hours here [abs]
-                if ((!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false) &&  (Holidays == null || Holidays.Count() == 0))
+                if ((!DTR.Shift.IsRestDay.HasValue || DTR.Shift.IsRestDay == false) && (Holidays == null || Holidays.Count() == 0))
                 {
                     absentHours = requiredWorkHours * 60;
 
@@ -171,7 +180,6 @@ namespace TKProcessor.Services
                     }
                 }
             }
-
 
             //MapFieldsToDTR();
             MapFields();
@@ -184,7 +192,7 @@ namespace TKProcessor.Services
                 workHours = DTR.Shift.RequiredWorkHours.Value * leaveDuration;
             }
 
-            else if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
+            if (DTR.TimeIn.HasValue && DTR.TimeOut.HasValue)
             {
                 GetActualTimeInAndOut();
                 workHours = (decimal)(actualTimeOut - actualTimeIn).TotalMinutes;
@@ -201,7 +209,21 @@ namespace TKProcessor.Services
 
                 ComputeLate();
                 ComputeUndertime();
-                ComputeOvertime();
+                //ComputeOvertime();
+
+                if (leaveDuration > 0)
+                {
+                    if (regularWorkHours + requiredWorkHours * leaveDuration * 60 >= requiredWorkHours * 60)
+                        regularWorkHours = requiredWorkHours * 60;
+                    else
+                        regularWorkHours += requiredWorkHours * leaveDuration * 60;
+                }
+                else
+                {
+                    if (regularWorkHours >= requiredWorkHours * 60)
+                        ComputeOvertime();
+                }
+
                 ComputeNightDifferential();
             }
             else
@@ -210,6 +232,18 @@ namespace TKProcessor.Services
             }
 
             MapFieldsToDTR();
+        }
+
+        private void AdjustForLeaves()
+        {
+            if (late > 0)
+            {
+
+            }
+            else if (undertime > 0)
+            {
+
+            }
         }
 
         private void ComputeLate()
@@ -230,6 +264,9 @@ namespace TKProcessor.Services
                     if (actualTimeIn > expectedTimeIn.AddMinutes(gracePeriodMinutes))
                     {
                         approvedLate = late;
+
+                        if (DTR.Shift.IsPlusLateInMinutes == false)
+                            approvedLate -= gracePeriodMinutes;
                     }
                     else
                     {
@@ -298,6 +335,9 @@ namespace TKProcessor.Services
                     if (actualTimeOut < expectedTimeOut.AddMinutes(-gracePeriodMinutes))
                     {
                         approvedUndertime = undertime;
+
+                        if (DTR.Shift.IsPlusEarlyOutMinutes == false)
+                            approvedUndertime -= gracePeriodMinutes;
                     }
                     else
                     {
