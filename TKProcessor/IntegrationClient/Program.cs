@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using IntegrationClient.DAL.Models;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace IntegrationClient
 {
@@ -18,7 +19,7 @@ namespace IntegrationClient
 
         private static LastRun lastRun;
         private static string fileName = "lastsuccessfulrun.json";
-        private static string path = Directory.GetCurrentDirectory() + "/" + fileName;
+        private static string path = GetBasePath() + "/" + fileName;
         private static bool updateLastRun = false;
 
         static void Main(string[] args)
@@ -240,8 +241,16 @@ namespace IntegrationClient
 
         private static void BuildConfiguration()
         {
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            var builder = new ConfigurationBuilder().SetBasePath(GetBasePath()).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _configuration = builder.Build();
+        }
+        
+        private static string GetBasePath()
+        {
+            string assemblyPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
+
+            return appPathMatcher.Match(assemblyPath).Value;
         }
 
         private static void RegisterServices()

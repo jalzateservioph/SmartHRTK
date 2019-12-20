@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -38,12 +39,30 @@ namespace BiometricsIntegrationWebAPI.Helpers
 
             try
             {
-                var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
-                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
-                var username = credentials[0];
-                var password = credentials[1];
-                site = await workSiteService.Authenticate(username, password);
+                using (EventLog eventLog = new EventLog("Application"))
+                {
+                    eventLog.Source = "Application";
+                    var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
+                    eventLog.WriteEntry("Test1");
+                    var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
+                    eventLog.WriteEntry("Test2");
+                    var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
+                    eventLog.WriteEntry("Test3");
+
+                    var username = credentials[0];
+                    var password = credentials[1];
+                    try
+                    {
+                        site = await workSiteService.Authenticate(username, password);
+                    }
+                    catch (Exception ex)
+                    {
+                        eventLog.WriteEntry(ex.Message);
+                        throw ex;
+                    }
+                    eventLog.WriteEntry("Test4");
+
+                }
             }
             catch
             {
