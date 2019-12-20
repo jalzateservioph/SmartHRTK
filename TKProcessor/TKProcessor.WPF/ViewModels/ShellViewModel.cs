@@ -180,6 +180,11 @@ namespace TKProcessor.WPF.ViewModels
             ChangeActiveItem(new GlobalSettingsViewModel(eventAggregator, windowManager), true);
         }
 
+        public void ShowWorkSites()
+        {
+            ChangeActiveItem(new WorkSiteViewModel(eventAggregator, windowManager), true);
+        }
+
         public void ShowAuditLogs()
         {
             ChangeActiveItem(new AuditLogsViewModel(eventAggregator, windowManager), true);

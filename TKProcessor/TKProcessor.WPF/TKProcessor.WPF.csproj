@@ -301,6 +301,7 @@
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\WorkScheduleAdjustmentViewModel.cs" />
     <Compile Include="ViewModels\WorkScheduleViewModel.cs" />
+    <Compile Include="ViewModels\WorkSiteViewModel.cs" />
     <Compile Include="Views\AuditLogsView.xaml.cs">
       <DependentUpon>AuditLogsView.xaml</DependentUpon>
     </Compile>

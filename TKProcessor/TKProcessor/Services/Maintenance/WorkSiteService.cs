@@ -75,11 +75,11 @@ namespace TKProcessor.Services.Maintenance
             }
         }
 
-        public async Task<int> Save(CancellationToken cancellationToken = default)
+        public int Save(CancellationToken cancellationToken = default)
         {
             try
             {
-                return await context.SaveChangesAsync(cancellationToken);
+                return context.SaveChanges();
             }
             catch (Exception ex)
             {
