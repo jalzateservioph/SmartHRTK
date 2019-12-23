@@ -314,6 +314,8 @@ namespace TKProcessor.Services
                             {
                                 if (leaves.First().LeaveHours == 1m)
                                     DTR.RegularWorkHours = requiredWorkHours;
+                                else
+                                    DTR.RegularWorkHours = requiredWorkHours / 2;
                             }
                             else if (timein == null && timeout == null && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
                             {
@@ -817,9 +819,15 @@ namespace TKProcessor.Services
                     }
 
                     if (timein.HasValue && timein.Value.TimeOfDay > timeout.Value.TimeOfDay)
+                    {
                         timeout = timeout.Value.AddDays(1);
 
-                    rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timeout.Value);
+                        rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate.AddDays(1), timeout.Value);
+                    }
+                    else
+                    {
+                        rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(transactionDate, timeout.Value);
+                    }
 
                     service.SaveNoAdjustment(rawDataOut);
                 }
@@ -827,8 +835,6 @@ namespace TKProcessor.Services
                 {
                     service.Delete(employee.BiometricsId, transactionDate, (int)TransactionType.TimeOut);
                 }
-
-                service.SaveChanges();
             }
             // Raw data
 
