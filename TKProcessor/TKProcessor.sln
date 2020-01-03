@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationClient.DAL", "In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKProcessor.DBGenerator", "TKProcessor.DBGenerator\TKProcessor.DBGenerator.csproj", "{D98CABBB-B25C-43D1-986C-6832A0BC2101}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKProcessor.Console", "TKProcessor.Console\TKProcessor.Console.csproj", "{FB79EF93-1112-4969-A323-9BC1F50D4486}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,12 @@ Global
 		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D98CABBB-B25C-43D1-986C-6832A0BC2101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB79EF93-1112-4969-A323-9BC1F50D4486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

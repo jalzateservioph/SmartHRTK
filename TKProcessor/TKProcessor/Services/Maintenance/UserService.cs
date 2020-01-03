@@ -12,8 +12,8 @@ namespace TKProcessor.Services.Maintenance
 {
     public class UserService : TKService<User>
     {
-
         private const string salt = "PNeAscT6iJcRna80tFwb60wUVQbHeOLpnTE4G0gilNKEjwW1gaztxOrDoWHKzOGe1wH3UzhkMZjv4uQ43xPNy2r85iai9cLdg5NnnbNnwpkfvbM37dNcAOYxu8DtFR6I";
+
         public UserService() : base()
         {
 
@@ -21,6 +21,34 @@ namespace TKProcessor.Services.Maintenance
         public UserService(TKContext context) : base(context)
         {
 
+        }
+
+        public User Add(string name, string username, string password = "Password1")
+        {
+            User user = null;
+
+            try
+            {
+                user = new Models.TK.User()
+                {
+                    Name = name,
+                    Username = string.IsNullOrEmpty(username) ? name : username,
+                    Password = Hash(password)
+                };
+
+                Context.User.Add(user);
+
+                user.CreatedBy = null;
+                user.LastModifiedBy = null;
+
+                Context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return user;
         }
 
         public bool TryLogin(string username, string password, out User user)
