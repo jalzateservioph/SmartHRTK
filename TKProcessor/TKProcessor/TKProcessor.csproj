@@ -332,6 +332,10 @@
     <Compile Include="Migrations\20191203022647_AddWorkSiteFieldsToWorkSched.designer.cs">
       <DependentUpon>20191203022647_AddWorkSiteFieldsToWorkSched.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20200107120004_EmployeeAddDepartmentField.cs" />
+    <Compile Include="Migrations\20200107120004_EmployeeAddDepartmentField.designer.cs">
+      <DependentUpon>20200107120004_EmployeeAddDepartmentField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />

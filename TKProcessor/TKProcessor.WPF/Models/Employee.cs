@@ -85,6 +85,7 @@ namespace TKProcessor.WPF.Models
                 NotifyOfPropertyChange();
             }
         }
+        public string Department { get; set; }
 
         public ObservableCollection<EmployeeWorkSite> EmployeeWorkSites
         {

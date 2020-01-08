@@ -148,6 +148,9 @@ namespace TKProcessor.WPF.ViewModels
                         if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
                             return true;
 
+                        if (emp.Department.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                            return true;
+
                         return false;
                     };
 
@@ -165,6 +168,9 @@ namespace TKProcessor.WPF.ViewModels
                             return true;
 
                         if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                            return true;
+
+                        if (emp.Department.ToLower().Contains(EmployeeListViewSearch.ToLower()))
                             return true;
 
                         return false;
@@ -298,7 +304,7 @@ namespace TKProcessor.WPF.ViewModels
                     currentItem.TimeOut
                 );
 
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Adjustmnet complete"));
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"{currentItem.Employee} - {currentItem.TransactionDate.ToShortDateString()} adjusted complete"));
             }
             catch (Exception ex)
             {
@@ -448,6 +454,22 @@ namespace TKProcessor.WPF.ViewModels
         public void RemoveSelectedEmployees(Employee source)
         {
             SelectedEmployees.Remove(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void AddAllEmployees()
+        {
+            foreach (var source in EmployeeListView.Cast<Employee>())
+                SelectedEmployees.Add(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void RemoveAllEmployees()
+        {
+            foreach (var source in SelectedEmployeesView.Cast<Employee>().ToList())
+                SelectedEmployees.Remove(source);
 
             FilterEmployeeFilter();
         }

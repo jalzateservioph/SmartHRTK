@@ -85,7 +85,8 @@ namespace TKProcessor.Services.Maintenance
                                        FullName = p.FirstName + (string.IsNullOrEmpty(p.MiddleName) ? " " : " " + p.MiddleName + " ") + p.Surname,
                                        BiometricsId = int.Parse(p.PayrollEmployeeNum.Trim()).ToString(),
                                        TerminationDate = p.TerminationDate,
-                                       JobGradeBand = p1.JobGradeBand
+                                       JobGradeBand = p1.JobGradeBand,
+                                       Department = p.DeptName
                                    });
 
                     foreach (var emp in empList)
