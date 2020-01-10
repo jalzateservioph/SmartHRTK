@@ -48,7 +48,7 @@ namespace IntegrationClient.DAL.Services
                 var jsonString = response.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<IEnumerable<Employee>>(jsonString);
             }
-            throw new Exception($"Get employees failed\n{response.Content.ToString()}");
+            throw new Exception($"Get employees failed\n{response.Content.ReadAsStringAsync().Result}");
         }
 
         public void PushRawData(IEnumerable<RawData> rawData)

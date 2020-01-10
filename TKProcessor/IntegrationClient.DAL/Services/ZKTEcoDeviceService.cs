@@ -140,7 +140,8 @@ namespace IntegrationClient.DAL.Services
             ConnectToDevices();
             foreach (var device in deviceList)
             {
-                IList<Employee> empList = (IList<Employee>)employees;
+                //IList<Employee> empList = (IList<Employee>)employees;
+                IList<Employee> empList = employees.ToList();
                 EnableDevice(device, false);
                 device.ReadAllUserID(machineNumber);
 

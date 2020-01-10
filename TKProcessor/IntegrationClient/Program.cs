@@ -241,6 +241,7 @@ namespace IntegrationClient
 
         private static void BuildConfiguration()
         {
+            //Console.WriteLine("Base Path: " + GetBasePath());
             var builder = new ConfigurationBuilder().SetBasePath(GetBasePath()).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _configuration = builder.Build();
         }
@@ -248,9 +249,11 @@ namespace IntegrationClient
         private static string GetBasePath()
         {
             string assemblyPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
-            Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
+            //Console.WriteLine("Assembly Path: " + assemblyPath);
+            //Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
 
-            return appPathMatcher.Match(assemblyPath).Value;
+            //return appPathMatcher.Match(assemblyPath).Value;
+            return assemblyPath.Replace("file:\\", null);
         }
 
         private static void RegisterServices()
