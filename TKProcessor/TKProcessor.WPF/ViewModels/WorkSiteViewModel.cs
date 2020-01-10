@@ -16,6 +16,7 @@ namespace TKProcessor.WPF.ViewModels
         readonly WorkSiteService service;
 
         readonly IMapper mapper;
+        private WorkSite currentItem;
 
         public WorkSiteViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
@@ -38,20 +39,81 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Populate()
         {
-            foreach (var item in service.Get())
+            Task.Run(() =>
             {
-                Items.Add(mapper.Map<WorkSite>(item));
-            }
+                StartProcessing();
+
+                try
+                {
+                    foreach (var item in service.Get())
+                    {
+                        Items.Add(mapper.Map<WorkSite>(item));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex);
+                }
+
+                EndProcessing();
+            });
+        }
+
+        public void ShowRecord(WorkSite entity = null)
+        {
+            CurrentItem = entity ?? new WorkSite();
+
+            StartEditing();
         }
 
         public void Save()
         {
-            var existing = Items.FirstOrDefault(workSite => workSite.Id == ActiveItem.Id);
+            try
+            {
+                var existing = Items.FirstOrDefault(workSite => workSite.Id == currentItem.Id);
 
-            if (existing == null)
-                service.Add(mapper.Map<TK.WorkSite>(existing));
-            else
-                service.Update(existing.Id, mapper.Map<TK.WorkSite>(existing));
+                if (existing == null)
+                    service.Add(mapper.Map<TK.WorkSite>(currentItem));
+                else
+                    service.Update(existing.Id, mapper.Map<TK.WorkSite>(existing));
+
+                if (service.Save() > 0)
+                    RaiseMessage("Record saved successfuly", Events.MessageType.Success);
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
+        }
+
+        public void Delete()
+        {
+
+        }
+
+       public void Import()
+        {
+
+        }
+
+        public void Export()
+        {
+
+        }
+
+        public void DownloadTemplate()
+        {
+
+        }
+
+        public WorkSite CurrentItem
+        {
+            get => currentItem;
+            set
+            {
+                currentItem = value;
+                NotifyOfPropertyChange();
+            }
         }
     }
 }

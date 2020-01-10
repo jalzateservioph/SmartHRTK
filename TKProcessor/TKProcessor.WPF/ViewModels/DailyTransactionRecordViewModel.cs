@@ -142,11 +142,19 @@ namespace TKProcessor.WPF.ViewModels
                         if (string.IsNullOrEmpty(EmployeeListViewSearch))
                             return true;
 
-                        if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                            return true;
+                        if (EmployeeListViewSearch.ToLower().StartsWith("dept:"))
+                        {
+                            if (emp.Department.ToLower().Contains(EmployeeListViewSearch.ToLower().Replace("dept:","")))
+                                return true;
+                        }
+                        else
+                        {
+                            if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                                return true;
 
-                        if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                            return true;
+                            if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                                return true;
+                        }
 
                         return false;
                     };
@@ -161,11 +169,19 @@ namespace TKProcessor.WPF.ViewModels
                         if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
                             return true;
 
-                        if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                            return true;
+                        if (SelectedEmployeesViewSearch.ToLower().StartsWith("dept:"))
+                        {
+                            if (emp.Department.ToLower().Contains(SelectedEmployeesViewSearch.ToLower().Replace("dept:", "")))
+                                return true;
+                        }
+                        else
+                        {
+                            if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                                return true;
 
-                        if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                            return true;
+                            if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                                return true;
+                        }
 
                         return false;
                     };
@@ -298,7 +314,7 @@ namespace TKProcessor.WPF.ViewModels
                     currentItem.TimeOut
                 );
 
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Adjustmnet complete"));
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"{currentItem.Employee} - {currentItem.TransactionDate.ToShortDateString()} adjusted complete"));
             }
             catch (Exception ex)
             {
@@ -448,6 +464,22 @@ namespace TKProcessor.WPF.ViewModels
         public void RemoveSelectedEmployees(Employee source)
         {
             SelectedEmployees.Remove(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void AddAllEmployees()
+        {
+            foreach (var source in EmployeeListView.Cast<Employee>())
+                SelectedEmployees.Add(source);
+
+            FilterEmployeeFilter();
+        }
+
+        public void RemoveAllEmployees()
+        {
+            foreach (var source in SelectedEmployeesView.Cast<Employee>().ToList())
+                SelectedEmployees.Remove(source);
 
             FilterEmployeeFilter();
         }

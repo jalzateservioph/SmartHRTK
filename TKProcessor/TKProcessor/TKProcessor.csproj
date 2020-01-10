@@ -110,6 +110,9 @@
     <Reference Include="Microsoft.Identity.Client, Version=3.0.8.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Identity.Client.3.0.8\lib\net45\Microsoft.Identity.Client.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Remotion.Linq, Version=2.2.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <HintPath>..\packages\Remotion.Linq.2.2.0\lib\net45\Remotion.Linq.dll</HintPath>
     </Reference>
@@ -329,6 +332,10 @@
     <Compile Include="Migrations\20191203022647_AddWorkSiteFieldsToWorkSched.designer.cs">
       <DependentUpon>20191203022647_AddWorkSiteFieldsToWorkSched.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20200107120004_EmployeeAddDepartmentField.cs" />
+    <Compile Include="Migrations\20200107120004_EmployeeAddDepartmentField.designer.cs">
+      <DependentUpon>20200107120004_EmployeeAddDepartmentField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\TKContextModelSnapshot.cs" />
     <Compile Include="Models\DP\Company.cs" />
     <Compile Include="Models\DP\Country.cs" />
@@ -364,6 +371,7 @@
     <Compile Include="Models\TK\WorkScheduleAdjustment.cs" />
     <Compile Include="Models\TK\WorkSite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Maintenance\WorkSiteService.cs" />
     <Compile Include="Services\Reports\AbsenceReportService.cs" />
     <Compile Include="Services\Reports\AbsenceReportSummaryService.cs" />
     <Compile Include="Services\Reports\DailyTransactionRecordReportService.cs" />

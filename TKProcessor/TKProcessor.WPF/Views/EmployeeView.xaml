@@ -41,7 +41,17 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding}" />
+                                <TextBlock Text="{Binding}" Padding="0,0,5,0"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Department" Width="auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
+                                <TextBlock Text="{Binding Department}" Padding="0,0,5,0"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -51,7 +61,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding BiometricsId}" />
+                                <TextBlock Text="{Binding BiometricsId}" Padding="0,0,5,0"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -61,7 +71,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding JobGradeBand}" />
+                                <TextBlock Text="{Binding JobGradeBand}" Padding="0,0,5,0"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -71,7 +81,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding TerminationDate}" />
+                                <TextBlock Text="{Binding TerminationDate}" Padding="0,0,5,0"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -111,6 +121,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
@@ -125,18 +136,21 @@
                         <Label Content="Employee:" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
                         <TextBox Text="{Binding CurrentItem, Converter={StaticResource EmployeeStringConverter}}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="6" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
 
-                        <Label Content="Biometrics Id:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.BiometricsId}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23" Margin="0,0,2,0" VerticalContentAlignment="Center"/>
+                        <Label Content="Employee:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding CurrentItem.Department}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="6" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
 
-                        <Label Content="Job Grade Band:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.JobGradeBand}" Grid.Row="1" Grid.Column="3" Height="23" Margin="0,0,2,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
+                        <Label Content="Biometrics Id:" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding CurrentItem.BiometricsId}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23" Margin="0,0,2,0" VerticalContentAlignment="Center"/>
 
-                        <Label Content="Termination Date:" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="4" VerticalAlignment="Center"/>
-                        <TextBox Text="{Binding CurrentItem.TerminationDate, StringFormat=d}" Grid.Row="1" Grid.Column="5" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
+                        <Label Content="Job Grade Band:" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding CurrentItem.JobGradeBand}" Grid.Row="2" Grid.Column="3" Height="23" Margin="0,0,2,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
 
-                        <Label Content="Assigned Worksites:" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="6" VerticalAlignment="Center"/>
+                        <Label Content="Termination Date:" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="4" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding CurrentItem.TerminationDate, StringFormat=d}" Grid.Row="2" Grid.Column="5" Height="23" Margin="0,0,0,0" IsReadOnly="True" VerticalContentAlignment="Center" Background="#FFF9F9F9"/>
 
-                        <DataGrid Grid.Row="4" Grid.ColumnSpan="6" Background="#FFF3F3F3" ItemsSource="{Binding CurrentItem.EmployeeWorkSites}" AutoGenerateColumns="False">
+                        <Label Content="Assigned Worksites:" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" VerticalAlignment="Center"/>
+
+                        <DataGrid Grid.Row="5" Grid.ColumnSpan="6" Background="#FFF3F3F3" ItemsSource="{Binding CurrentItem.EmployeeWorkSites}" AutoGenerateColumns="False">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Width="*">
                                     <DataGridTemplateColumn.CellTemplate>

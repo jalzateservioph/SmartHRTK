@@ -24,6 +24,7 @@
                 <MenuItem x:Name="ShowDashboard" Header="Dashboard"/>
                 <Separator/>
                 <MenuItem x:Name="ShowGlobalSettings" Header="Global Settings"/>
+                <MenuItem x:Name="ShowWorkSites" Header="Work Sites"/>
                 <Separator/>
                 <MenuItem x:Name="ShowErrorLogs" Header="Error Logs"/>
                 <MenuItem x:Name="ShowAuditLogs" Header="Audit Logs"/>

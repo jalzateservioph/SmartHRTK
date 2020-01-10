@@ -20,13 +20,14 @@ namespace TKProcessor.Contexts
         public virtual DbSet<AuditLog> AuditLog { get; set; }
         public virtual DbSet<DailyTransactionRecord> DailyTransactionRecord { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
+        public virtual DbSet<EmployeeWorkSite> EmployeeWorkSite { get; set; }
         public virtual DbSet<WorkSite> WorkSite { get; set; }
         public virtual DbSet<ErrorLog> ErrorLog { get; set; }
         public virtual DbSet<GlobalSetting> GlobalSetting { get; set; }
         public virtual DbSet<Mapping> Mapping { get; set; }
         public virtual DbSet<SelectionSetting> SelectionSetting { get; set; }
         public virtual DbSet<Calendar> Calendars { get; set; }
-        public virtual DbSet<CalendarDay> CalendarDays { get;set; }
+        public virtual DbSet<CalendarDay> CalendarDays { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<Leave> Leave { get; set; }
         public virtual DbSet<RawData> RawData { get; set; }
@@ -36,10 +37,7 @@ namespace TKProcessor.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
-            }
+            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -32,6 +32,7 @@ namespace TKProcessor.Models.TK
         public string FullName { get; set; }
         public string BiometricsId { get; set; }
         public string JobGradeBand { get; set; }
+        public string Department { get; set; }
         public DateTime? TerminationDate { get; set; }
 
         //ICollection<WorkSite> AssignedWorkSites { get; set; }

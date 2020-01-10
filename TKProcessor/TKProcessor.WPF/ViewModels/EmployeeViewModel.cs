@@ -50,7 +50,23 @@ namespace TKProcessor.WPF.ViewModels
                 cfg.CreateMap<TKModels.User, User>();
             }).CreateMapper();
 
+            Init();
+
             Populate();
+        }
+
+        public void Init()
+        {
+            StartProcessing();
+
+            eventAggregator.PublishOnUIThread(new NewMessageEvent("Initializing..."));
+
+            foreach (var item in new WorkSiteService().Get())
+            {
+                WorkSiteList.Add(mapper.Map<WorkSite>(item));
+            }
+
+            EndProcessing();
         }
 
         public void Populate()
@@ -73,13 +89,6 @@ namespace TKProcessor.WPF.ViewModels
                     }
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} employees."));
-
-                    WorkSiteList = new BindingList<WorkSite>();
-
-                    foreach (var item in new WorkSiteService().Get())
-                    {
-                        WorkSiteList.Add(mapper.Map<WorkSite>(item));
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -143,7 +152,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {CurrentItem}..."));
 
-                foreach(var site in currentItem.EmployeeWorkSites)
+                foreach (var site in currentItem.EmployeeWorkSites)
                 {
                     if (site.Id == Guid.Empty)
                         site.Id = Guid.NewGuid();
@@ -172,6 +181,11 @@ namespace TKProcessor.WPF.ViewModels
 
         public void OpenRecord(Employee employee)
         {
+            foreach(var item in employee.EmployeeWorkSites)
+            {
+                item.WorkSite = workSiteList.First(i => i.Id == item.WorkSiteId);
+            }
+
             CurrentItem = employee;
 
             StartEditing();
@@ -235,7 +249,7 @@ namespace TKProcessor.WPF.ViewModels
 
         public BindingList<WorkSite> WorkSiteList
         {
-            get => workSiteList;
+            get => workSiteList ?? (workSiteList = new BindingList<WorkSite>());
             set
             {
                 workSiteList = value;

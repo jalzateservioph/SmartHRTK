@@ -25,7 +25,7 @@ namespace TKProcessor.Services.Maintenance
 
         public override IEnumerable<Employee> List()
         {
-            return Context.Employee.Include(emp => emp.EmployeeWorkSites).ToList(); //Need to include relationship before making it to a list
+            return Context.Employee.Include(ews => ews.EmployeeWorkSites).ThenInclude(i => i.WorkSite); //Need to include relationship before making it to a list
         }
 
         public override void Save(Employee entity)
@@ -38,9 +38,29 @@ namespace TKProcessor.Services.Maintenance
                     entity.Id = existing.Id;
 
                 base.Save(entity);
+
+                if (entity.EmployeeWorkSites != null)
+                {
+                    foreach (var existingChild in Context.EmployeeWorkSite.Where(ews => ews.EmployeeId == (existing ?? entity).Id))
+                    {
+                        Context.EmployeeWorkSite.Remove(existingChild);
+                    }
+
+                    foreach (var ews in entity.EmployeeWorkSites)
+                    {
+                        ews.Employee = Context.Employee.Find(ews.Employee.Id);
+                        ews.WorkSite = Context.WorkSite.Find(ews.WorkSite.Id);
+
+                        Context.EmployeeWorkSite.Add(ews);
+                    }
+
+                    Context.SaveChanges();
+                }
             }
             catch (Exception ex)
             {
+                Context.Remove(entity);
+
                 CreateErrorLog(ex);
 
                 throw ex;
@@ -65,7 +85,8 @@ namespace TKProcessor.Services.Maintenance
                                        FullName = p.FirstName + (string.IsNullOrEmpty(p.MiddleName) ? " " : " " + p.MiddleName + " ") + p.Surname,
                                        BiometricsId = int.Parse(p.PayrollEmployeeNum.Trim()).ToString(),
                                        TerminationDate = p.TerminationDate,
-                                       JobGradeBand = p1.JobGradeBand
+                                       JobGradeBand = p1.JobGradeBand,
+                                       Department = p.DeptName
                                    });
 
                     foreach (var emp in empList)
