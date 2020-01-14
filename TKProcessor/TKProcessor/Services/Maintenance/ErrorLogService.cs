@@ -14,5 +14,10 @@ namespace TKProcessor.Services.Maintenance
         {
             Save(new ErrorLog(ex, source));
         }
+
+        public void Log(string message, [CallerMemberName]string source = "")
+        {
+            Save(new ErrorLog(message, source));
+        }
     }
 }

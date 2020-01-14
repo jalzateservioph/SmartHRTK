@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
+using TKProcessor.Services.Maintenance;
 using TKProcessor.WPF.Events;
 using TKProcessor.WPF.Models;
 
@@ -22,8 +24,12 @@ namespace TKProcessor.WPF.ViewModels
         private bool _isEnabled;
         private bool _isCheckedAll;
 
+        private ErrorLogService errLog;
+
         public ViewModelBase()
         {
+            errLog = new ErrorLogService();
+
             View = CollectionViewSource.GetDefaultView(Items);
 
             Sort();
@@ -35,6 +41,8 @@ namespace TKProcessor.WPF.ViewModels
         {
             this.eventAggregator = eventAggregator;
             this.windowManager = windowManager;
+
+            errLog = new ErrorLogService();
         }
 
         public virtual void StartProcessing()
@@ -66,13 +74,17 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
-        public virtual void HandleError(Exception ex)
+        public virtual void HandleError(Exception ex, [CallerMemberName]string source = "")
         {
+            errLog.Log(ex, source);
+
             eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
         }
 
         public virtual void HandleError(string message)
         {
+            errLog.Log(message);
+
             eventAggregator.PublishOnUIThread(new NewMessageEvent(message, MessageType.Error));
         }
 
@@ -129,14 +141,18 @@ namespace TKProcessor.WPF.ViewModels
 
         private bool isFormEnabled;
 
+        private ErrorLogService errLog;
+
         public ViewModel(IEventAggregator eventAggregator, IWindowManager windowManager)
         {
             this.eventAggregator = eventAggregator;
             this.windowManager = windowManager;
         }
 
-        public virtual void HandleError(Exception ex)
+        public virtual void HandleError(Exception ex, [CallerMemberName]string source = "")
         {
+            errLog.Log(ex, source);
+
             eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
         }
 

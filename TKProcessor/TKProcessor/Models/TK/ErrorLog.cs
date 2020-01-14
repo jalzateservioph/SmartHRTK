@@ -26,6 +26,12 @@ namespace TKProcessor.Models.TK
             Message = ex.Message;
         }
 
+        public ErrorLog(string message, [CallerMemberName]string source = "") : this()
+        {
+            Source = source;
+            Message = message;
+        }
+
         public Guid Id { get; set; }
         public User CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }

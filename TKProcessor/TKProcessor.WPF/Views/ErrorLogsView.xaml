@@ -25,10 +25,10 @@
         <DataGrid Margin="0,10,0,0" Grid.Row="2" CanUserAddRows="False" CanUserDeleteRows="False"
                   ItemsSource="{Binding View}" AutoGenerateColumns="False" Background="#FFF3F3F3">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Source}" Header="Target" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding Message}" Header="Action" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding StackTrace}" Header="Old Value" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding DateRaised}" Header="New Value" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Source}" Header="Source" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Message}" Header="Message" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding StackTrace}" Header="Stack Trace" Width="auto" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding DateRaised}" Header="Date Raised" Width="auto" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
 
