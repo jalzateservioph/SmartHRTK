@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
 using TKProcessor.WPF.Common;
@@ -143,33 +144,34 @@ namespace TKProcessor.WPF.ViewModels
 
         public void Import()
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 StartProcessing();
 
-            try
-            {
-                bool? result = null;
-
-                App.Current.Dispatcher.Invoke(() => { result = openFileDialog.ShowDialog(); });
-
-                if (result == true)
+                try
                 {
-                    service.Import(openFileDialog.FileName, null);
+                    bool? result = null;
 
-                    Populate();
+                    App.Current.Dispatcher.Invoke(() => { result = openFileDialog.ShowDialog(); });
 
-                    eventAggregator.BeginPublishOnUIThread(
-                        new NewMessageEvent(
-                            $"Successfully imported {Path.GetFileName(openFileDialog.FileName)}",
-                            MessageType.Success
-                        )
-                    );
+                    if (result == true)
+                    {
+                        service.Import(openFileDialog.FileName, null);
+
+                        Populate();
+
+                        eventAggregator.BeginPublishOnUIThread(
+                            new NewMessageEvent(
+                                $"Successfully imported {Path.GetFileName(openFileDialog.FileName)}",
+                                MessageType.Success
+                            )
+                        );
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
-            }
+                catch (Exception ex)
+                {
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                }
 
                 EndProcessing();
             });
@@ -187,6 +189,31 @@ namespace TKProcessor.WPF.ViewModels
                 service.ExportTemplate(saveFileDialog.FileName);
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saved file to {saveFileDialog.FileName}", MessageType.Success));
+            }
+        }
+
+        public void DownloadData()
+        {
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                try
+                {
+                    var data = DataTableHelpers.ToStringDataTable(View.Cast<Holiday>());
+
+                    data.RetainColumns(new string[] { "Name", "Type", "Date" });
+
+                    ExcelFileHandler.Export(saveFileDialog.FileName, data);
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saved file to {saveFileDialog.FileName}", MessageType.Success));
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, GetType().Name);
+                }
+
+                EndProcessing();
             }
         }
 

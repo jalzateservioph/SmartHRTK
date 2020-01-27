@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TKProcessor.Models.TK
 {
-    public partial class AuditLog : IEntity
+    public partial class AuditLog : IModel
     {
         public AuditLog()
         {
@@ -13,11 +13,6 @@ namespace TKProcessor.Models.TK
         }
 
         public Guid Id { get; set; }
-        public User CreatedBy { get; set; }
-        public DateTime? CreatedOn { get; set; }
-        public User LastModifiedBy { get; set; }
-        public DateTime? LastModifiedOn { get; set; }
-        public bool IsActive { get; set; }
 
 
         public string Target { get; set; }

@@ -35,6 +35,8 @@ namespace TKProcessor.WPF.ViewModels
         protected override void OnInitialize()
         {
             base.OnInitialize();
+
+            Populate();
         }
 
         public void Populate()
@@ -45,6 +47,8 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
+                    Items.Clear();
+
                     foreach (var item in service.Get())
                     {
                         Items.Add(mapper.Map<WorkSite>(item));

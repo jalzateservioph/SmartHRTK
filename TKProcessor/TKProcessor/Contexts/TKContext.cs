@@ -35,14 +35,18 @@ namespace TKProcessor.Contexts
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<WorkSchedule> WorkSchedule { get; set; }
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
+            base.OnConfiguring(optionsBuilder);
+
+            if (ConfigurationManager.ConnectionStrings["TK"] != null)
+                optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<User>().HasOne(a => a.CreatedBy).WithOne(a => a.LastModifiedBy).HasForeignKey<User>(c => c.Id);
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["TK"].ToString());
+        //}
     }
 }

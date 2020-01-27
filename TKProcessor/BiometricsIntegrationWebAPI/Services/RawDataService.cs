@@ -23,6 +23,8 @@ namespace BiometricsIntegrationWebAPI.Services
             {
                 rawDataService.Save(mapper.Map<Integration.RawData, TK.RawData>(i));
             }
+
+            rawDataService.SaveChanges();
         }
     }
 }

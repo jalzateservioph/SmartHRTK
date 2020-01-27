@@ -73,15 +73,34 @@ namespace TKProcessor.Services.Maintenance
 
         public override void Save(RawData entity)
         {
-            //Context = new TKContext();
+            RawData existing = null;
 
-            var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
-                                                    i.TransactionType == entity.TransactionType &&
-                                                    i.ScheduleDate == entity.ScheduleDate);
+            //var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
+            //                                        i.TransactionType == entity.TransactionType &&
+            //                                        i.ScheduleDate == entity.ScheduleDate);
 
             if (entity.ScheduleDate.Date != entity.TransactionDateTime.Date)
                 entity = SetScheduleDate(entity);
 
+            base.Save(existing, entity);
+        }
+
+        public void SaveNoAdjustment(RawData entity)
+        {
+            base.Save(entity);
+        }
+
+        public void SaveAndReplace(RawData entity)
+        {
+            var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
+                                                    i.TransactionType == entity.TransactionType &&
+                                                    i.ScheduleDate == entity.ScheduleDate);
+
+            base.Save(existing, entity);
+        }
+
+        public void SaveAndReplace(RawData existing, RawData entity)
+        {
             base.Save(existing, entity);
         }
 
@@ -91,17 +110,6 @@ namespace TKProcessor.Services.Maintenance
 
             if (forDelete != null)
                 base.DeleteHard(forDelete);
-        }
-
-        public void SaveNoAdjustment(RawData entity)
-        {
-            //Context = new TKContext();
-
-            var existing = List().FirstOrDefault(i => i.BiometricsId == entity.BiometricsId &&
-                                                    i.TransactionType == entity.TransactionType &&
-                                                    i.ScheduleDate == entity.ScheduleDate);
-
-            base.Save(existing, entity);
         }
 
         public void Import(string filename, Action<RawData> iterationCallback)
@@ -116,6 +124,9 @@ namespace TKProcessor.Services.Maintenance
 
                 foreach (DataTable data in ds.Tables)
                 {
+                    if (data.Columns.Count == 0 || data.Rows.Count == 0)
+                        continue;
+
                     string[] columns = null;
 
                     foreach (var columnSetup in templateSetup)
@@ -159,17 +170,33 @@ namespace TKProcessor.Services.Maintenance
                     {
                         DataRow row = data.Rows[rowCounter];
 
-                        if (validBiometricsId.Any(i => i == row[columns[0]].ToString()))
+                        try
                         {
-                            if (templateSetup.IndexOf(columns) == 1)
-                                ImportNormal(row, columns, iterationCallback);
-                            else
-                                ImportInOutFormat(row, columns, iterationCallback);
-                        }
+                            if (validBiometricsId.Any(i => i == row[columns[0]].ToString()))
+                            {
+                                if (templateSetup.IndexOf(columns) == 1)
+                                {
+                                    iterationCallback?.Invoke(ImportNormal(row, columns, iterationCallback));
+                                }
+                                else
+                                {
+                                    var outt = ImportInOutFormat(row, columns, iterationCallback);
 
-                        if (rowCounter % 1000 == 0)
+                                    if (outt != null && outt[0] != null)
+                                        iterationCallback?.Invoke(outt[0]);
+                                    if (outt != null && outt[1] != null)
+                                        iterationCallback?.Invoke(outt[1]);
+                                }
+                            }
+
+                            if (rowCounter % 1000 == 0)
+                            {
+                                SaveChanges();
+                            }
+                        }
+                        catch (Exception ex)
                         {
-                            SaveChanges();
+                            //throw new Exception(ex.Message + "@" + rowCounter);
                         }
                     }
 
@@ -186,7 +213,7 @@ namespace TKProcessor.Services.Maintenance
             }
         }
 
-        private void ImportNormal(DataRow row, string[] columns, Action<RawData> iterationCallback)
+        private RawData ImportNormal(DataRow row, string[] columns, Action<RawData> iterationCallback)
         {
             try
             {
@@ -223,7 +250,9 @@ namespace TKProcessor.Services.Maintenance
                     importedRawData.TransactionDateTime = DateTime.FromOADate(double.Parse(row[columns[3]].ToString()));
                 }
 
-                Save(importedRawData);
+                SaveNoAdjustment(importedRawData);
+
+                return importedRawData;
             }
             catch (Exception ex)
             {
@@ -231,14 +260,15 @@ namespace TKProcessor.Services.Maintenance
             }
         }
 
-        private void ImportInOutFormat(DataRow row, string[] columns, Action<RawData> iterationCallback)
+        private RawData[] ImportInOutFormat(DataRow row, string[] columns, Action<RawData> iterationCallback)
         {
+            RawData[] output = new RawData[2];
 
             try
             {
-                var schedDate = DateTimeHelpers.Parse(row[columns[1]]);
-                var timein = DateTimeHelpers.Parse(row[columns[2]]);
-                var timeout = DateTimeHelpers.Parse(row[columns[3]]);
+                var schedDate = string.IsNullOrEmpty(row[columns[1]]?.ToString()) ? null : DateTimeHelpers.Parse(row[columns[1]]);
+                var timein = string.IsNullOrEmpty(row[columns[2]]?.ToString()) ? null : DateTimeHelpers.Parse(row[columns[2]]);
+                var timeout = string.IsNullOrEmpty(row[columns[3]]?.ToString()) ? null : DateTimeHelpers.Parse(row[columns[3]]);
 
                 if (schedDate != null && timein != null)
                 {
@@ -250,7 +280,9 @@ namespace TKProcessor.Services.Maintenance
                         TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value, timein.Value)
                     };
 
-                    Save(rawDataIn);
+                    SaveNoAdjustment(rawDataIn);
+
+                    output[0] = rawDataIn;
                 }
 
                 if (schedDate != null && timeout != null)
@@ -262,13 +294,17 @@ namespace TKProcessor.Services.Maintenance
                         ScheduleDate = schedDate.Value
                     };
 
-                    if (timein.HasValue && timeout.Value < timein.Value)
+                    if (timein.HasValue && timeout.Value.TimeOfDay < timein.Value.TimeOfDay)
                         rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value.AddDays(1), timeout.Value);
                     else
                         rawDataOut.TransactionDateTime = DateTimeHelpers.ConstructDate(schedDate.Value, timeout.Value);
 
-                    Save(rawDataOut);
+                    SaveNoAdjustment(rawDataOut);
+
+                    output[1] = rawDataOut;
                 }
+
+                return output;
             }
             catch (Exception ex)
             {

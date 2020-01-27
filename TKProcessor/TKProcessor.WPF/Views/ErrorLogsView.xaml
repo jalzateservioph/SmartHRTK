@@ -15,7 +15,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Error Logs" FontSize="30" FontFamily="Segoe UI Light" Background="{DynamicResource HeaderBackground}" Foreground="{DynamicResource OverlayBackground1}"/>
+        <Label Content="Error Logs" FontSize="30" FontFamily="Segoe UI Light" Background="{DynamicResource HeaderBackground}" Foreground="{DynamicResource OverlayBackground1}" Margin="0,0,0,5"/>
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Height="26" Width="48" Grid.Row="1"/>
         <TextBox Height="26" Margin="53,0,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"

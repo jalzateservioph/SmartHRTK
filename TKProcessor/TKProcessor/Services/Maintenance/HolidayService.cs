@@ -75,6 +75,8 @@ namespace TKProcessor.Services.Maintenance
                     if (AutoSaveChanges)
                         context.SaveChanges();
                 }
+
+                CreateAuditLog(null, entity);
             }
             catch (Exception ex)
             {

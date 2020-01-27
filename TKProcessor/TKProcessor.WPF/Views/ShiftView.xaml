@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TKProcessor.WPF.Views"
+             xmlns:converters="clr-namespace:TKProcessor.WPF.Converter"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Name="baseControl" x:Class="TKProcessor.WPF.Views.ShiftView"
              mc:Ignorable="d" 
@@ -24,6 +25,7 @@
             <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="DownloadTemplate" Content="Download Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="DownloadData" Content="Download Data" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top" IsEnabled="{Binding IsEnabled}" />
@@ -44,7 +46,7 @@
                         </DataGridTemplateColumn.HeaderTemplate>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -52,7 +54,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
-                                    <TextBlock Text="{Binding ShiftCode}"/>
+                                    <Label Content="{Binding ShiftCode}"/>
                                 </ContentControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -61,7 +63,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
-                                    <TextBlock Text="{Binding ScheduleIn, StringFormat=t}"/>
+                                    <Label Content="{Binding ScheduleIn, Converter={StaticResource TimeDisplayConverter}}"/>
                                 </ContentControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -70,7 +72,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
-                                    <TextBlock Text="{Binding ScheduleOut, StringFormat=t}"/>
+                                    <Label Content="{Binding ScheduleOut, Converter={StaticResource TimeDisplayConverter}}"/>
                                 </ContentControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -79,7 +81,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
-                                    <TextBlock Text="{Binding RequiredWorkHours}"/>
+                                    <Label Content="{Binding RequiredWorkHours}"/>
                                 </ContentControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -88,17 +90,102 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
-                                    <TextBlock Text="{Binding IsRestDay, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                    <Label Content="{Binding IsRestDay, Converter={StaticResource BooleanToYesNoConverter}}"/>
                                 </ContentControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Late">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
+                                    <Label Content="{Binding IsLateIn, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Undertime">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
+                                    <Label Content="{Binding IsEarlyOut, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Pre-OT">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
+                                    <Label Content="{Binding IsPreShiftOt, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Post-OT">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
+                                    <Label Content="{Binding IsPostShiftOt, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Rest Day OT">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl cal:Message.Attach="[Event MouseDoubleClick] = [Action Edit()]">
+                                    <Label Content="{Binding IsHolidayRestDayOt, Converter={StaticResource BooleanToYesNoConverter}}"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Created On" SortMemberPath="CreatedOn">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl>
+                                    <Label Content="{Binding CreatedOn, Converter={StaticResource DateTimeDisplayConverter}}" Foreground="DarkSlateGray"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Created By" SortMemberPath="CreatedBy">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl>
+                                    <Label Content="{Binding CreatedBy}" Foreground="DarkSlateGray"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Last Modified On" SortMemberPath="LastModifiedOn">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl>
+                                    <Label Content="{Binding LastModifiedOn, Converter={StaticResource DateTimeDisplayConverter}}" Foreground="DarkSlateGray"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Last Modified By" SortMemberPath="LastModifiedBy">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl>
+                                    <Label Content="{Binding LastModifiedBy}" Foreground="DarkSlateGray"/>
+                                </ContentControl>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
                 </DataGrid.Columns>
             </DataGrid>
 
         </Grid>
 
-        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="3" >
+        <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="3" d:IsHidden="True" >
             <Border BorderBrush="#FF767676" BorderThickness="1" Margin="50">
 
                 <Grid Background="White">

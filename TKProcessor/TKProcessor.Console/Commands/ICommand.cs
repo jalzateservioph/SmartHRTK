@@ -22,6 +22,9 @@ namespace TKProcessor.Console
             if (string.Compare(token, "user_add") == 0)
                 return new AddUserCommand();
 
+            else if (string.Compare(token, "database_migrate") == 0)
+                return new CreateDatabaseCommand();
+
             return null;
         }
     }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
 using TKProcessor.WPF.Common;
@@ -24,31 +25,11 @@ namespace TKProcessor.WPF.ViewModels
         private Employee currentItem;
         private BindingList<WorkSite> workSiteList;
 
-        public EmployeeViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
+        public EmployeeViewModel(IEventAggregator eventAggregator, IWindowManager windowManager, IMapper mapper) : base(eventAggregator, windowManager)
         {
             employeeService = new EmployeeService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
-            mapper = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Employee, TKModels.Employee>();
-                cfg.CreateMap<TKModels.Employee, Employee>()
-                    .AfterMap((empDto, emp) =>
-                    {
-                        emp.IsDirty = false;
-
-                        if (emp.EmployeeWorkSites == null)
-                            emp.EmployeeWorkSites = new System.Collections.ObjectModel.ObservableCollection<EmployeeWorkSite>();
-                    });
-
-                cfg.CreateMap<TKModels.EmployeeWorkSite, EmployeeWorkSite>();
-                cfg.CreateMap<EmployeeWorkSite, TKModels.EmployeeWorkSite>();
-
-                cfg.CreateMap<WorkSite, TKModels.WorkSite>();
-                cfg.CreateMap<TKModels.WorkSite, WorkSite>();
-
-                cfg.CreateMap<User, TKModels.User>();
-                cfg.CreateMap<TKModels.User, User>();
-            }).CreateMapper();
+            this.mapper = mapper;
 
             Init();
 
@@ -59,12 +40,14 @@ namespace TKProcessor.WPF.ViewModels
         {
             StartProcessing();
 
-            eventAggregator.PublishOnUIThread(new NewMessageEvent("Initializing..."));
+            RaiseMessage("Initializing...");
 
             foreach (var item in new WorkSiteService().Get())
             {
                 WorkSiteList.Add(mapper.Map<WorkSite>(item));
             }
+
+            InitializeFilter();
 
             EndProcessing();
         }
@@ -77,7 +60,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent("Retrieving employees from the database..."));
+                    RaiseMessage("Retrieving employees from the database...");
 
                     Items.Clear();
 
@@ -85,18 +68,26 @@ namespace TKProcessor.WPF.ViewModels
                     {
                         Items.Add(mapper.Map<Employee>(item));
 
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing {item.ToString()}..."));
+                        RaiseMessage($"Syncing {item.ToString()}...");
                     }
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} employees."));
+                    RaiseMessage($"Retrieved {Items.Count} employees.");
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
             });
+        }
+
+        public override void InvokeFilter(KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                View.Refresh();
+            }
         }
 
         public void Sync()
@@ -107,9 +98,9 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent("Employee sync started..."));
+                    RaiseMessage("Employee sync started...");
 
-                    employeeService.Sync(Session.Default.CurrentUser.Id, emp =>
+                    employeeService.Sync(emp =>
                     {
                         var employee = mapper.Map<Employee>(emp);
 
@@ -122,20 +113,21 @@ namespace TKProcessor.WPF.ViewModels
 
                         Items.Add(employee);
 
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing {employee.ToString()}..."));
+                        RaiseMessage($"Syncing {employee.ToString()}...");
                     });
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
+                    employeeService.SaveChanges();
+
+
+                    RaiseMessage($"Syncing leaves...");
 
                     new LeaveService(Session.Default.CurrentUser.Id).Sync();
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Syncing leaves..."));
-
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent("Employee Sync Complete!"));
+                    RaiseMessage("Employee Sync Complete!");
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
@@ -148,9 +140,7 @@ namespace TKProcessor.WPF.ViewModels
             {
                 StartProcessing();
 
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving edited employees..."));
-
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {CurrentItem}..."));
+                RaiseMessage($"Saving {CurrentItem}...");
 
                 foreach (var site in currentItem.EmployeeWorkSites)
                 {
@@ -165,23 +155,24 @@ namespace TKProcessor.WPF.ViewModels
 
                 employeeService.Save(mapper.Map<TKModels.Employee>(CurrentItem));
 
-                CurrentItem.IsDirty = false;
+                if (employeeService.SaveChanges() > 0)
+                    RaiseMessage($"Employee record saved");
+                else
+                    RaiseMessage($"Record was not saved", MessageType.Warning);
 
                 Items.First(i => i.Id == CurrentItem.Id).BiometricsId = CurrentItem.BiometricsId;
-
-                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Employee records saved"));
 
                 EndProcessing();
             }
             catch (Exception ex)
             {
-                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                HandleError(ex, GetType().Name);
             }
         }
 
         public void OpenRecord(Employee employee)
         {
-            foreach(var item in employee.EmployeeWorkSites)
+            foreach (var item in employee.EmployeeWorkSites)
             {
                 item.WorkSite = workSiteList.First(i => i.Id == item.WorkSiteId);
             }

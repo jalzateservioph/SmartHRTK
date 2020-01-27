@@ -1,9 +1,11 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TKProcessor.WPF.Common;
 using TKProcessor.WPF.Models;
 using TKProcessor.WPF.ViewModels;
 
@@ -21,9 +23,18 @@ namespace TKProcessor.WPF
         protected override void Configure()
         {
             container = new SimpleContainer();
+
             container.Singleton<IWindowManager, WindowManager>();
+
             container.Singleton<IEventAggregator, EventAggregator>();
+
             container.PerRequest<ShellViewModel, ShellViewModel>();
+
+            container.RegisterInstance(
+                typeof(IMapper), 
+                "IMapper",
+                new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())).CreateMapper()
+            );
         }
 
         protected override object GetInstance(Type service, string key)

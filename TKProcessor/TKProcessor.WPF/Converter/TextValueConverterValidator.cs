@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TKProcessor.WPF.Converter
 {
-    class TextValueConverterValidator
+    public class TextValueConverterValidator
     {
     }
 }

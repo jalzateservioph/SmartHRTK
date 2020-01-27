@@ -104,96 +104,105 @@ namespace TKProcessor.WPF.ViewModels
 
                 RaiseMessage("Loading filters...");
 
-                App.Current.Dispatcher.Invoke(() =>
+                try
                 {
-                    PayrollCodeList = new ObservableCollection<string>(employeeService.List().Select(i => i.JobGradeBand).Distinct().OrderBy(i => i));
+                    App.Current.Dispatcher.Invoke(() =>
+                            {
+                                PayrollCodeList = new ObservableCollection<string>(employeeService.List().Select(i => i.JobGradeBand).Distinct().ToList());
 
-                    SelectedPayrollCodes = new ObservableCollection<string>();
+                                SelectedPayrollCodes = new ObservableCollection<string>();
 
-                    SelectedPayrollCodes.CollectionChanged += (o, e) =>
-                    {
-                        NotifyOfPropertyChange(() => SelectedPayrollCodes);
-                    };
+                                SelectedPayrollCodes.CollectionChanged += (o, e) =>
+                                {
+                                    NotifyOfPropertyChange(() => SelectedPayrollCodes);
+                                };
 
-                    EmployeeList = new ObservableCollection<Employee>(employeeService.List().Select(i => mapper.Map<Employee>(i)).OrderBy(i => i.EmployeeCode));
+                                EmployeeList = new ObservableCollection<Employee>(employeeService.List().Select(i => mapper.Map<Employee>(i)).ToList());
 
-                    EmployeeListView = CollectionViewSource.GetDefaultView(EmployeeList);
+                                EmployeeListView = CollectionViewSource.GetDefaultView(EmployeeList);
 
-                    EmployeeListView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
+                                EmployeeListView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
 
-                    SelectedEmployees = new ObservableCollection<Employee>();
+                                SelectedEmployees = new ObservableCollection<Employee>();
 
-                    SelectedEmployees.CollectionChanged += (o, e) =>
-                    {
-                        NotifyOfPropertyChange(() => SelectedEmployees);
-                    };
+                                SelectedEmployees.CollectionChanged += (o, e) =>
+                                {
+                                    NotifyOfPropertyChange(() => SelectedEmployees);
+                                };
 
-                    SelectedEmployeesView = CollectionViewSource.GetDefaultView(SelectedEmployees);
+                                SelectedEmployeesView = CollectionViewSource.GetDefaultView(SelectedEmployees);
 
-                    SelectedEmployeesView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
+                                SelectedEmployeesView.SortDescriptions.Add(new SortDescription("EmployeeCode", ListSortDirection.Ascending));
 
-                    EmployeeListView.Filter += (o) =>
-                    {
-                        Employee emp = (Employee)o;
+                                EmployeeListView.Filter += (o) =>
+                                {
+                                    Employee emp = (Employee)o;
 
-                        if (SelectedEmployees.Cast<Employee>().Any(i => i.Id == emp.Id))
-                            return false;
+                                    if (SelectedEmployees.Cast<Employee>().Any(i => i.Id == emp.Id))
+                                        return false;
 
-                        if (string.IsNullOrEmpty(EmployeeListViewSearch))
-                            return true;
+                                    if (string.IsNullOrEmpty(EmployeeListViewSearch))
+                                        return true;
 
-                        if (EmployeeListViewSearch.ToLower().StartsWith("dept:"))
-                        {
-                            if (emp.Department.ToLower().Contains(EmployeeListViewSearch.ToLower().Replace("dept:","")))
-                                return true;
-                        }
-                        else
-                        {
-                            if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                                return true;
+                                    if (EmployeeListViewSearch.ToLower().StartsWith("dept:"))
+                                    {
+                                        if (emp.Department.ToLower().Contains(EmployeeListViewSearch.ToLower().Replace("dept:", "").Trim()))
+                                            return true;
+                                    }
+                                    else
+                                    {
+                                        if (emp.EmployeeCode.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                                            return true;
 
-                            if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
-                                return true;
-                        }
+                                        if (emp.FullName.ToLower().Contains(EmployeeListViewSearch.ToLower()))
+                                            return true;
+                                    }
 
-                        return false;
-                    };
+                                    return false;
+                                };
 
-                    SelectedEmployeesView.Filter += (o) =>
-                    {
-                        Employee emp = (Employee)o;
+                                SelectedEmployeesView.Filter += (o) =>
+                                {
+                                    Employee emp = (Employee)o;
 
-                        if (EmployeeListView.Cast<Employee>().Any(i => i.Id == emp.Id))
-                            return false;
+                                    if (EmployeeListView.Cast<Employee>().Any(i => i.Id == emp.Id))
+                                        return false;
 
-                        if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
-                            return true;
+                                    if (string.IsNullOrEmpty(SelectedEmployeesViewSearch))
+                                        return true;
 
-                        if (SelectedEmployeesViewSearch.ToLower().StartsWith("dept:"))
-                        {
-                            if (emp.Department.ToLower().Contains(SelectedEmployeesViewSearch.ToLower().Replace("dept:", "")))
-                                return true;
-                        }
-                        else
-                        {
-                            if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                                return true;
+                                    if (SelectedEmployeesViewSearch.ToLower().StartsWith("dept:"))
+                                    {
+                                        if (emp.Department.ToLower().Contains(SelectedEmployeesViewSearch.ToLower().Replace("dept:", "").Trim()))
+                                            return true;
+                                    }
+                                    else
+                                    {
+                                        if (emp.EmployeeCode.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                                            return true;
 
-                            if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
-                                return true;
-                        }
+                                        if (emp.FullName.ToLower().Contains(SelectedEmployeesViewSearch.ToLower()))
+                                            return true;
+                                    }
 
-                        return false;
-                    };
+                                    return false;
+                                };
 
-                    SelectedEmployeesView.Refresh();
+                                SelectedEmployeesView.Refresh();
 
-                    EmployeeShiftList = new ObservableCollection<Shift>(shiftService.List().Where(i => i.IsActive).Select(i => mapper.Map<Shift>(i)));
-                });
+                                EmployeeShiftList = new ObservableCollection<Shift>(shiftService.List().Where(i => i.IsActive).Select(i => mapper.Map<Shift>(i)));
 
-                RaiseMessage("Filters loaded");
+                            });
+
+                    RaiseMessage("Filters loaded");
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, GetType().Name);
+                }
 
                 EndProcessing();
+
             });
         }
 
@@ -330,7 +339,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing DTR records...", MessageType.Information, 0));
+                    RaiseMessage($"Processing DTR records...", MessageType.Information, 0);
 
                     dtrService.Process(
                         StartDate,
@@ -338,15 +347,15 @@ namespace TKProcessor.WPF.ViewModels
                         (SelectedPayrollCodes.Count == 0 ? PayrollCodeList : SelectedPayrollCodes),
                         (SelectedEmployees.Count == 0 ? EmployeeList : SelectedEmployees).Select(i => mapper.Map<TK.Employee>(i)).ToList(),
                         message => eventAggregator.PublishOnUIThread(new NewMessageEvent(message, 0))
-                        );
+                    );
 
                     Populate();
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Processing complete", MessageType.Information));
+                    RaiseMessage($"Processing complete", MessageType.Information);
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
@@ -437,6 +446,35 @@ namespace TKProcessor.WPF.ViewModels
 
                     EndProcessing();
                 });
+            }
+        }
+
+        public void DownloadData()
+        {
+            if (saveDiag.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                try
+                {
+                    var data = DataTableHelpers.ToStringDataTable(View.Cast<DailyTransactionRecord>());
+
+                    data.RemoveColumns(new string[] {
+                        "Id", "CreatedBy", "CreatedOn", "LastModifiedBy",
+                        "LastModifiedOn", "IsActive", "IsDirty", "IsValid",
+                        "IsSelected", "IsNotifying" }
+                    );
+
+                    ExcelFileHandler.Export(saveDiag.FileName, data);
+
+                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saved file to {saveDiag.FileName}", MessageType.Success));
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, GetType().Name);
+                }
+
+                EndProcessing();
             }
         }
 

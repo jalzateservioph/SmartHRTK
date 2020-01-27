@@ -11,9 +11,9 @@ using TKProcessor.Models.TK;
 
 namespace TKProcessor.Services.Maintenance
 {
-    public class ShiftService : TKService<Shift>, IExportTemplate
+    public class ShiftService : TimekeepingService<Shift>, IExportTemplate
     {
-        private readonly string[] columns;
+        public string[] Columns;
 
         public ShiftService(Guid userId) : base(userId)
         {
@@ -22,19 +22,28 @@ namespace TKProcessor.Services.Maintenance
             var shift = typeof(Shift).GetProperties().Select(i => i.Name);
             var include = shift.Where(s => !exclude1.Any(e => e == s) && !exclude2.Any(e => e == s));
 
-            columns = include.ToArray();
+            Columns = include.ToArray();
         }
 
         public override void Save(Shift entity)
         {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             try
             {
-                var existing = Context.Shift.FirstOrDefault(i => i.IsActive && (i.Id == entity.Id || i.ShiftCode == entity.ShiftCode));
+                var existing = context.Shift.FirstOrDefault(i => i.IsActive && (i.Id == entity.Id || i.ShiftCode == entity.ShiftCode));
 
-                if (existing != default(Shift))
-                    entity.Id = existing.Id;
-
-                base.Save(entity);
+                if (existing == null)
+                {
+                    Add(entity);
+                }
+                else 
+                {
+                    Update(existing.Id, entity);
+                }
             }
             catch (Exception ex)
             {
@@ -47,7 +56,7 @@ namespace TKProcessor.Services.Maintenance
 
         public void ExportTemplate(string filename)
         {
-            ExcelFileHandler.Export(filename, columns);
+            ExcelFileHandler.Export(filename, Columns);
         }
 
         public void Import(string filename, Action<WorkSchedule> iterationCallback)
@@ -65,54 +74,11 @@ namespace TKProcessor.Services.Maintenance
                     throw new FormatException("Invalid employee shift file format");
             }
 
-            Shift tempShift = null;
-
             try
             {
-                foreach (DataRow row in data.Rows)
+                foreach (var item  in data.CastAs<Shift>())
                 {
-                    tempShift = new Shift();
-
-                    foreach (DataColumn col in data.Columns)
-                    {
-                        var prop = shiftProperties.First(i => i.Name == col.ColumnName);
-
-                        var value = row[col].ToString();
-
-                        if (string.IsNullOrEmpty(value.ToString()) || string.Compare(value.ToString(), "NULL", true) == 0)
-                        {
-                            prop.SetValue(tempShift, ObjectHelpers.GetDefault(prop.PropertyType));
-                        }
-                        else if ((prop.PropertyType == typeof(DateTime)) || (prop.PropertyType == typeof(DateTime?)))
-                        {
-                            if (DateTime.TryParse(value.ToString(), out DateTime result))
-                            {
-                                prop.SetValue(tempShift, result);
-                            }
-                            else
-                            {
-                                prop.SetValue(tempShift, DateTime.FromOADate(Convert.ToDouble(value.ToString())));
-                            }
-                        }
-                        else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
-                        {
-                            prop.SetValue(tempShift, string.Compare(value.ToString(), "1", true) == 0 || string.Compare(value.ToString(), "y", true) == 0 || string.Compare(value.ToString(), "yes", true) == 0);
-                        }
-                        else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
-                        {
-                            prop.SetValue(tempShift, ObjectHelpers.GetNullableInt(value.ToString()));
-                        }
-                        else if (prop.PropertyType == typeof(decimal) || prop.PropertyType == typeof(decimal?))
-                        {
-                            prop.SetValue(tempShift, ObjectHelpers.GetNullableDecimal(value.ToString()));
-                        }
-                        else
-                        {
-                            prop.SetValue(tempShift, value);
-                        }
-                    }
-
-                    Save(tempShift);
+                    Save(item);
                 }
             }
             catch (Exception ex)

@@ -20,6 +20,11 @@ namespace TKProcessor.Console
             }
         }
 
+        static void ShowHelp()
+        {
+
+        }
+
         static void ConsoleMode()
         {
             string input;

@@ -86,7 +86,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Mappings">
+            <TabItem Header="Dynamic Pay Mappings">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

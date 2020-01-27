@@ -55,11 +55,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\TKProcessor\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>B0818AA2AD4DD7FED2ECDF8F247E5A90B2A1A1E3</ManifestCertificateThumbprint>
@@ -79,6 +81,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>tk_icon_draftv3_0_3WJ_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=9.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
@@ -248,6 +253,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\CustomExceptions.cs" />
+    <Compile Include="Common\MapperProfile.cs" />
     <Compile Include="Common\Session.cs" />
     <Compile Include="Converter\CollectionToCommaSeparatedConverter.cs" />
     <Compile Include="Converter\DataConverter\EmployeeConverters.cs" />
@@ -258,6 +266,7 @@
     <Compile Include="Converter\ObjectConverters.cs" />
     <Compile Include="Converter\ReverseBoolVisibilityConverter.cs" />
     <Compile Include="Converter\TextValueConverterValidator.cs" />
+    <Compile Include="Converter\TimeDisplayConverters.cs" />
     <Compile Include="Events\LoginEvent.cs" />
     <Compile Include="Events\NewMessageEvent.cs" />
     <Compile Include="Models\AuditLog.cs" />
@@ -299,7 +308,6 @@
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\ShiftViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="ViewModels\WorkScheduleAdjustmentViewModel.cs" />
     <Compile Include="ViewModels\WorkScheduleViewModel.cs" />
     <Compile Include="ViewModels\WorkSiteViewModel.cs" />
     <Compile Include="Views\AuditLogsView.xaml.cs">
@@ -495,6 +503,12 @@
     <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="hiclipart_com_b18_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="tk_icon_draftv3_0_3WJ_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

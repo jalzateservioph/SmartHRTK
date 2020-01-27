@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -19,7 +20,7 @@ namespace TKProcessor.WPF.ViewModels
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IWindowManager windowManager;
-
+        private readonly IMapper mapper;
         private SolidColorBrush _messageColor;
         private SolidColorBrush _messageFontColor;
         private System.Timers.Timer t;
@@ -30,11 +31,11 @@ namespace TKProcessor.WPF.ViewModels
         private bool _isVerifyingDB;
         private string _startupMessage;
 
-        public ShellViewModel(IEventAggregator eventAggregator, IWindowManager windowManager)
+        public ShellViewModel(IEventAggregator eventAggregator, IWindowManager windowManager, IMapper mapper)
         {
             this.eventAggregator = eventAggregator;
             this.windowManager = windowManager;
-
+            this.mapper = mapper;
             eventAggregator.Subscribe(this);
 
             t = new System.Timers.Timer() { Interval = 5000 };
@@ -142,17 +143,17 @@ namespace TKProcessor.WPF.ViewModels
 
         public void ShowEmployees()
         {
-            ChangeActiveItem(new EmployeeViewModel(eventAggregator, windowManager), true);
+            ChangeActiveItem(new EmployeeViewModel(eventAggregator, windowManager, mapper), true);
         }
 
         public void ShowShifts()
         {
-            ChangeActiveItem(new ShiftViewModel(eventAggregator, windowManager), true);
+            ChangeActiveItem(new ShiftViewModel(eventAggregator, windowManager, mapper), true);
         }
 
         public void ShowWorkSchedules()
         {
-            ChangeActiveItem(new WorkScheduleViewModel(eventAggregator, windowManager), true);
+            ChangeActiveItem(new WorkScheduleViewModel(eventAggregator, windowManager, mapper), true);
         }
 
         public void ShowHolidays()

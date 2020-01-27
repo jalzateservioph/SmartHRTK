@@ -32,52 +32,17 @@ namespace TKProcessor.WPF.ViewModels
         private WorkSchedule _currentItem;
         private bool isNewRecordState;
 
-        public WorkScheduleViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
+        public WorkScheduleViewModel(IEventAggregator eventAggregator, IWindowManager windowManager, IMapper mapper) : base(eventAggregator, windowManager)
         {
             PropertyChanged += WorkScheduleViewModel_PropertyChanged;
 
-            service = new WorkScheduleService(Session.Default.CurrentUser.Id) { AutoSaveChanges = true };
+            service = new WorkScheduleService(Session.Default.CurrentUser.Id);
 
-            mapper = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<WorkSchedule, TK.WorkSchedule>();
-                cfg.CreateMap<TK.WorkSchedule, WorkSchedule>();
+            this.mapper = mapper;
 
-                cfg.CreateMap<Employee, TK.Employee>();
-                cfg.CreateMap<TK.Employee, Employee>();
+            openFileDialog = new OpenFileDialog() { Filter = Constants.OpenFilter };
 
-                cfg.CreateMap<Shift, TK.Shift>();
-                cfg.CreateMap<TK.Shift, Shift>();
-
-                cfg.CreateMap<User, TK.User>();
-                cfg.CreateMap<TK.User, User>();
-
-                cfg.CreateMap<WorkSchedule, WorkSchedule>();
-                cfg.CreateMap<WorkSchedule, WorkSchedule>();
-
-                cfg.CreateMap<TK.WorkSite, WorkSite>();
-                cfg.CreateMap<WorkSite,TK.WorkSite>();
-
-                cfg.CreateMap<Employee, Employee>();
-                cfg.CreateMap<Employee, Employee>();
-
-                cfg.CreateMap<Shift, Shift>();
-                cfg.CreateMap<Shift, Shift>();
-
-                cfg.CreateMap<User, User>();
-                cfg.CreateMap<User, User>();
-
-            }).CreateMapper();
-
-            openFileDialog = new OpenFileDialog()
-            {
-                Filter = "Excel files (*.xlsx)|*.xlsx"
-            };
-
-            saveFileDialog = new SaveFileDialog()
-            {
-                Filter = "Excel file (*.xlsx)|*.xlsx"
-            };
+            saveFileDialog = new SaveFileDialog() { Filter = Constants.SaveFilter };
 
             Populate();
         }
@@ -133,11 +98,11 @@ namespace TKProcessor.WPF.ViewModels
                         Items.Add(ws);
                     }
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Retrieved {Items.Count} raw data entries ", MessageType.Success));
+                    RaiseMessage($"Retrieved {Items.Count} raw data entries ", MessageType.Success);
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
@@ -161,21 +126,23 @@ namespace TKProcessor.WPF.ViewModels
 
                     if (diagRes == true)
                     {
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Importing {openFileDialog.FileName}...", MessageType.Success));
+                        RaiseMessage($"Importing {openFileDialog.FileName}...", 0);
 
                         service.Import(openFileDialog.FileName, ws =>
                         {
-                            eventAggregator.PublishOnUIThread(new NewMessageEvent(ws + "...", MessageType.Success));
+                            RaiseMessage(ws + "...", MessageType.Success);
                         });
+
+                        service.SaveChanges();
 
                         Populate();
 
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Successfully imported {Path.GetFileName(openFileDialog.FileName)}", MessageType.Success));
+                        RaiseMessage($"Successfully imported {Path.GetFileName(openFileDialog.FileName)}", MessageType.Success);
                     }
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
@@ -190,7 +157,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    foreach (var item in service.HeaderDef)
+                    foreach (var item in service.Columns)
                     {
                         var suffix = "";
 
@@ -206,11 +173,36 @@ namespace TKProcessor.WPF.ViewModels
                                                 $"\\{Path.GetFileNameWithoutExtension(saveFileDialog.FileName)}{suffix}.xlsx", item);
                     }
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Successfully downloaded template files", MessageType.Success));
+                    RaiseMessage($"Successfully downloaded template files", MessageType.Success);
                 }
                 catch (Exception ex)
                 {
-                    HandleError(ex);
+                    HandleError(ex, GetType().Name);
+                }
+
+                EndProcessing();
+            }
+        }
+
+        public void DownloadData()
+        {
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                try
+                {
+                    var data = DataTableHelpers.ToStringDataTable(View.Cast<WorkSchedule>());
+
+                    data.RetainColumns(new string[] { "Employee", "ScheduleDate", "Shift", "StartDate", "EndDate" });
+
+                    ExcelFileHandler.Export(saveFileDialog.FileName, data);
+
+                    RaiseMessage($"Saved file to {saveFileDialog.FileName}", MessageType.Success);
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, GetType().Name);
                 }
 
                 EndProcessing();
@@ -272,10 +264,12 @@ namespace TKProcessor.WPF.ViewModels
                             wsObject.Saturday
                         };
 
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving work schedules for {wsObject.Employee} ", MessageType.Information));
+                        RaiseMessage($"Saving work schedules for {wsObject.Employee} ", MessageType.Information);
 
                         var start = wsObject.StartDate;
                         var end = wsObject.EndDate;
+
+                        List<WorkSchedule> itemsForSaving = new List<WorkSchedule>();
 
                         while (start <= end)
                         {
@@ -285,8 +279,7 @@ namespace TKProcessor.WPF.ViewModels
                             {
                                 if (shifts[(int)start.DayOfWeek] == null)
                                 {
-                                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Skipping because {start.DayOfWeek.ToString()} " +
-                                        $"has no shift setup", MessageType.Information));
+                                    RaiseMessage($"Skipping because {start.DayOfWeek.ToString()} has no shift setup", MessageType.Information);
 
                                     start = start.AddDays(1);
 
@@ -300,17 +293,26 @@ namespace TKProcessor.WPF.ViewModels
                                     Shift = shifts[(int)start.DayOfWeek]
                                 };
 
-                                eventAggregator.PublishOnUIThread(
-                                   new NewMessageEvent(
-                                       $"Saving {forSave.ScheduleDate.ToShortDateString()} - {forSave.Shift}",
-                                       MessageType.Information
-                                   )
-                               );
+                                RaiseMessage($"Saving {forSave.ScheduleDate.ToShortDateString()} - {forSave.Shift}", MessageType.Information);
 
                                 service.Save(mapper.Map<TK.WorkSchedule>(forSave));
 
+                                itemsForSaving.Add(forSave);
+                            }
+                            catch (Exception ex)
+                            {
+                                HandleError(ex, GetType().Name, "Save_Summary");
+                            }
+
+                            start = start.AddDays(1);
+                        }
+
+                        if (service.SaveChanges() > 0)
+                        {
+                            foreach (var forSave in itemsForSaving)
+                            {
                                 var existing = Items.FirstOrDefault(i => i.Employee.Id == forSave.Employee.Id &&
-                                                                         i.ScheduleDate.Date == forSave.ScheduleDate.Date);
+                                                                             i.ScheduleDate.Date == forSave.ScheduleDate.Date);
 
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
@@ -320,27 +322,23 @@ namespace TKProcessor.WPF.ViewModels
                                     Items.Add(forSave);
                                 });
                             }
-                            catch (Exception ex)
-                            {
-                                eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
-                            }
 
-                            start = start.AddDays(1);
-                        }
-
-                        eventAggregator.PublishOnUIThread(
-                            new NewMessageEvent(
-                                $"Saved work schedule for {wsObject.Employee} from " +
+                            RaiseMessage($"Saved work schedule for {wsObject.Employee} from " +
                                 $"{wsObject.StartDate.ToShortDateString()} to {wsObject.EndDate.ToShortDateString()}",
                                 MessageType.Success
-                            )
-                        );
+                            );
+
+                        }
+                        else
+                        {
+                            throw new Exception("Work schedules were not saved");
+                        }
 
                         EndEditing();
                     }
                     catch (Exception ex)
                     {
-                        eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                        HandleError(ex, "WorkSchedule", "SaveSummary");
                     }
 
                     EndProcessing();
@@ -366,21 +364,27 @@ namespace TKProcessor.WPF.ViewModels
                     if (existing != default(WorkSchedule))
                         Items.Remove(existing);
 
-                    Items.Add(forSave);
 
-                    eventAggregator.PublishOnUIThread(
-                        new NewMessageEvent(
-                            $"Saved work schedule for {CurrentItem.Employee} for " +
-                            $"{CurrentItem.ScheduleDate.ToShortDateString()}",
-                            MessageType.Success
-                        )
-                    );
+                    if (service.SaveChanges() > 0)
+                    {
+                        Items.Add(forSave);
+
+                        RaiseMessage($"Saved work schedule for {CurrentItem.Employee} for " +
+                                     $"{CurrentItem.ScheduleDate.ToShortDateString()}",
+                                     MessageType.Success
+                        );
+
+                    }
+                    else
+                    {
+                        throw new Exception("Work schedule was not saved");
+                    }
 
                     EndEditing();
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, "WorkSchedule");
                 }
             }
         }
@@ -391,10 +395,26 @@ namespace TKProcessor.WPF.ViewModels
             {
                 StartProcessing();
 
-                foreach (var item in Items.Where(i => i.IsSelected))
+                try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting {item.Employee} - {item.ScheduleDate.ToShortDateString()}", MessageType.Error));
-                    service.Delete(mapper.Map<TK.WorkSchedule>(item));
+                    foreach (var item in Items.Where(i => i.IsSelected).ToArray())
+                    {
+                        RaiseMessage($"Deleting {item.Employee} - {item.ScheduleDate.ToShortDateString()}", MessageType.Success);
+                        service.Delete(item.Id);
+                    }
+
+                    if (service.SaveChanges() > 0)
+                    {
+                        Items.RemoveRange(Items.Where(i => i.IsSelected).ToArray());
+                    }
+                    else
+                    {
+                        throw new Exception("Work schedules were not deleted");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, GetType().Name, "Delete");
                 }
 
                 EndProcessing();

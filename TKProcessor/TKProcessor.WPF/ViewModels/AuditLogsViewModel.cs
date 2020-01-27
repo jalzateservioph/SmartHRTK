@@ -12,12 +12,12 @@ namespace TKProcessor.WPF.ViewModels
 {
     public class AuditLogsViewModel : ViewModelBase<AuditLog>
     {
-        readonly TKService<TKProcessor.Models.TK.AuditLog> service;
+        readonly AuditLogService service;
         readonly IMapper mapper;
 
         public AuditLogsViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
         {
-            service = new TKService<TKProcessor.Models.TK.AuditLog>();
+            service = new AuditLogService();
             mapper = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<TKProcessor.Models.TK.AuditLog, AuditLog>();
@@ -34,7 +34,7 @@ namespace TKProcessor.WPF.ViewModels
             {
                 Items.Clear();
 
-                foreach (var item in service.List())
+                foreach (var item in service.Get())
                 {
                     Items.Add(mapper.Map<AuditLog>(item));
                 }

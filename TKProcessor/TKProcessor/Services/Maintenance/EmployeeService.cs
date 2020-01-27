@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,68 +11,90 @@ using TKProcessor.Models.TK;
 
 namespace TKProcessor.Services.Maintenance
 {
-    public class EmployeeService : TKService<Employee>
+    public class EmployeeService : TimekeepingService<Employee>
     {
         public EmployeeService(Guid userId) : base(userId)
         {
 
         }
 
-        public EmployeeService(Guid userId, TKContext context) : base(userId, context)
+        public EmployeeService(Guid userId, TKContext context) : base(context, userId)
         {
 
         }
 
 
-        public override IEnumerable<Employee> List()
+        public override IQueryable<Employee> List()
         {
-            return Context.Employee.Include(ews => ews.EmployeeWorkSites).ThenInclude(i => i.WorkSite); //Need to include relationship before making it to a list
+            return context.Employee.Include(ews => ews.EmployeeWorkSites).ThenInclude(i => i.WorkSite); //Need to include relationship before making it to a list
+        }
+
+        public override void Add(Employee entity)
+        {
+            try
+            {
+                base.Add(entity);
+
+                entity.EmployeeWorkSites = new List<EmployeeWorkSite>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public override void Update(Guid id, Employee entity)
+        {
+            try
+            {
+                base.Update(id, entity);
+
+                if (entity.EmployeeWorkSites != null)
+                {
+                    foreach (var existingChild in context.EmployeeWorkSite.Where(ews => ews.EmployeeId == id))
+                    {
+                        context.EmployeeWorkSite.Remove(existingChild);
+                    }
+
+                    foreach (var ews in entity.EmployeeWorkSites)
+                    {
+                        ews.Employee = context.Employee.Find(ews.Employee.Id);
+                        ews.WorkSite = context.WorkSite.Find(ews.WorkSite.Id);
+
+                        context.EmployeeWorkSite.Add(ews);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public override void Save(Employee entity)
         {
             try
             {
-                var existing = Context.Employee.FirstOrDefault(i => i.EmployeeCode == entity.EmployeeCode);
+                var existing = context.Employee.FirstOrDefault(i => i.EmployeeCode == entity.EmployeeCode);
 
-                if (existing != default(Employee))
-                    entity.Id = existing.Id;
-
-                base.Save(entity);
-
-                if (entity.EmployeeWorkSites != null)
-                {
-                    foreach (var existingChild in Context.EmployeeWorkSite.Where(ews => ews.EmployeeId == (existing ?? entity).Id))
-                    {
-                        Context.EmployeeWorkSite.Remove(existingChild);
-                    }
-
-                    foreach (var ews in entity.EmployeeWorkSites)
-                    {
-                        ews.Employee = Context.Employee.Find(ews.Employee.Id);
-                        ews.WorkSite = Context.WorkSite.Find(ews.WorkSite.Id);
-
-                        Context.EmployeeWorkSite.Add(ews);
-                    }
-
-                    Context.SaveChanges();
-                }
+                if (existing == null)
+                    Add(entity);
+                else
+                    Update(existing.Id, entity);
             }
             catch (Exception ex)
             {
-                Context.Remove(entity);
-
-                CreateErrorLog(ex);
-
                 throw ex;
             }
         }
 
-        public void Sync(Guid userId, Action<Employee> iterationCallback = null)
+        public void Sync(Action<Employee> iterationCallback = null)
         {
             try
             {
                 int successCount = 0;
+
+                int tempEmpNum;
 
                 using (var hRContext = new SHRContext())
                 {
@@ -79,11 +102,10 @@ namespace TKProcessor.Services.Maintenance
                                    join p1 in hRContext.Personnel1 on p.EmployeeNum equals p1.EmployeeNum
                                    select new Employee()
                                    {
-                                       Id = Guid.NewGuid(),
                                        EmployeeCode = p.EmployeeNum,
                                        Password = p.EmployeeNum,
                                        FullName = p.FirstName + (string.IsNullOrEmpty(p.MiddleName) ? " " : " " + p.MiddleName + " ") + p.Surname,
-                                       BiometricsId = int.Parse(p.PayrollEmployeeNum.Trim()).ToString(),
+                                       BiometricsId = int.Parse((string.IsNullOrEmpty(p.PayrollEmployeeNum) ? (int.TryParse(p.EmployeeNum, out tempEmpNum) ? p.EmployeeNum : "") : p.PayrollEmployeeNum).Trim()).ToString(),
                                        TerminationDate = p.TerminationDate,
                                        JobGradeBand = p1.JobGradeBand,
                                        Department = p.DeptName
@@ -104,10 +126,6 @@ namespace TKProcessor.Services.Maintenance
                             throw ex;
                         }
                     }
-
-                    Context.AuditLog.Add(new AuditLog() { Target = nameof(Employee), Action = $"Sync {successCount} employees." });
-
-                    Context.SaveChanges();
                 }
             }
             catch (Exception ex)

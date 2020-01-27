@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,6 @@ namespace TKProcessor.Services
         void ExportTemplate(string filename);
     }
 
-    public interface IService<T>
-        where T : class, new()
-    {
-        IEnumerable<T> List();
-        void Save(T entity);
-        void Delete(T entity);
-        void DeleteHard(T entity);
-        void SaveChanges();
-    }
-
     public class ErrorLogBase
     {
         protected void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
@@ -40,9 +31,60 @@ namespace TKProcessor.Services
         }
     }
 
-    public class BasicTKService<T> where T : class
+    public interface IBasicTimekeepingService<T> where T : class
     {
-        protected void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
+        void CreateAuditLog(T newValue);
+        void CreateAuditLog(T newValue, T oldValue);
+        void CreateErrorLog(Exception ex, [CallerMemberName] string source = "");
+        void CreateErrorLog(string message, [CallerMemberName] string source = "");
+    }
+
+    public class BasicTimekeepingService<T> : IBasicTimekeepingService<T> where T : class
+    {
+        protected string user;
+
+        protected TKContext context;
+
+        public BasicTimekeepingService()
+        {
+            context = new TKContext();
+        }
+
+        public BasicTimekeepingService(Guid userId) : this()
+        {
+            this.user = GetUserName(userId);
+        }
+
+        public BasicTimekeepingService(TKContext context)
+        {
+            this.context = context;
+        }
+
+        public BasicTimekeepingService(TKContext context, Guid userId)
+        {
+            this.context = context;
+            this.user = GetUserName(userId);
+        }
+
+        /// <summary>
+        /// Validates and retrieves the user Id of the user with the id userId
+        /// </summary>
+        /// <param name="userId">Id of the application user</param>
+        /// <returns></returns>
+        protected string GetUserName(Guid userId)
+        {
+            using (TKContext ctx = new TKContext())
+            {
+                User user = ctx.User.Find(userId);
+
+                if (user == null)
+                    user = ctx.User.First();
+
+                return user.Name;
+            }
+        }
+
+        public virtual void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
         {
             using (var ctx = new TKContext())
             {
@@ -51,39 +93,230 @@ namespace TKProcessor.Services
             }
         }
 
-        protected void CreateAuditLog(T newValue)
+        public virtual void CreateErrorLog(string message, [CallerMemberName]string source = "")
+        {
+            using (var ctx = new TKContext())
+            {
+                ctx.ErrorLog.Add(new ErrorLog(message, source));
+                ctx.SaveChanges();
+            }
+        }
+
+        public void CreateAuditLog(T newValue)
         {
             CreateAuditLog(newValue, null);
         }
 
-        protected void CreateAuditLog(T newValue, T oldValue)
+        public virtual void CreateAuditLog(T newValue, T oldValue)
         {
-            using (var ctx = new TKContext())
+            try
             {
-                foreach (var prop in typeof(T).GetProperties())
+                var log = new AuditLog()
                 {
-                    var oldVal = oldValue == null ? null : prop.GetValue(oldValue)?.ToString();
-                    var newVal = prop.GetValue(newValue)?.ToString();
+                    Target = $"{typeof(T).Name}",
+                    Action = newValue == null ? "delete" : oldValue == null ? "Create" : "Update",
+                    OldValue = JsonConvert.SerializeObject(oldValue),
+                    NewValue = JsonConvert.SerializeObject(newValue),
+                    ModifiedBy = user
+                };
 
-                    if (oldValue == null || oldVal != newVal)
-                    {
-                        ctx.AuditLog.Add(new AuditLog()
-                        {
-                            Target = $"{typeof(T).Name}.{prop.Name}",
-                            Action = oldValue == null ? "Create" : "Update",
-                            OldValue = JsonConvert.SerializeObject(oldVal),
-                            NewValue = JsonConvert.SerializeObject(newVal),
-                            ModifiedBy = CurrentUser?.Name ?? "admin"
-                        });
-                    }
+                using (var ctx = new TKContext())
+                {
+                    ctx.AuditLog.Add(log);
+
+                    ctx.SaveChanges();
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+    }
+
+    public class TimekeepingService<T> : IDisposable
+        where T : class, IEntity, new()
+    {
+        protected string user;
+
+        protected TKContext context;
+
+        public TimekeepingService()
+        {
+            context = new TKContext();
+        }
+
+        public TimekeepingService(Guid userId) : this()
+        {
+            user = GetUserName(userId);
+        }
+
+        public TimekeepingService(TKContext context)
+        {
+            this.context = context;
+        }
+
+        public TimekeepingService(TKContext context, Guid userId)
+        {
+            this.context = context;
+            this.user = GetUserName(userId);
+        }
+
+        /// <summary>
+        /// Validates and retrieves the user Id of the user with the id userId
+        /// </summary>
+        /// <param name="userId">Id of the application user</param>
+        /// <returns></returns>
+        protected string GetUserName(Guid userId)
+        {
+            User user = context.User.Find(userId);
+
+            if (user == null)
+                user = context.User.First();
+
+            return user.Name;
+        }
+
+        public void CreateErrorLog(Exception ex, [CallerMemberName]string source = "")
+        {
+            context.ErrorLog.Add(new ErrorLog(ex, source));
+            context.SaveChanges();
+        }
+
+        public void CreateErrorLog(string message, [CallerMemberName]string source = "")
+        {
+            context.ErrorLog.Add(new ErrorLog(message, source));
+            context.SaveChanges();
+        }
+
+        public void CreateAuditLog(T newValue)
+        {
+            CreateAuditLog(newValue, null);
+        }
+
+        public void CreateAuditLog(T newValue, T oldValue)
+        {
+            try
+            {
+                var log = new AuditLog()
+                {
+                    Target = $"{typeof(T).Name}",
+                    Action = newValue == null ? "delete" : oldValue == null ? "Create" : "Update",
+                    OldValue = JsonConvert.SerializeObject(oldValue, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }),
+                    NewValue = JsonConvert.SerializeObject(newValue, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }),
+                    ModifiedBy = user
+                };
+
+                context.AuditLog.Add(log);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
-        protected User CurrentUser { get; set; }
+        public virtual IQueryable<T> List()
+        {
+            return context.Set<T>();
+        }
+
+        public virtual void Add(T entity)
+        {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            entity.CreatedBy = entity.LastModifiedBy = string.IsNullOrEmpty(entity.CreatedBy) ? user : entity.CreatedBy;
+            entity.CreatedOn = entity.LastModifiedOn = DateTime.Now;
+
+            CreateAuditLog(entity);
+
+            context.Set<T>().Add(entity);
+        }
+
+        public virtual void Update(Guid id, T entity)
+        {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            T existing = context.Set<T>().Find(id);
+
+            if (existing != null)
+            {
+                entity.Id = existing.Id;
+                entity.LastModifiedBy = string.IsNullOrEmpty(entity.CreatedBy) ? user : entity.CreatedBy;
+                entity.LastModifiedOn = DateTime.Now;
+
+                CreateAuditLog(entity, existing);
+
+                context.Entry(existing).CurrentValues.SetValues(entity);
+            }
+            else
+                throw new Exception("Record does not exist");
+        }
+
+        public virtual void Save(T entity)
+        {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            try
+            {
+                Update(entity.Id, entity);
+            }
+            catch
+            {
+                Add(entity);
+            }
+        }
+
+        public virtual void SetState(Guid id, bool isActive)
+        {
+            T existing = context.Set<T>().Find(id);
+
+            if (existing != null)
+            {
+                existing.LastModifiedBy = string.IsNullOrEmpty(existing.CreatedBy) ? user : existing.CreatedBy;
+                existing.LastModifiedOn = DateTime.Now;
+
+                existing.IsActive = isActive;
+            }
+            else
+                throw new Exception("Record does not exist");
+        }
+
+        public virtual void Delete(Guid id)
+        {
+            T existing = context.Set<T>().Find(id);
+
+            if (existing != null)
+                context.Set<T>().Remove(existing);
+            else
+                throw new Exception("Record does not exist");
+        }
+
+        public virtual int SaveChanges()
+        {
+            return context.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            if (context != null)
+                context.Dispose();
+        }
     }
 
-    public class TKService<T> : IService<T>, IDisposable
+    /// <summary>
+    /// old. will be replaced
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class TKService<T> : IDisposable
         where T : class, IEntity, new()
     {
         private List<AuditLog> logs;
@@ -124,7 +357,11 @@ namespace TKProcessor.Services
 
             if (existing != default(T))
             {
+                var tempex = existing;
+
                 existing.IsActive = false;
+
+                CreateAuditLog(tempex, existing);
 
                 if (AutoSaveChanges)
                     SaveChanges();
@@ -134,6 +371,8 @@ namespace TKProcessor.Services
         public virtual void DeleteHard(T entity)
         {
             var existing = Context.Set<T>().Find(entity.Id);
+
+            CreateAuditLog(null, existing);
 
             Context.Set<T>().Remove(existing);
 
@@ -155,9 +394,9 @@ namespace TKProcessor.Services
             if (existing == default(T))
             {
                 entity.IsActive = true;
-                entity.CreatedBy = CurrentUser;
+                entity.CreatedBy = CurrentUser.ToString();
                 entity.CreatedOn = DateTime.Now;
-                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedBy = CurrentUser.ToString();
                 entity.LastModifiedOn = DateTime.Now;
 
                 CreateAuditLog(entity);
@@ -168,7 +407,7 @@ namespace TKProcessor.Services
             {
                 entity.Id = existing.Id;
                 entity.IsActive = true;
-                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedBy = CurrentUser.ToString();
                 entity.LastModifiedOn = DateTime.Now;
 
                 CreateAuditLog(entity, existing);
@@ -187,9 +426,9 @@ namespace TKProcessor.Services
             if (existing == default(T))
             {
                 entity.IsActive = true;
-                entity.CreatedBy = CurrentUser;
+                entity.CreatedBy = CurrentUser.ToString();
                 entity.CreatedOn = DateTime.Now;
-                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedBy = CurrentUser.ToString();
                 entity.LastModifiedOn = DateTime.Now;
 
                 CreateAuditLog(entity);
@@ -200,7 +439,7 @@ namespace TKProcessor.Services
             {
                 entity.Id = existing.Id;
                 entity.IsActive = true;
-                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedBy = CurrentUser.ToString();
                 entity.LastModifiedOn = DateTime.Now;
 
                 CreateAuditLog(entity, existing);
@@ -235,21 +474,31 @@ namespace TKProcessor.Services
 
         protected void CreateAuditLog(T newValue, T oldValue)
         {
-            foreach (var prop in typeof(T).GetProperties())
+            try
             {
-                var oldVal = oldValue == null ? null : prop.GetValue(oldValue)?.ToString();
-                var newVal = prop.GetValue(newValue)?.ToString();
+                var log = new AuditLog()
+                {
+                    Target = $"{typeof(T).Name}",
+                    Action = newValue == null ? "delete" : oldValue == null ? "Create" : "Update",
+                    OldValue = JsonConvert.SerializeObject(oldValue),
+                    NewValue = JsonConvert.SerializeObject(newValue),
+                    ModifiedBy = CurrentUser?.Name ?? "admin",
+                };
 
-                if (oldValue == null || oldVal != newVal)
+                if (AutoSaveChanges)
+                {
+                    Context.AuditLog.Add(log);
 
-                    logs.Add(new AuditLog()
-                    {
-                        Target = $"{typeof(T).Name}.{prop.Name}",
-                        Action = oldValue == null ? "Create" : "Update",
-                        OldValue = oldVal,
-                        NewValue = newVal,
-                        ModifiedBy = CurrentUser?.Name ?? "admin"
-                    });
+                    Context.SaveChanges();
+                }
+                else
+                {
+                    logs.Add(log);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 

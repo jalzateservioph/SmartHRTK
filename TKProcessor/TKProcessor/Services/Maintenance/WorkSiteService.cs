@@ -10,7 +10,7 @@ using TKProcessor.Models.TK;
 
 namespace TKProcessor.Services.Maintenance
 {
-    public class WorkSiteService : BasicTKService<WorkSite>
+    public class WorkSiteService : BasicTimekeepingService<WorkSite>
     {
         readonly TKContext context;
 
@@ -75,7 +75,7 @@ namespace TKProcessor.Services.Maintenance
             }
         }
 
-        public int Save(CancellationToken cancellationToken = default)
+        public int Save()
         {
             try
             {

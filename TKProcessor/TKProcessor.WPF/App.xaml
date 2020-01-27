@@ -16,6 +16,10 @@
             <converter:BooleanToYesNoConverter x:Key="BooleanToYesNoConverter"/>
             <converter:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
 
+            <converter:TimeDisplayConverter x:Key="TimeDisplayConverter"/>
+            <converter:DateTimeDisplayConverter x:Key="DateTimeDisplayConverter"/>
+            <converter:DateTimeDayDisplayConverter x:Key="DateTimeDayDisplayConverter"/>
+
             <ControlTemplate x:Key="TextBoxErrorTemplate">
                 <Border BorderBrush="Red" BorderThickness="2" Grid.Column="0">
                     <AdornedElementPlaceholder />

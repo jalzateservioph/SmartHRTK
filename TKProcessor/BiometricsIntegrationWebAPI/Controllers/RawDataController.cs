@@ -34,6 +34,7 @@ namespace BiometricsIntegrationWebAPI.Controllers
             {
                 return new BadRequestResult();
             }
+
             return new OkResult();
         }
 

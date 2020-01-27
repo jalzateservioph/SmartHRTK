@@ -41,7 +41,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding}" Padding="0,0,5,0"/>
+                                <Label Content="{Binding}" />
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -51,7 +51,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding Department}" Padding="0,0,5,0"/>
+                                <Label Content="{Binding Department}" />
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -61,7 +61,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding BiometricsId}" Padding="0,0,5,0"/>
+                                <Label Content="{Binding BiometricsId}" />
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -71,7 +71,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding JobGradeBand}" Padding="0,0,5,0"/>
+                                <Label Content="{Binding JobGradeBand}" />
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -81,16 +81,34 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick]=[Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding TerminationDate}" Padding="0,0,5,0"/>
+                                <Label Content="{Binding TerminationDate}" />
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <DataGridTemplateColumn Header="Last Modified On" SortMemberPath="LastModifiedOn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding LastModifiedOn, Converter={StaticResource DateTimeDisplayConverter}}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Last Modified By" SortMemberPath="LastModifiedBy">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding LastModifiedBy}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <!--<Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="Hidden"  Margin="0,0,0,0" Grid.RowSpan="2">-->
         <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2">
             <Border Width="500" Height="350" BorderBrush="#FF767676" BorderThickness="1" VerticalAlignment="Center">
 

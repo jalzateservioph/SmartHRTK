@@ -14,9 +14,9 @@ namespace TKProcessor.Models
 
     public interface IEntity : IModel
     {
-        User CreatedBy { get; set; }
+        string CreatedBy { get; set; }
         DateTime? CreatedOn { get; set; }
-        User LastModifiedBy { get; set; }
+        string LastModifiedBy { get; set; }
         DateTime? LastModifiedOn { get; set; }
         bool IsActive { get; set; }
     }
@@ -30,9 +30,9 @@ namespace TKProcessor.Models
         }
 
         public Guid Id { get; set; }
-        public User CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
-        public User LastModifiedBy { get; set; }
+        public string LastModifiedBy { get; set; }
         public DateTime? LastModifiedOn { get; set; }
         public bool IsActive { get; set; }
     }

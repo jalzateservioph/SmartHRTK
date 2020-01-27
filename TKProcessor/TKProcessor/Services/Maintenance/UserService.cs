@@ -38,9 +38,6 @@ namespace TKProcessor.Services.Maintenance
 
                 Context.User.Add(user);
 
-                user.CreatedBy = null;
-                user.LastModifiedBy = null;
-
                 Context.SaveChanges();
             }
             catch (Exception ex)

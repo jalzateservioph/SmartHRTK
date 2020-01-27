@@ -14,7 +14,7 @@ using TKProcessor.Models.TK;
 
 namespace TKProcessor.Services.Maintenance
 {
-    public class WorkScheduleService : TKService<WorkSchedule>, IExportTemplate
+    public class WorkScheduleService : TimekeepingService<WorkSchedule>, IExportTemplate
     {
         readonly List<List<string>> headerDef;
 
@@ -45,7 +45,7 @@ namespace TKProcessor.Services.Maintenance
             };
         }
 
-        public WorkScheduleService(Guid userId, TKContext context) : base(userId, context)
+        public WorkScheduleService(Guid userId, TKContext context) : base(context, userId)
         {
             headerDef = new List<List<string>>()
             {
@@ -72,48 +72,43 @@ namespace TKProcessor.Services.Maintenance
 
         public override void Save(WorkSchedule entity)
         {
-            var existing = Context.WorkSchedule.Find(entity.Id);
+            var existing = context.WorkSchedule.Find(entity.Id);
 
             if (existing == null)
             {
-                existing = Context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id &&
+                existing = context.WorkSchedule.FirstOrDefault(i => i.Employee.Id == entity.Employee.Id &&
                                                                     i.ScheduleDate == entity.ScheduleDate);
             }
-
-            CurrentUser = Context.User.First(i => i.Id == CurrentUser.Id);
 
             if (existing == null)
             {
                 entity.IsActive = true;
-                entity.CreatedBy = CurrentUser;
+                entity.CreatedBy = user;
                 entity.CreatedOn = DateTime.Now;
-                entity.LastModifiedBy = CurrentUser;
+                entity.LastModifiedBy = user;
                 entity.LastModifiedOn = DateTime.Now;
 
-                entity.Employee = Context.Employee.First(i => i.Id == entity.Employee.Id);
+                entity.Employee = context.Employee.First(i => i.Id == entity.Employee.Id);
 
-                entity.Shift = Context.Shift.First(i => i.Id == entity.Shift.Id);
+                entity.Shift = context.Shift.First(i => i.Id == entity.Shift.Id);
 
                 CreateAuditLog(entity);
 
-                Context.WorkSchedule.Add(entity);
+                context.WorkSchedule.Add(entity);
             }
             else
             {
-                existing.LastModifiedBy = CurrentUser;
+                existing.LastModifiedBy = user;
                 existing.LastModifiedOn = DateTime.Now;
 
-                existing.Employee = Context.Employee.First(i => i.Id == entity.Employee.Id);
+                existing.Employee = context.Employee.First(i => i.Id == entity.Employee.Id);
 
                 existing.ScheduleDate = entity.ScheduleDate;
 
-                existing.Shift = Context.Shift.First(i => i.Id == entity.Shift.Id);
+                existing.Shift = context.Shift.First(i => i.Id == entity.Shift.Id);
 
                 CreateAuditLog(entity, existing);
             }
-
-            if (AutoSaveChanges)
-                SaveChanges();
         }
 
         public void Import(string filename, Action<string> iterationCallback)
@@ -140,19 +135,18 @@ namespace TKProcessor.Services.Maintenance
             }
             catch (Exception ex)
             {
-                Context.ErrorLog.Add(new ErrorLog(nameof(WorkScheduleService.Import), ex));
-                Context.SaveChanges();
+                context.ErrorLog.Add(new ErrorLog(nameof(WorkScheduleService.Import), ex));
+                context.SaveChanges();
 
                 throw ex;
             }
         }
 
-        public override IEnumerable<WorkSchedule> List()
+        public override IQueryable<WorkSchedule> List()
         {
-            return Context.WorkSchedule
+            return context.WorkSchedule
                             .Include(entity => entity.Employee)
-                            .Include(entity => entity.Shift)
-                            .ToList();
+                            .Include(entity => entity.Shift);
         }
 
         private void ParsePlot(DataTable data)
@@ -172,7 +166,7 @@ namespace TKProcessor.Services.Maintenance
 
                         if (isFirstCol)
                         {
-                            currentEmp = Context.Employee.FirstOrDefault(i => i.EmployeeCode == value);
+                            currentEmp = context.Employee.FirstOrDefault(i => i.EmployeeCode == value);
 
                             if (currentEmp == default(Employee))
                                 break;
@@ -182,7 +176,7 @@ namespace TKProcessor.Services.Maintenance
                         else
                         {
                             var scheduleDate = DateTime.Parse(column.ColumnName);
-                            var shift = Context.Shift.FirstOrDefault(i => i.ShiftCode == value);
+                            var shift = context.Shift.FirstOrDefault(i => i.ShiftCode == value);
 
                             if (shift == default(Shift))
                             {
@@ -219,7 +213,7 @@ namespace TKProcessor.Services.Maintenance
             {
                 foreach (DataRow row in data.Rows)
                 {
-                    var currentEmp = Context.Employee.FirstOrDefault(i => i.EmployeeCode == row[headerDef[0][0]].ToString());
+                    var currentEmp = context.Employee.FirstOrDefault(i => i.EmployeeCode == row[headerDef[0][0]].ToString());
 
                     if (currentEmp == default(Employee))
                     {
@@ -230,7 +224,7 @@ namespace TKProcessor.Services.Maintenance
 
                     var scheduleDate = DateTime.Parse(row[headerDef[0][1]].ToString());
 
-                    var shift = Context.Shift.FirstOrDefault(i => i.ShiftCode == row[headerDef[0][2]].ToString());
+                    var shift = context.Shift.FirstOrDefault(i => i.ShiftCode == row[headerDef[0][2]].ToString());
 
                     if (shift == default(Shift))
                     {
@@ -266,7 +260,7 @@ namespace TKProcessor.Services.Maintenance
                 // import
                 foreach (DataRow row in data.Rows)
                 {
-                    var currentEmp = Context.Employee.FirstOrDefault(i => i.EmployeeCode == row["Employee Code"].ToString());
+                    var currentEmp = context.Employee.FirstOrDefault(i => i.EmployeeCode == row["Employee Code"].ToString());
 
                     if (currentEmp == default(Employee))
                     {
@@ -284,7 +278,7 @@ namespace TKProcessor.Services.Maintenance
 
                         index += index == 0 ? 9 : 2;
 
-                        var shift = Context.Shift.FirstOrDefault(i => i.ShiftCode == row[index].ToString());
+                        var shift = context.Shift.FirstOrDefault(i => i.ShiftCode == row[index].ToString());
 
                         if (shift == default(Shift))
                         {
@@ -383,6 +377,6 @@ namespace TKProcessor.Services.Maintenance
             //ExcelFileHander.Export(filename, headerDef[templateType]);
         }
 
-        public List<List<string>> HeaderDef => headerDef;
+        public List<List<string>> Columns => headerDef;
     }
 }

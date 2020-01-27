@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace TKProcessor.Common
@@ -35,6 +36,11 @@ namespace TKProcessor.Common
         public static bool In(this string target, params string[] collection)
         {
             return collection.Any(i => string.Compare(i, target, true) == 0);
+        }
+
+        public static bool InsensitiveContains(this string target, string toFind)
+        {
+            return (CultureInfo.CurrentCulture.CompareInfo.IndexOf(target, toFind, CompareOptions.IgnoreCase) >= 0);
         }
     }
 }

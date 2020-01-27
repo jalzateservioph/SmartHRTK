@@ -34,7 +34,7 @@
             <Button x:Name="Save" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Process" Content="Process" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="ConfirmExportToDP" Content="Export to Dynamic Pay" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
-            <!--<Button x:Name="ExportToExcel" Content="Export to Excel File" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>-->
+            <Button x:Name="DownloadData" Content="Download Data" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
         <Grid x:Name="gridFilters" Margin="0,5,0,0" Grid.Row="2" IsEnabled="{Binding IsEnabled}">
@@ -119,14 +119,12 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Shift.ShiftCode}" Header="Shift Code" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat={}{0:MMMM dd\, yyyy \- dddd}}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
-                <!--<DataGridTextColumn Binding="{Binding TimeIn}" Header="Time In" Width="auto" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding TimeOut}" Header="Time Out" Width="auto" IsReadOnly="True"/>-->
+                <DataGridTextColumn Binding="{Binding TransactionDate, Converter={StaticResource DateTimeDayDisplayConverter}}" Header="Transaction Date" Width="auto" IsReadOnly="True"/>
                 <DataGridTemplateColumn Header="Time In" Width="auto" IsReadOnly="True" SortMemberPath="TimeIn">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
-                                <TextBlock Text="{Binding TimeIn}"/>
+                                <TextBlock Text="{Binding TimeIn, Converter={StaticResource DateTimeDisplayConverter}}"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -135,13 +133,12 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action EditItem($dataContext)]">
-                                <TextBlock Text="{Binding TimeOut}"/>
+                                <TextBlock Text="{Binding TimeOut, Converter={StaticResource DateTimeDisplayConverter}}"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding WorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Actual Work Hours" Width="auto" IsReadOnly="True"/>
-                <!--<DataGridTextColumn Binding="{Binding RegularWorkHours, Converter={StaticResource DecimalToTimeConverter}}" Header="Regular Work Hours" Width="auto" IsReadOnly="False"/>-->
                 <DataGridTemplateColumn Header="Regular Work Hours" Width="auto" IsReadOnly="False" SortMemberPath="RegularWorkHours">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
@@ -917,7 +914,6 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Remarks}" Header="Remarks" Width="auto" IsReadOnly="True"/>
-                <!--<DataGridTextColumn Binding="{Binding LeaveType}" Header="Leave Type" Width="auto" IsReadOnly="True"/>-->
                 <DataGridTemplateColumn Header="Leave Type" Width="auto" IsReadOnly="False" SortMemberPath="LeaveType">
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
@@ -940,7 +936,7 @@
         </DataGrid>
 
         <Grid x:Name="EmployeeFilterSelector" Grid.Row="1" Grid.RowSpan="4" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsFilteringEmployees, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0"
-              IsEnabled="{Binding IsEnabled}">
+              IsEnabled="{Binding IsEnabled}" d:IsHidden="True">
             <Border BorderBrush="#FF767676" BorderThickness="1" Margin="100" Padding="0">
 
                 <Grid Background="White">

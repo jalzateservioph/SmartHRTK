@@ -182,7 +182,7 @@ namespace TKProcessor.Services
 
                         try
                         {
-                            iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
+                            //iterationCallback?.Invoke($"Processing {employee.EmployeeCode} - {employee.FullName} - {scheduleDate.ToLongDateString()}...");
 
                             empWorkSched = workschedules.FirstOrDefault(i => i.Employee.Id == employee.Id && i.ScheduleDate == scheduleDate);
 
@@ -196,13 +196,49 @@ namespace TKProcessor.Services
 
                             worksite = empWorkSched?.WorkSite;
 
-                            timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
-                                                                       (i.ScheduleDate.Date == scheduleDate.Date) &&
-                                                                       i.TransactionType == (int)TransactionType.TimeIn);
+                            DateTime? timeinMin = null;
+                            DateTime? timeinMax = null;
 
-                            timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                            if (rawdata.Count(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                      (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                      i.TransactionType == (int)TransactionType.TimeIn) > 0)
+                            {
+                                timeinMin = rawdata.Where(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                        (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                        i.TransactionType == (int)TransactionType.TimeIn).Min(i => i.TransactionDateTime);
+
+                                timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
                                                                        (i.ScheduleDate.Date == scheduleDate.Date) &&
-                                                                       i.TransactionType == (int)TransactionType.TimeOut);
+                                                                       i.TransactionType == (int)TransactionType.TimeIn &&
+                                                                       i.TransactionDateTime == timeinMin);
+                            }
+                            else
+                            {
+                                timein = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                         (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                         i.TransactionType == (int)TransactionType.TimeIn);
+                            }
+
+
+                            if (rawdata.Count(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                    (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                    i.TransactionType == (int)TransactionType.TimeOut) > 0)
+                            {
+                                timeinMax = rawdata.Where(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                          (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                          i.TransactionType == (int)TransactionType.TimeOut).Max(i => i.TransactionDateTime);
+
+                                timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                           (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                           i.TransactionType == (int)TransactionType.TimeOut &&
+                                                                           i.TransactionDateTime == timeinMax);
+                            }
+                            else
+                            {
+                                timeout = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
+                                                                           (i.ScheduleDate.Date == scheduleDate.Date) &&
+                                                                           i.TransactionType == (int)TransactionType.TimeOut);
+                            }
 
                             ambreakin = rawdata.FirstOrDefault(i => string.Compare(i.BiometricsId, employee.BiometricsId) == 0 &&
                                                                 (i.TransactionDateTime.Date == scheduleDate.Date) &&
@@ -302,7 +338,9 @@ namespace TKProcessor.Services
 
                             decimal requiredWorkHours = DTR.Shift.RequiredWorkHours ?? Convert.ToDecimal((DTR.Shift.ScheduleOut - DTR.Shift.ScheduleOut).Value.TotalMinutes / 60);
 
-                            if (timein == null && timeout == null && holidays != null && holidays.Count() > 0)
+                            bool noWork = ((timein == null && timeout == null) ||  ((timein != null && timein.TransactionDateTime == timein.TransactionDateTime.GetStartOfDay()) && (timeout != null && timeout.TransactionDateTime == timeout.TransactionDateTime.GetStartOfDay())));
+
+                            if (noWork && holidays != null && holidays.Count() > 0)
                             {
                                 if (holidays.Any(i => i.Type == (int)HolidayType.Legal))
                                 {
@@ -310,18 +348,18 @@ namespace TKProcessor.Services
                                     //DTR.RemapWorkHours(isLegalHoliday, isSpecialHoliday);
                                 }
                             }
-                            else if (timein == null && timeout == null && leaves != null && leaves.Count() > 0)
+                            else if (noWork && leaves != null && leaves.Count() > 0)
                             {
                                 if (leaves.First().LeaveHours == 1m)
                                     DTR.RegularWorkHours = requiredWorkHours;
                                 else
                                     DTR.RegularWorkHours = requiredWorkHours / 2;
                             }
-                            else if (timein == null && timeout == null && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
+                            else if (noWork && (shift.IsRestDay.HasValue && shift.IsRestDay.Value == true))
                             {
                                 DTR.AddRemarks("Rest Day");
                             }
-                            else if (timein == null && timeout == null)
+                            else if (noWork)
                             {
                                 DTR.AbsentHours = requiredWorkHours;
                             }
@@ -371,9 +409,12 @@ namespace TKProcessor.Services
                                         }
                                     }
 
-                                    foreach (SelectionSetting notAutoApprove in globalSettings.AutoApproveDTRFieldsList.Where(i => !i.IsSelected))
+                                    if (globalSettings != null)
                                     {
-                                        typeof(DailyTransactionRecord).GetProperty("Approved" + notAutoApprove.Name).SetValue(DTR, 0m);
+                                        foreach (SelectionSetting notAutoApprove in globalSettings.AutoApproveDTRFieldsList.Where(i => !i.IsSelected))
+                                        {
+                                            typeof(DailyTransactionRecord).GetProperty("Approved" + notAutoApprove.Name).SetValue(DTR, 0m);
+                                        }
                                     }
                                 }
                             }
@@ -385,15 +426,6 @@ namespace TKProcessor.Services
                         }
                         catch (Exception ex)
                         {
-                            using (TKContext ctx = new TKContext())
-                            {
-                                ctx.ErrorLog.Add(new ErrorLog(ex.InnerException == null ? ex : ex.InnerException));
-
-                                ctx.SaveChanges();
-
-                                WriteToConsole((ex.InnerException == null ? ex : ex.InnerException).Message);
-                            }
-
                             throw ex;
                         }
                     }
@@ -415,9 +447,7 @@ namespace TKProcessor.Services
             }
             catch (Exception ex)
             {
-                CreateErrorLog(ex.InnerException == null ? ex : ex.InnerException);
-
-                throw ex.InnerException == null ? ex : ex.InnerException;
+                throw ex;
             }
 
             sw.Stop();
@@ -768,7 +798,7 @@ namespace TKProcessor.Services
                     IsActive = ws.IsActive,
                     CreatedBy = ws.CreatedBy,
                     CreatedOn = ws.CreatedOn,
-                    LastModifiedBy = CurrentUser,
+                    LastModifiedBy = CurrentUser.ToString(),
                     LastModifiedOn = DateTime.Now
                 });
             }

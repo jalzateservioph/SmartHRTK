@@ -26,6 +26,7 @@ namespace TKProcessor.WPF.ViewModels
         readonly OpenFileDialog openFileDialog;
         readonly SaveFileDialog saveFileDialog;
         readonly RawDataService service;
+        readonly EmployeeService empservice;
 
         private string importFile;
         private string[] targetValues;
@@ -39,6 +40,7 @@ namespace TKProcessor.WPF.ViewModels
             PropertyChanged += RawDataViewModel_PropertyChanged;
 
             service = new RawDataService(Session.Default.CurrentUser.Id);
+            empservice = new EmployeeService(Session.Default.CurrentUser.Id);
 
             mapper = new MapperConfiguration(cfg =>
             {
@@ -151,9 +153,10 @@ namespace TKProcessor.WPF.ViewModels
 
                     if (result == true)
                     {
-                        service.Import(openFileDialog.FileName, data => {
+                        service.Import(openFileDialog.FileName, data =>
+                        {
                             RaiseMessage($"Import {data.BiometricsId} - {data.ScheduleDate.ToShortDateString()} - {data.TransactionDateTime.ToShortTimeString()}");
-                            Items.Add(mapper.Map<RawData>(data)); 
+                            Items.Add(mapper.Map<RawData>(data));
                         });
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Successfully imported {Path.GetFileName(openFileDialog.FileName)}", MessageType.Success));
@@ -337,7 +340,11 @@ namespace TKProcessor.WPF.ViewModels
 
                 try
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving mapped data...", MessageType.Information));
+
+                    if (OutputData == null || OutputData.Count == 0)
+                        throw new Exception("Please map data first.");
+
+                    RaiseMessage($"Saving mapped data...", MessageType.Information);
 
                     int total = outputData.Count;
 
@@ -347,15 +354,16 @@ namespace TKProcessor.WPF.ViewModels
 
                         try
                         {
-                            eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saving {rawData.BiometricsId} - " +
-                                                                                  $"{rawData.ScheduleDate.ToShortDateString()} ({i + 1}/{total})...", MessageType.Information));
-                            service.Save(mapper.Map<TK.RawData>(rawData));
+                            RaiseMessage($"Saving {rawData.BiometricsId} - {rawData.ScheduleDate.ToShortDateString()} ({i + 1}/{total})...", MessageType.Information);
+
+                            service.SaveNoAdjustment(mapper.Map<TK.RawData>(rawData));
                         }
-                        catch (Exception ex)
+                        catch (AppException ex)
                         {
-                            eventAggregator.PublishOnUIThread(new NewMessageEvent($"Error on saving {rawData.BiometricsId} - " +
-                                                                                  $"{rawData.ScheduleDate.ToShortDateString()}...", MessageType.Error));
-                        }
+                            ex.ErrorMessage = $"Error on saving {rawData.BiometricsId} - {rawData.ScheduleDate.ToShortDateString()}...";
+
+                            throw;
+                        };
                     }
 
                     Populate();
@@ -364,15 +372,26 @@ namespace TKProcessor.WPF.ViewModels
 
                     eventAggregator.PublishOnUIThread(new NewMessageEvent($"Mapped data has been saved", MessageType.Success));
                 }
+                catch (AppException ex)
+                {
+                    HandleError(ex, "RawDataViewModel");
+                }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, "RawDataViewModel");
                 }
 
                 EndProcessing();
-
-
             });
+        }
+
+        public override void EndEditing()
+        {
+            base.EndEditing();
+
+            InputData?.Clear();
+            OutputData?.Clear();
+            ImportCustomFile = "";
         }
 
         public void DownloadTemplate()
@@ -382,6 +401,66 @@ namespace TKProcessor.WPF.ViewModels
                 service.ExportTemplate(saveFileDialog.FileName);
 
                 eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saved file to {saveFileDialog.FileName}", MessageType.Success));
+            }
+        }
+
+        public void DownloadData()
+        {
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                List<TimesheetEntry> timesheetentries = new List<TimesheetEntry>();
+
+                TimesheetEntry entry = null;
+
+                foreach (var record in View.Cast<RawData>())
+                {
+                    var emp = empservice.List().FirstOrDefault(i => i.BiometricsId == record.BiometricsId)?.ToString();
+
+                    if (string.IsNullOrEmpty(emp))
+                    {
+                        entry = null;
+                        continue;
+                    }
+
+                    entry = timesheetentries.FirstOrDefault(i => i.BiometricsId == record.BiometricsId && i.ScheduleDate.Date == record.ScheduleDate.Date);
+
+                    if (entry == null)
+                    {
+                        entry = new TimesheetEntry
+                        {
+                            Employee = empservice.List().FirstOrDefault(i => i.BiometricsId == record.BiometricsId).ToString(),
+                            BiometricsId = record.BiometricsId,
+                            ScheduleDate = record.ScheduleDate
+                        };
+
+                        timesheetentries.Add(entry);
+                    }
+
+                    if (record.ScheduleDate.Date == entry.ScheduleDate.Date)
+                    {
+                        if (record.TransactionType == 1) // in 
+                        {
+                            if (entry.TimeIn == DateTime.MinValue || record.TransactionDateTime < entry.TimeIn)
+                                entry.TimeIn = record.TransactionDateTime;
+                        }
+                        if (record.TransactionType == 2) // out
+                        {
+                            if (entry.TimeOut == DateTime.MinValue || record.TransactionDateTime > entry.TimeOut)
+                                entry.TimeOut = record.TransactionDateTime;
+                        }
+                    }
+                }
+
+                var data = DataTableHelpers.ToStringDataTable(timesheetentries);
+
+
+                ExcelFileHandler.Export(saveFileDialog.FileName, data);
+
+                RaiseMessage($"Saved file to {saveFileDialog.FileName}", MessageType.Success);
+
+                EndProcessing();
             }
         }
 

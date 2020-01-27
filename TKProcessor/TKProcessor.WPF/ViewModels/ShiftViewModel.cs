@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TKProcessor.Common;
 using TKProcessor.Services;
 using TKProcessor.Services.Maintenance;
 using TKProcessor.WPF.Common;
@@ -26,21 +27,11 @@ namespace TKProcessor.WPF.ViewModels
         readonly ShiftService service;
         private Shift _currentItem;
 
-        public ShiftViewModel(IEventAggregator eventAggregator, IWindowManager windowManager) : base(eventAggregator, windowManager)
+        public ShiftViewModel(IEventAggregator eventAggregator, IWindowManager windowManager, IMapper mapper) : base(eventAggregator, windowManager)
         {
-            service = new ShiftService(Session.Default.CurrentUser?.Id ?? Guid.Empty) { AutoSaveChanges = true };
+            service = new ShiftService(Session.Default.CurrentUser?.Id ?? Guid.Empty);
 
-            mapper = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Shift, TKModels.Shift>();
-                cfg.CreateMap<TKModels.Shift, Shift>()
-                   .AfterMap((model, appmodel) => { appmodel.IsDirty = false; });
-
-                cfg.CreateMap<User, TKModels.User>();
-                cfg.CreateMap<TKModels.User, User>();
-
-                cfg.CreateMap<Shift, Shift>();
-            }).CreateMapper();
+            this.mapper = mapper;
 
             openFileDialog = new OpenFileDialog()
             {
@@ -100,7 +91,7 @@ namespace TKProcessor.WPF.ViewModels
 
                     Items.Clear();
 
-                    foreach (var item in service.List().Where(i => i.IsActive).Select(i => mapper.Map<Shift>(i)))
+                    foreach (var item in service.List().Select(i => mapper.Map<Shift>(i)))
                     {
                         Items.Add(item);
                     }
@@ -142,16 +133,18 @@ namespace TKProcessor.WPF.ViewModels
 
                 service.Save(mapper.Map<TKModels.Shift>(CurrentItem));
 
-                if (Items.Any(i => i.Id == CurrentItem.Id))
+                if (service.SaveChanges() > 0)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updated shift {CurrentItem.ShiftCode}", MessageType.Success));
+                    if (Items.Any(i => i.Id == CurrentItem.Id))
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Updated shift {CurrentItem.ShiftCode}", MessageType.Success));
+                    }
+                    else
+                    {
+                        ActivateItem(CurrentItem);
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Added new shift {CurrentItem.ShiftCode}", MessageType.Success));
+                    }
                 }
-                else
-                {
-                    ActivateItem(CurrentItem);
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Added new shift {CurrentItem.ShiftCode}", MessageType.Success));
-                }
-
             }
             catch (Exception ex)
             {
@@ -201,19 +194,25 @@ namespace TKProcessor.WPF.ViewModels
 
                     foreach (var item in Items.Where(i => i.IsSelected).ToList())
                     {
-                        service.Delete(mapper.Map<TKModels.Shift>(item));
+                        service.Delete(item.Id);
 
                         eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleting {item.ShiftCode}...", MessageType.Information));
-
-                        Items.Remove(item);
                     }
 
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleted selected shifts.", MessageType.Information));
+                    if (service.SaveChanges() > 0)
+                    {
+                        eventAggregator.PublishOnUIThread(new NewMessageEvent($"Deleted selected shifts.", MessageType.Information));
+
+                        foreach (var item in Items.Where(i => i.IsSelected).ToList())
+                        {
+                            Items.Remove(item);
+                        }
+                    }
 
                 }
                 catch (Exception ex)
                 {
-                    eventAggregator.PublishOnUIThread(new NewMessageEvent(ex.Message, MessageType.Error));
+                    HandleError(ex, GetType().Name);
                 }
                 EndProcessing();
             });
@@ -234,6 +233,8 @@ namespace TKProcessor.WPF.ViewModels
                     if (result == true)
                     {
                         service.Import(openFileDialog.FileName, null);
+
+                        service.SaveChanges();
 
                         Populate();
 
@@ -260,6 +261,24 @@ namespace TKProcessor.WPF.ViewModels
             }
         }
 
+        public void DownloadData()
+        {
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                StartProcessing();
+
+                var data = DataTableHelpers.ToStringDataTable(View.Cast<Shift>());
+
+                data.RetainColumns(service.Columns);
+
+                ExcelFileHandler.Export(saveFileDialog.FileName, data);
+
+                eventAggregator.PublishOnUIThread(new NewMessageEvent($"Saved file to {saveFileDialog.FileName}", MessageType.Success));
+
+                EndProcessing();
+            }
+        }
+
         public override bool Filter(object o)
         {
             if (string.IsNullOrEmpty(FilterString))
@@ -275,8 +294,8 @@ namespace TKProcessor.WPF.ViewModels
 
             string[] filterColumns = new string[]
             {
-                entity.ShiftCode.ToLower(),
-                entity.Description.ToLower(),
+                entity.ShiftCode?.ToLower(),
+                entity.Description?.ToLower(),
                 entity.ScheduleIn?.ToString("hh:mm"),
                 entity.IsLateIn == true ? "late" : "nolate",
                 entity.IsEarlyOut == true ? "early out" : "",
@@ -297,7 +316,7 @@ namespace TKProcessor.WPF.ViewModels
 
                 int counter = 0;
 
-                foreach (var col in filterColumns)
+                foreach (var col in filterColumns.Where(i=> i != null))
                 {
                     if (filters.Any(i => col.Contains(i.Trim().ToLower())))
                         counter++;

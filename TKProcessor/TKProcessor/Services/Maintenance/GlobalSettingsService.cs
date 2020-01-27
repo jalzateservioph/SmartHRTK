@@ -36,12 +36,16 @@ namespace TKProcessor.Services.Maintenance
                                                     .Include(i => i.PayPackageMappings)
                                                     .Include(i => i.AutoApproveDTRFieldsList).FirstOrDefault();
 
+                CreateAuditLog(entity, existing);
+
                 if (existing == default(GlobalSetting))
                 {
                     Context.GlobalSetting.Add(entity);
                 }
                 else
                 {
+
+
                     entity.Id = existing.Id;
 
                     // Update parent

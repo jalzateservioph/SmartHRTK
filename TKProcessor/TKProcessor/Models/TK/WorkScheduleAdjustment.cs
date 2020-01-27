@@ -9,9 +9,9 @@ namespace TKProcessor.Models.TK
     class WorkScheduleAdjustment : IEntity
     {
         public Guid Id { get; set; }
-        public User CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
-        public User LastModifiedBy { get; set; }
+        public string LastModifiedBy { get; set; }
         public DateTime? LastModifiedOn { get; set; }
         public bool IsActive { get; set; }
 

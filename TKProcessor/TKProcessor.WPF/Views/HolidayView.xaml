@@ -23,11 +23,12 @@
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,5,0,0">
             <Button x:Name="Populate" Content="Reload Records" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
-            <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="New" Content="New" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold" Visibility="Collapsed"/>
             <!--<Button x:Name="SaveRecords" Content="Save" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>-->
             <Button x:Name="Delete" Content="Delete" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="Import" Content="Import From Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
             <Button x:Name="DownloadTemplate" Content="Download Template" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
+            <Button x:Name="DownloadData" Content="Download Data" Padding="10,1" Margin="0,0,5,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF636363" FontWeight="Bold"/>
         </StackPanel>
 
         <Label Content="Search:" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
@@ -46,7 +47,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -55,7 +56,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding Name}"/>
+                                <Label Content="{Binding Name}"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -65,7 +66,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding Type, Converter={StaticResource HolidayTypeConverter}}"/>
+                                <Label Content="{Binding Type, Converter={StaticResource HolidayTypeConverter}}"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -75,12 +76,54 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ContentControl cal:Message.Attach="[Event PreviewMouseDoubleClick] = [Action OpenRecord($dataContext)]">
-                                <TextBlock Text="{Binding Date, StringFormat=d}"/>
+                                <Label Content="{Binding Date, StringFormat=d}"/>
                             </ContentControl>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Created On" SortMemberPath="CreatedOn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding CreatedOn, Converter={StaticResource DateTimeDisplayConverter}}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Created By" SortMemberPath="CreatedBy">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding CreatedBy}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Last Modified On" SortMemberPath="LastModifiedOn">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding LastModifiedOn, Converter={StaticResource DateTimeDisplayConverter}}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Last Modified By" SortMemberPath="LastModifiedBy">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl>
+                                <Label Content="{Binding LastModifiedBy}" Foreground="DarkSlateGray"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
             </DataGrid.Columns>
+
         </DataGrid>
 
         <Grid Grid.Row="1" Background="{DynamicResource OverlayBackground2}" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,0" Grid.RowSpan="2" d:IsHidden="True">

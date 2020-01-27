@@ -424,7 +424,7 @@ namespace TKProcessor.Services
                     approvedPreShiftOvertime = 0;
                 }
 
-                if (DTR.Shift.MaximumPreShiftOt.HasValue && DTR.Shift.MaximumPreShiftOt.Value < preShiftOvertime)
+                if (DTR.Shift.MaximumPreShiftOt.HasValue && (DTR.Shift.MaximumPreShiftOt.Value < preShiftOvertime || DTR.Shift.MaximumPreShiftOt == 0))
                 {
                     approvedPreShiftOvertime = DTR.Shift.MaximumPreShiftOt.Value;
                 }
@@ -492,6 +492,31 @@ namespace TKProcessor.Services
 
             totalOvertime += postShiftOvertime;
             #endregion
+        }
+
+        private decimal GetDuration(DateTime transactionDate, DateTime actualTimein, DateTime actualTimeout, DateTime start, DateTime end)
+        {
+            decimal duration = 0m;
+
+            if (((actualTimein <= start && actualTimein <= end) &&
+                 (actualTimeout >= start && actualTimeout >= end)) ||
+              actualTimein == start && actualTimeout == end)
+            {
+                duration += Convert.ToDecimal((end.RemoveSeconds().TimeOfDay - start.RemoveSeconds().TimeOfDay).TotalMinutes);
+            }
+            else
+            {
+                if( (actualTimein.TimeOfDay > start.TimeOfDay && actualTimein.TimeOfDay < end.TimeOfDay) || (actualTimein.TimeOfDay > start.TimeOfDay && actualTimein.TimeOfDay < end.TimeOfDay))
+                {
+                    duration += Convert.ToDecimal((end.RemoveSeconds().TimeOfDay - actualTimein.RemoveSeconds().TimeOfDay).TotalMinutes);
+                }
+                if (actualTimeout > start && actualTimein < end)
+                {
+                    duration += Convert.ToDecimal((actualTimeout.RemoveSeconds().TimeOfDay - start.RemoveSeconds().TimeOfDay).TotalMinutes);
+                }
+            }
+
+            return duration;
         }
 
         private void ComputeNightDifferential()

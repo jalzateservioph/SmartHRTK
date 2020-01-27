@@ -29,7 +29,7 @@ namespace TKProcessor.Services.Maintenance
         public void Sync(Action<TK.Leave> iterationCallback = null)
         {
             foreach (TK.Leave leave in Context.Leave.ToList())
-                Delete(leave);
+                DeleteHard(leave);
 
             List<SHR.Leave> SHRLeaves = sHRContext.Leave.Where(i => i.LeaveStatus.ToUpper() == "HR GRANTED").ToList();
 
